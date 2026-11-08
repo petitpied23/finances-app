@@ -1,0 +1,1684 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Mes Finances</title>
+<meta name="theme-color" content="#2346d8">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Finances">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Appli mobile à trois onglets (Budget / Investissements / Réglages), colonne centrée, barre d'onglets fixe en bas */
+:root {
+  --bg: #f3f5f7; --surface: #ffffff; --fg: #14202b; --muted: #5d6b78; --line: #dde3e9;
+  --accent: #2346d8; --accent-fg: #ffffff; --warn: #c97a0a;
+  --up: #138a5b; --down: #c4342d;
+  --boomdef: #138a5b; --boominf: #c97a0a; --recinf: #c4342d; --dep: #2b6cb0;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root {
+  --bg: #0e1419; --surface: #172029; --fg: #e6ecf1; --muted: #93a1ae; --line: #26323d;
+  --accent: #7d97ff; --accent-fg: #0e1419; --warn: #f0a63a;
+  --up: #3cc28b; --down: #f06a5f; color-scheme: dark;
+  --boomdef: #3cc28b; --boominf: #f0a63a; --recinf: #f06a5f; --dep: #6aa7ea } }
+
+* { box-sizing: border-box }
+[hidden] { display: none !important }
+html { -webkit-text-size-adjust: 100% }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.45;
+  padding-top: env(safe-area-inset-top, 0px); -webkit-tap-highlight-color: transparent }
+.wrap { max-width: 720px; margin: 0 auto; padding-top: 12px; padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 16px }
+h1, h2 { font-family: var(--display); margin: 0; text-wrap: balance }
+h1 { font-size: 1.9rem; font-weight: 800; letter-spacing: -.01em }
+h2 { font-size: 1.15rem; font-weight: 600 }
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap }
+.eyebrow { font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600 }
+.muted { color: var(--muted) }
+.small { font-size: .82rem }
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; min-width: 0 }
+.stack { display: flex; flex-direction: column; gap: 12px }
+button, select, input, textarea { font: inherit; color: inherit }
+input, select, textarea { font-size: 16px }
+button { cursor: pointer }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--line); background: var(--surface);
+  border-radius: 10px; padding: 9px 14px; font-weight: 600 }
+.btn.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent) }
+.btn.danger { color: var(--down); border-color: color-mix(in srgb, var(--down) 40%, var(--line)) }
+.btn:disabled { opacity: .55; cursor: default }
+.btn svg { width: 18px; height: 18px }
+.linkbtn { border: 0; background: none; color: var(--accent); font-weight: 600; padding: 4px 0 }
+.notice { font-size: .82rem; color: var(--muted) }
+.notice.err { color: var(--down) }
+.pill { font-size: .78rem; font-weight: 600; padding: 4px 10px; border-radius: 99px; background: var(--bg); color: var(--muted); white-space: nowrap; border: 0 }
+.pill.warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 15%, transparent) }
+.pill.good { color: var(--up); background: color-mix(in srgb, var(--up) 14%, transparent) }
+.pill.bad { color: var(--down); background: color-mix(in srgb, var(--down) 14%, transparent) }
+label.field { display: flex; flex-direction: column; gap: 6px; min-width: 0 }
+.input, .field input, .field select, .field textarea { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface) }
+.field textarea { font-family: var(--mono); font-size: 13px; min-height: 140px; resize: vertical }
+.n { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end }
+.switchrow { display: flex; align-items: center; justify-content: space-between; gap: 12px }
+.switch { position: relative; width: 52px; height: 30px; flex: none; border-radius: 99px; border: none; background: var(--line); padding: 0 }
+.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; transition: transform .15s; box-shadow: 0 1px 2px rgb(0 0 0 / .25) }
+.switch[aria-checked="true"] { background: var(--up) }
+.switch[aria-checked="true"]::after { transform: translateX(22px) }
+.del { border: 0; background: transparent; color: var(--muted); padding: 6px; border-radius: 6px; min-width: 32px }
+.del:hover { color: var(--down) }
+.bar { height: 8px; border-radius: 99px; background: var(--line); overflow: hidden }
+.bar i { display: block; height: 100%; background: var(--accent); border-radius: 99px }
+.bar i.over { background: var(--down) }
+
+/* Barre d'onglets */
+.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; display: grid; grid-template-columns: repeat(4, 1fr);
+  background: var(--surface); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom, 0px) }
+.tabs button { border: 0; background: transparent; padding: 8px 4px 10px; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: .72rem; font-weight: 600; color: var(--muted) }
+.tabs button svg { width: 24px; height: 24px }
+.tabs button[aria-current="page"] { color: var(--accent) }
+.fab { position: fixed; z-index: 5; width: 60px; height: 60px; border-radius: 50%; border: 0;
+  right: calc(18px + env(safe-area-inset-right, 0px)); bottom: calc(82px + env(safe-area-inset-bottom, 0px));
+  background: var(--accent); color: var(--accent-fg); display: grid; place-items: center; box-shadow: 0 6px 18px rgb(20 32 43 / .28) }
+.fab svg { width: 28px; height: 28px }
+
+/* Bandeau et notifications */
+.banner { position: sticky; top: 0; z-index: 7; max-width: 720px; margin: 0 auto; padding: 12px 16px; display: flex; flex-direction: column; gap: 10px;
+  background: color-mix(in srgb, var(--warn) 14%, var(--surface)); border-bottom: 1px solid var(--line); font-size: .88rem }
+.banner.err { background: color-mix(in srgb, var(--down) 12%, var(--surface)) }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(156px + env(safe-area-inset-bottom, 0px)); z-index: 30;
+  background: var(--fg); color: var(--bg); padding: 10px 14px; border-radius: 10px; font-size: .86rem; max-width: 90vw; box-shadow: 0 6px 18px rgb(0 0 0 / .2) }
+
+/* Budget */
+.cyclenav { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; gap: 8px; text-align: center; padding: 10px }
+.cyclenav button.arrow { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; height: 40px; font-size: 1.3rem; line-height: 1 }
+.big { font-family: var(--mono); font-size: 2rem; font-weight: 500; font-variant-numeric: tabular-nums }
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px }
+.stat { display: flex; flex-direction: column; gap: 2px; min-width: 0 }
+.stat .v { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 1.05rem; font-weight: 500 }
+.stat input { width: 100%; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); font-family: var(--mono); font-variant-numeric: tabular-nums }
+.env { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; padding: 10px 2px; border: 0; border-bottom: 1px solid var(--line); background: none; text-align: left; width: 100%; border-radius: 0 }
+.env:last-child { border-bottom: 0 }
+.env .bar { grid-column: 1 / -1 }
+.env.on { background: color-mix(in srgb, var(--accent) 8%, transparent) }
+.env .tag { font-size: .7rem; font-weight: 600; color: var(--up); margin-left: 6px }
+.exp { display: grid; grid-template-columns: 3.4em minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px 2px; border: 0; border-bottom: 1px solid var(--line); background: none; text-align: left; width: 100%; border-radius: 0 }
+.exp:last-child { border-bottom: 0 }
+.exp .d { font-family: var(--mono); font-size: .75rem; color: var(--muted) }
+.exp .l { min-width: 0 }
+.exp .l b { display: block; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.exp .l small { display: block; color: var(--muted); font-size: .75rem }
+.sav { display: flex; flex-direction: column; gap: 6px; padding: 10px 0; border-bottom: 1px solid var(--line) }
+.sav:last-child { border-bottom: 0 }
+.savtop { display: grid; grid-template-columns: minmax(0, 1fr) 9em; gap: 12px; align-items: center }
+.savtop input { width: 100%; padding: 7px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg) }
+.totrow { display: flex; justify-content: space-between; gap: 12px; font-weight: 600; padding-top: 6px }
+.clshead { display: flex; align-items: center; justify-content: space-between; gap: 10px }
+.clshead h2 { display: flex; align-items: center; gap: 8px }
+.clshead .dot { width: 12px; height: 12px; border-radius: 4px }
+
+/* Feuille de saisie */
+.sheet { position: fixed; inset: 0; z-index: 20; display: flex; align-items: flex-end; justify-content: center }
+.sheetbg { position: absolute; inset: 0; background: rgb(10 16 22 / .45) }
+.sheetcard { position: relative; width: 100%; max-width: 560px; background: var(--surface); border-radius: 18px 18px 0 0;
+  padding: 18px 16px calc(18px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 12px; max-height: 92vh; overflow: auto }
+@media (min-width: 600px) { .sheet { align-items: center } .sheetcard { border-radius: 18px } }
+
+/* Réglages */
+.erow { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 36px; gap: 6px 8px; padding: 10px 0; border-bottom: 1px solid var(--line) }
+.erow:last-of-type { border-bottom: 0 }
+.erow .full { grid-column: 1 / -1 }
+.erow input, .erow select { width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface) }
+.hint { padding: 10px 12px; border-radius: 10px; background: var(--bg); line-height: 1.5 }
+.kv { display: flex; justify-content: space-between; gap: 12px; align-items: center; font-size: .88rem }
+.kv code { font-family: var(--mono); font-size: .78rem; overflow-wrap: anywhere }
+
+/* Investissements */
+.total { display: flex; flex-direction: column; gap: 10px }
+.alloc { display: flex; height: 10px; border-radius: 99px; overflow: hidden; background: var(--line) }
+.alloc i { display: block; height: 100% }
+.legend { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 14px; font-size: .84rem }
+.legend div { display: flex; align-items: center; gap: 8px; min-width: 0 }
+.legend .dot { width: 10px; height: 10px; border-radius: 3px; flex: none }
+.legend .pct { margin-left: auto }
+.perf { display: flex; flex-direction: column; gap: 6px; padding-bottom: 4px }
+.prow { display: flex; justify-content: space-between; align-items: baseline; gap: 4px 12px; flex-wrap: wrap; font-weight: 600 }
+.prow .num { font-size: 1.05rem }
+.cls { display: flex; flex-direction: column; gap: 10px }
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; -webkit-overflow-scrolling: touch; background: var(--surface) }
+table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: .88rem }
+th { text-align: left; font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; padding: 8px; background: var(--bg); border-bottom: 1px solid var(--line); white-space: nowrap }
+th.r { text-align: right }
+td { padding: 2px 4px; border-bottom: 1px solid var(--line); white-space: nowrap }
+tr:last-child td { border-bottom: 0 }
+td input { width: 100%; border: 1px solid transparent; background: transparent; padding: 7px 6px; border-radius: 6px }
+td input:hover { border-color: var(--line) }
+td input:focus { border-color: var(--accent); background: var(--bg); outline: none }
+td input.isin { font-family: var(--mono); width: 9.5em; text-transform: uppercase; font-size: 14px }
+td input.bad { border-color: var(--down) }
+td.calc { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; padding: 0 8px }
+td.acts { text-align: right }
+.mv { width: 34px; padding: 6px 2px; border: 1px solid transparent; background: transparent; color: var(--muted); border-radius: 6px; appearance: none; -webkit-appearance: none; text-align: center; cursor: pointer }
+.clsfoot { display: flex; justify-content: space-between; font-weight: 600; font-size: .9rem }
+.rb { display: flex; flex-direction: column; gap: 14px }
+.rbrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; align-items: center }
+.rbrow b { font-weight: 600 }
+.rbbar { grid-column: 1 / -1; position: relative; height: 12px; border-radius: 99px; background: var(--line) }
+.rbbar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 99px }
+.rbbar .band { position: absolute; top: -3px; bottom: -3px; border-left: 1.5px dashed var(--muted); border-right: 1.5px dashed var(--muted); pointer-events: none }
+.rbbar .target { position: absolute; top: -5px; bottom: -5px; left: calc(50% - 1px); width: 2px; background: var(--fg); border-radius: 2px }
+.act { font-weight: 600; font-size: .84rem; padding: 3px 10px; border-radius: 99px; white-space: nowrap }
+.act.buy { color: var(--up); background: color-mix(in srgb, var(--up) 14%, transparent) }
+.act.sell { color: var(--down); background: color-mix(in srgb, var(--down) 14%, transparent) }
+.act.ok { color: var(--muted); background: var(--bg) }
+.scale { display: flex; justify-content: space-between; font-size: .7rem; color: var(--muted); font-family: var(--mono) }
+input[type=range] { width: 100%; accent-color: var(--accent) }
+.apport { display: flex; flex-direction: column; gap: 10px; border-top: 1px solid var(--line); padding-top: 14px }
+.aprow { display: flex; justify-content: space-between; align-items: center; gap: 10px }
+.aprow .dot { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 8px }
+.chart { position: relative; min-width: 0 }
+.chart svg { display: block; max-width: 100%; touch-action: pan-y }
+.chart .grid { stroke: var(--line); stroke-width: 1 }
+.chart .ax { fill: var(--muted); font: 11px var(--mono) }
+.chart .area { fill: var(--accent); opacity: .12 }
+.chart .ln { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round }
+.chart .end { fill: var(--accent); stroke: var(--surface); stroke-width: 2 }
+.chart .xh { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 3 }
+.tip { position: absolute; width: 124px; padding: 6px 8px; border-radius: 8px; background: var(--fg); color: var(--bg); font-size: .78rem; pointer-events: none; display: flex; flex-direction: column }
+.tip b { font-family: var(--mono); font-weight: 500 }
+.vh { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; pointer-events: none }
+label.btn { cursor: pointer }
+label.btn:focus-within { outline: 2px solid var(--accent); outline-offset: 2px }
+.xprev { display: flex; flex-direction: column; gap: 12px; border-top: 1px solid var(--line); padding-top: 12px }
+.xrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; align-items: center }
+.xrow select { grid-column: 1 / -1; width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface) }
+.tk { font-family: var(--mono); font-size: .75rem; color: var(--muted) }
+td small.tk { display: block; padding: 0 6px 4px; font-size: .68rem }
+td.quote small { display: block; font-size: .68rem; color: var(--muted); font-family: var(--body) }
+td.quote small.stale { color: var(--warn); font-weight: 600 }
+td.live { color: var(--fg) }
+.fav { font-size: .7rem; font-weight: 600; color: var(--up); margin-left: 6px; white-space: nowrap }
+.spin svg { animation: spin 1s linear infinite }
+@keyframes spin { to { transform: rotate(360deg) } }
+@media (prefers-reduced-motion: reduce) { .spin svg { animation: none } }
+.steps { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 4px }
+.steps code, .notice code { font-family: var(--mono); font-size: .9em; background: var(--bg); padding: 1px 4px; border-radius: 4px }
+
+/* Conjoncture */
+.seg { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--line); border-radius: 10px; overflow: hidden }
+.seg button { border: 0; background: transparent; padding: 8px; font-weight: 600; color: var(--muted) }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg) }
+.regime { border-radius: 16px; padding: 20px; color: #fff; display: flex; flex-direction: column; gap: 6px; background: var(--rc) }
+.regime .name { font-family: var(--display); font-weight: 800; font-size: 1.8rem; line-height: 1.1 }
+.regime .sub { opacity: .92; font-weight: 500 }
+.regime .meta { opacity: .85; font-size: .8rem; margin-top: 6px }
+.regime.empty { background: var(--surface); color: var(--fg); border: 1px dashed var(--line) }
+.quad { display: grid; grid-template-columns: 22px 1fr 1fr; gap: 8px; align-items: stretch }
+.quad .axis { font-size: .7rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; font-weight: 600 }
+.quad .ylab { writing-mode: vertical-rl; transform: rotate(180deg); text-align: center; align-self: center }
+.quad .xlab { text-align: center }
+.cell { border-radius: 12px; padding: 12px; min-height: 76px; border: 1.5px solid var(--c); color: var(--c); display: flex; flex-direction: column; justify-content: space-between; gap: 4px }
+.cell b { font-family: var(--display); font-weight: 600; font-size: .98rem; line-height: 1.15 }
+.cell span { font-size: .72rem; opacity: .85 }
+.cell.on { background: var(--c); color: #fff }
+.ind { display: grid; grid-template-columns: 1fr 1fr; gap: 12px }
+.ind .v { font-family: var(--mono); font-size: 1.7rem; font-weight: 500; font-variant-numeric: tabular-nums }
+.trend { font-size: .8rem; font-weight: 600 }
+.trend.up { color: var(--up) } .trend.down { color: var(--down) }
+.sources a { color: var(--accent) }
+</style>
+</head>
+<body>
+
+<div id="banner" class="banner" hidden></div>
+
+<!-- ============ BUDGET ============ -->
+<section id="v-budget" class="wrap" hidden>
+  <div class="top">
+    <div><div class="eyebrow">Budget</div><h1>Cycle de paie</h1></div>
+    <button class="pill" type="button" data-syncpill data-goto="reglages">Local</button>
+  </div>
+  <div class="panel cyclenav">
+    <button class="arrow" type="button" id="cprev" aria-label="Cycle précédent">‹</button>
+    <div><b id="clabel"></b><div class="small muted"><span id="csub"></span> <button class="linkbtn small" type="button" id="cnow" hidden>Revenir au cycle en cours</button></div></div>
+    <button class="arrow" type="button" id="cnext" aria-label="Cycle suivant">›</button>
+  </div>
+
+  <div class="panel total">
+    <div class="eyebrow">Reste sur le cycle</div>
+    <div class="big" id="b-left">0,00 €</div>
+    <div class="bar" aria-hidden="true"><i id="b-bar" style="width:0"></i></div>
+    <div class="stats">
+      <label class="stat"><span class="eyebrow">Revenu du cycle</span><input id="b-income" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><span class="small muted" id="b-incnote"></span></label>
+      <div class="stat"><span class="eyebrow">Sorties</span><span class="v" id="b-out">0,00 €</span><span class="small muted" id="b-saved"></span></div>
+      <div class="stat"><span class="eyebrow">Prévu</span><span class="v" id="b-planned">0,00 €</span></div>
+      <div class="stat"><span class="eyebrow">Non affecté</span><span class="v" id="b-free">0,00 €</span></div>
+    </div>
+    <div class="notice" id="b-pace"></div>
+  </div>
+
+  <div class="panel">
+    <div class="clshead"><h2>Enveloppes</h2><button class="linkbtn" type="button" data-goto="reglages" data-anchor="set-env">Modifier</button></div>
+    <div id="envlist"></div>
+  </div>
+
+  <div class="panel">
+    <div class="clshead"><h2>Dépenses <span class="small muted" id="expcount"></span></h2><button class="linkbtn" type="button" id="expclear" hidden>Tout afficher</button></div>
+    <div id="explist"></div>
+  </div>
+
+  <div class="panel">
+    <div class="clshead"><h2>Épargne & patrimoine</h2><button class="linkbtn" type="button" data-goto="reglages" data-anchor="set-sav">Comptes</button></div>
+    <div id="savlist"></div>
+    <div class="totrow"><span>Total épargne</span><span class="num" id="sav-total">0,00 €</span></div>
+    <div class="totrow muted" style="font-weight:500"><span>Investissements</span><span class="num" id="sav-inv">0,00 €</span></div>
+    <div class="totrow"><span>Patrimoine suivi</span><span class="num" id="sav-all">0,00 €</span></div>
+  </div>
+</section>
+
+<!-- ============ INVESTISSEMENTS ============ -->
+<section id="v-invest" class="wrap" hidden>
+  <div class="top">
+    <div><div class="eyebrow">Investissements</div><h1>Portefeuille</h1></div>
+    <button class="pill" type="button" data-syncpill data-goto="reglages">Local</button>
+  </div>
+  <div class="panel total">
+    <div class="eyebrow">Valeur totale</div>
+    <div class="big" id="grand">0,00 €</div>
+    <div class="perf" id="perf"></div>
+    <div class="alloc" id="alloc"></div>
+    <div class="legend" id="legend"></div>
+  </div>
+  <div class="panel total">
+    <div class="clshead">
+      <div><div class="eyebrow">Historique</div><h2>Valeur totale</h2></div>
+      <span class="small muted num" id="histdelta"></span>
+    </div>
+    <div class="chart" id="chart" hidden></div>
+    <div class="notice" id="histnote"></div>
+  </div>
+  <div class="panel rb">
+    <div class="clshead">
+      <div><div class="eyebrow">Rééquilibrage</div><h2>Cible 25 % par classe</h2></div>
+      <span class="pill" id="rbstatus">—</span>
+    </div>
+    <div id="rbrows" class="rb"></div>
+    <div class="scale" aria-hidden="true"><span>0 %</span><span>25 %</span><span>50 %</span></div>
+    <label class="field" for="band">
+      <span class="small muted">Rééquilibrer quand une classe s'écarte de plus de <b id="bandv">5</b> points de 25 %</span>
+      <input type="range" id="band" min="1" max="15" step="1" value="5">
+    </label>
+    <div class="notice" id="rbnote"></div>
+    <div class="hint small" id="rbregime"></div>
+    <div class="apport">
+      <label class="field" for="apport">
+        <span style="font-weight:600">Rééquilibrer avec un nouvel apport</span>
+        <span class="small muted">Montant que vous allez investir : il est réparti pour vous rapprocher des 25 %, sans rien vendre.</span>
+        <input id="apport" class="n" type="text" inputmode="decimal" placeholder="Ex. 500" autocomplete="off" style="text-align:left">
+      </label>
+      <div id="aprows" class="stack" style="gap:8px"></div>
+    </div>
+  </div>
+  <div class="panel switchrow" style="flex-wrap:wrap">
+    <div style="min-width:0;flex:1"><div style="font-weight:600">Cours en direct</div><div class="notice" id="qnote"></div></div>
+    <button class="btn" id="qrefresh" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>
+      <span>Actualiser</span>
+    </button>
+  </div>
+  <div class="panel stack">
+    <div class="switchrow" style="flex-wrap:wrap">
+      <div style="min-width:0;flex:1">
+        <div style="font-weight:600">Importer depuis DEGIRO</div>
+        <div class="notice" id="impnote">Sur le site DEGIRO : Portefeuille › Exporter › CSV. Pour le montant investi et les plus-values, ajoutez l'export Transactions (CSV) sur une période qui part de l'ouverture du compte. Choisissez les deux fichiers ensemble ou l'un après l'autre : ils sont lus sur votre appareil.</div>
+      </div>
+      <label class="btn" for="impfile">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"/><path d="m7 9 5-5 5 5"/><path d="M5 15v3.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V15"/></svg>
+        <span>Choisir les fichiers</span>
+        <input type="file" id="impfile" class="vh" accept=".csv,.xls,.xlsx,text/csv" multiple>
+      </label>
+    </div>
+    <div class="xprev" id="impprev" hidden></div>
+  </div>
+  <div id="classes" class="stack" style="gap:22px"></div>
+</section>
+
+<!-- ============ CONJONCTURE ============ -->
+<section id="v-conj" class="wrap" hidden>
+  <div class="top">
+    <div><div class="eyebrow">Situation économique</div><h1>Conjoncture</h1></div>
+    <button id="mrefresh" class="btn primary" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>
+      <span>Actualiser</span>
+    </button>
+  </div>
+  <div class="panel">
+    <label class="field" for="country"><span class="eyebrow">Pays</span><select id="country"></select></label>
+  </div>
+  <div id="regime" class="regime empty"><div class="name">Chargement…</div><div class="sub">Lecture des derniers chiffres publiés.</div></div>
+  <div class="panel"><div class="quad" id="quad"></div></div>
+  <div class="ind" id="ind"></div>
+  <div class="panel stack">
+    <div>
+      <div class="eyebrow" style="margin-bottom:6px">Méthode</div>
+      <div class="seg" id="method">
+        <button type="button" data-m="trend" aria-pressed="true">Tendance</button>
+        <button type="button" data-m="absolute" aria-pressed="false">Absolu</button>
+      </div>
+      <div class="notice" id="methodNote" style="margin-top:6px"></div>
+    </div>
+    <div class="notice" id="mstatus" aria-live="polite"></div>
+  </div>
+  <div class="notice sources" id="msources"></div>
+</section>
+
+<!-- ============ RÉGLAGES ============ -->
+<section id="v-reglages" class="wrap" hidden>
+  <div class="top">
+    <div><div class="eyebrow">Mes Finances</div><h1>Réglages</h1></div>
+    <button class="pill" type="button" data-syncpill>Local</button>
+  </div>
+
+  <div class="panel stack" id="set-sync">
+    <div class="clshead"><h2>Synchronisation</h2></div>
+    <div id="syncbox" class="stack"></div>
+    <div class="notice" id="syncmsg" aria-live="polite"></div>
+  </div>
+
+  <div class="panel stack">
+    <h2>Cycle de paie</h2>
+    <div class="row2">
+      <label class="field"><span class="small muted">Jour de paie</span><input id="s-payday" class="n" type="number" min="1" max="31" inputmode="numeric" style="text-align:left"></label>
+      <label class="field"><span class="small muted">Revenu habituel (€)</span><input id="s-income" class="n" type="text" inputmode="decimal" placeholder="0" style="text-align:left"></label>
+    </div>
+    <div class="switchrow">
+      <div><div style="font-weight:600">Paie avancée si week-end</div><div class="notice">Si le jour de paie tombe un samedi ou un dimanche, le cycle commence le vendredi d'avant.</div></div>
+      <button id="s-shift" class="switch" role="switch" aria-checked="true" aria-label="Paie avancée si week-end" type="button"></button>
+    </div>
+  </div>
+
+  <div class="panel stack" id="set-env">
+    <div class="clshead"><h2>Enveloppes</h2><span class="small muted num" id="s-envtotal"></span></div>
+    <div class="notice">Montant prévu par cycle. Le type « Épargne » sert aux virements vers l'épargne ou les placements : ils comptent dans les sorties, mais pas dans le reste à dépenser par jour.</div>
+    <div id="s-envs"></div>
+    <div><button class="btn" type="button" id="s-envadd">+ Ajouter une enveloppe</button></div>
+  </div>
+
+  <div class="panel stack" id="set-sav">
+    <h2>Comptes d'épargne</h2>
+    <div class="notice">Nom et objectif (facultatif). Le solde se met à jour dans l'onglet Budget.</div>
+    <div id="s-savs"></div>
+    <div><button class="btn" type="button" id="s-savadd">+ Ajouter un compte</button></div>
+  </div>
+
+  <div class="panel stack" id="set-quotes">
+    <h2>Cours en direct</h2>
+    <div class="notice">Les cours viennent d'un Google Sheets à vous (fonction GOOGLEFINANCE : toutes les places, différé d'environ 20 minutes), puis sont convertis en euros au taux du jour de la BCE.</div>
+    <ol class="steps notice">
+      <li>Dans l'onglet Portefeuille, indiquez la <b>quantité</b> et le <b>symbole</b> de chaque ligne (ex. <code>NASDAQ:AAPL</code>, <code>EPA:MC</code>, <code>WSE:PKO</code> — le symbole s'affiche sur google.com/finance).</li>
+      <li>Touchez « Copier les lignes », ouvrez un nouveau Google Sheets (<code>sheets.new</code>), cliquez sur la case A1 et collez.</li>
+      <li>Dans Google Sheets : Fichier › Partager › Publier sur le Web › choisissez la feuille et le format CSV › Publier. Copiez le lien et collez-le ci-dessous.</li>
+    </ol>
+    <div class="actions" style="justify-content:flex-start"><button class="btn" type="button" id="q-copy">Copier les lignes pour Google Sheets</button></div>
+    <label class="field" id="q-tsvbox" hidden><span class="small muted">Si la copie automatique ne marche pas, sélectionnez ce texte et copiez-le :</span><textarea id="q-tsv" readonly spellcheck="false"></textarea></label>
+    <label class="field"><span class="small muted">Lien du tableau publié (CSV)</span><input id="q-url" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://docs.google.com/spreadsheets/d/e/…/pub?output=csv"></label>
+    <div class="notice" id="q-msg" aria-live="polite"></div>
+    <div class="notice">Nouvelle ligne plus tard : ajoutez son symbole, puis recopiez les lignes et recollez-les en A1 du même tableau (le lien publié ne change pas).</div>
+  </div>
+
+  <div class="panel stack">
+    <h2>Investissements</h2>
+    <div class="notice">Nom des quatre classes du rééquilibrage.</div>
+    <div class="row2" id="s-classes"></div>
+  </div>
+
+  <div class="panel stack">
+    <h2>Sauvegarde</h2>
+    <div class="notice">Exportez régulièrement une copie de vos données (fichier .json), surtout sans synchronisation.</div>
+    <div class="actions" style="justify-content:flex-start">
+      <button class="btn" type="button" id="bk-export">Exporter</button>
+      <label class="btn" for="bk-file">Importer<input type="file" id="bk-file" class="vh" accept=".json,application/json"></label>
+      <button class="btn danger" type="button" id="bk-reset">Tout effacer</button>
+    </div>
+    <div id="bk-confirm" class="stack" hidden></div>
+    <div class="notice" id="bk-msg" aria-live="polite"></div>
+  </div>
+
+  <div class="panel stack">
+    <div class="kv"><span>Version de l'appli</span><code id="appver"></code></div>
+    <div><button class="btn" type="button" id="reload">Recharger l'appli</button></div>
+  </div>
+</section>
+
+<button class="fab" id="fab" type="button" aria-label="Ajouter une dépense" hidden>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+</button>
+
+<nav class="tabs" aria-label="Navigation">
+  <button type="button" data-tab="budget"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H18v3"/><rect x="3.5" y="8" width="17" height="11.5" rx="2.5"/><path d="M15.5 13.75h2.5"/></svg>Budget</button>
+  <button type="button" data-tab="invest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><path d="m5 15 4.5-5 3.5 3 6-7"/><path d="M15 6h4v4"/></svg>Portefeuille</button>
+  <button type="button" data-tab="conj"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5c2.3 2.4 3.5 5.2 3.5 8.5s-1.2 6.1-3.5 8.5c-2.3-2.4-3.5-5.2-3.5-8.5s1.2-6.1 3.5-8.5z"/></svg>Conjoncture</button>
+  <button type="button" data-tab="reglages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Réglages</button>
+</nav>
+
+<!-- Feuille d'ajout / modification d'une dépense -->
+<div id="sheet" class="sheet" hidden>
+  <div class="sheetbg" data-close></div>
+  <form class="sheetcard" id="expform" novalidate>
+    <h2 id="sheettitle">Nouvelle dépense</h2>
+    <label class="field"><span class="small muted">Montant (€) — négatif pour un remboursement</span><input id="f-amount" class="n" type="text" inputmode="decimal" autocomplete="off" placeholder="0,00" style="text-align:left;font-size:1.4rem"></label>
+    <label class="field"><span class="small muted">Enveloppe</span><select id="f-env"></select></label>
+    <label class="field"><span class="small muted">Libellé (facultatif)</span><input id="f-label" type="text" autocomplete="off" placeholder="Ex. Courses Saran"></label>
+    <label class="field"><span class="small muted">Date</span><input id="f-date" type="date"></label>
+    <div class="notice err" id="f-err"></div>
+    <div class="actions">
+      <button type="button" class="btn danger" id="f-del" hidden>Supprimer</button>
+      <button type="button" class="btn" data-close>Annuler</button>
+      <button type="submit" class="btn primary">Enregistrer</button>
+    </div>
+  </form>
+</div>
+
+<div id="toast" class="toast" role="status" hidden></div>
+
+<script>
+"use strict";
+const APP_VERSION = "1.1.0";
+const FB_VERSION = "10.12.2"; // SDK Firebase chargé depuis gstatic uniquement si la synchronisation est configurée
+const LS = { state: "fin.state", fb: "fin.firebase", dev: "fin.device", link: "fin.linked" };
+const CLASSES = [{ id: "stocks", c: "#2346d8" }, { id: "bonds", c: "#7a4fd0" }, { id: "gold", c: "#c99a0a" }, { id: "cash", c: "#138a5b" }];
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const ls = {
+  get(k) { try { return localStorage.getItem(k) } catch { return null } },
+  set(k, v) { try { localStorage.setItem(k, v); return true } catch { return false } },
+  del(k) { try { localStorage.removeItem(k) } catch {} }
+};
+const rid = () => Math.random().toString(36).slice(2, 10);
+const DEVICE = ls.get(LS.dev) || (() => { const d = rid() + rid(); ls.set(LS.dev, d); return d })();
+const fmtEUR = v => (isFinite(v) ? v : 0).toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
+const fmtPct = v => (v >= 0 ? "+" : "") + v.toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + " %";
+const round2 = v => Math.round(v * 100) / 100;
+const fmtIn = v => (isFinite(+v) && +v !== 0) ? String(round2(+v)).replace(".", ",") : "";
+const pad = n => String(n).padStart(2, "0");
+const ymd = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const parseYmd = s => { const [y, m, d] = String(s).split("-").map(Number); return new Date(y, m - 1, d) };
+const todayKey = () => ymd(new Date());
+const fmtDay = d => d.toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
+
+// Nombre au format français (1 234,56), anglais (1,234.56) ou précédé d'une devise (USD 822,00).
+function toNum(v) {
+  if (typeof v === "number") return v;
+  let s = String(v ?? "").replace(/[\s  ]/g, "");
+  if (!s || /^[A-Z]{2}[A-Z0-9]{9}\d$/.test(s)) return NaN;
+  s = s.replace(/^[A-Za-z€$£]+|[A-Za-z€$£]+$/g, "");
+  if (!/^[+-]?[\d.,]*\d[\d.,]*$/.test(s)) return NaN;
+  const c = s.lastIndexOf(","), d = s.lastIndexOf(".");
+  if (c > -1 && d > -1) s = c > d ? s.replace(/\./g, "").replace(",", ".") : s.replace(/,/g, "");
+  else if (c > -1) s = s.split(",").length > 2 ? s.replace(/,/g, "") : s.replace(",", ".");
+  else if (d > -1 && s.split(".").length > 2) s = s.replace(/\./g, "");
+  const n = parseFloat(s); return isFinite(n) ? n : NaN;
+}
+const parseNum = v => { const n = toNum(v); return isFinite(n) ? n : 0 };
+
+let toastTimer = null;
+function toast(msg) { const t = $("toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true }, 2600) }
+
+/* ---------- Données ---------- */
+function defaultState() {
+  const env = (id, name, kind = "spend") => ({ id, name, planned: 0, kind });
+  return {
+    v: 1, updatedAt: 0,
+    budget: {
+      payday: 25, shiftWeekend: true, income: 0,
+      envelopes: [env("courses", "Courses"), env("restos", "Restaurants"), env("carburant", "Carburant"), env("loisirs", "Loisirs"),
+        env("sante", "Santé"), env("voiture", "Voiture"), env("abos", "Abonnements"), env("imprevus", "Imprévus"),
+        env("epargne", "Épargne", "save"), env("invest", "Investissements", "save")],
+      cycles: {},      // "AAAA-MM" -> { income } quand le revenu du cycle diffère du revenu habituel
+      expenses: [],    // { id, date: "AAAA-MM-JJ", amount, env, label, at }
+      savings: [{ id: "reserve", name: "Réserve de sécurité", balance: 0, goal: 0 }, { id: "livreta", name: "Livret A", balance: 0, goal: 0 }]
+    },
+    invest: {
+      classNames: { stocks: "Actions", bonds: "Obligations", gold: "Or & matières premières", cash: "Énergie" },
+      portfolio: { stocks: [], bonds: [], gold: [], cash: [] },
+      band: 5, importAt: null, history: [],
+      quotesUrl: "",                    // lien CSV du Google Sheets publié (cours GOOGLEFINANCE)
+      country: "FRA", method: "trend"   // conjoncture : pays et méthode choisis
+    }
+  };
+}
+function normalize(s) {
+  const d = defaultState();
+  if (!s || typeof s !== "object") return d;
+  const b = { ...d.budget, ...(s.budget || {}) }, i = { ...d.invest, ...(s.invest || {}) };
+  if (!Array.isArray(b.envelopes)) b.envelopes = d.budget.envelopes;
+  if (!Array.isArray(b.expenses)) b.expenses = [];
+  if (!Array.isArray(b.savings)) b.savings = [];
+  if (!b.cycles || typeof b.cycles !== "object") b.cycles = {};
+  b.payday = Math.min(31, Math.max(1, Math.round(+b.payday) || 25));
+  i.classNames = { ...d.invest.classNames, ...(i.classNames || {}) };
+  i.portfolio = Object.fromEntries(CLASSES.map(c => [c.id, Array.isArray(i.portfolio?.[c.id]) ? i.portfolio[c.id] : []]));
+  if (!Array.isArray(i.history)) i.history = [];
+  if (typeof i.quotesUrl !== "string") i.quotesUrl = "";
+  if (!["trend", "absolute"].includes(i.method)) i.method = "trend";
+  return { v: 1, updatedAt: +s.updatedAt || 0, budget: b, invest: i };
+}
+let S = (() => { try { const j = JSON.parse(ls.get(LS.state)); if (j && j.v) return normalize(j) } catch {} return defaultState() })();
+
+function save() { if (!ls.set(LS.state, JSON.stringify(S))) toast("Stockage de l'appareil plein : exportez une sauvegarde.") }
+// Toute modification passe par commit : horodatage, sauvegarde locale, envoi en ligne si synchronisé.
+function commit(rerender = true) {
+  S.updatedAt = Date.now(); save(); sync.push();
+  if (rerender) renderView();
+  scheduleHistory();
+}
+// Données reçues d'un autre appareil : on les applique sans les renvoyer.
+let renderLater = false;
+function applyRemote(remote) {
+  S = remote; save(); sync.cancelPush();
+  const a = document.activeElement;
+  if (a && a.matches?.("input, textarea, select") && !$("sheet").contains(a)) { renderLater = true; return }
+  renderView();
+}
+document.addEventListener("focusout", () => { if (renderLater) setTimeout(() => { if (renderLater && !document.activeElement?.matches?.("input, textarea, select")) { renderLater = false; renderView() } }, 50) });
+
+/* ---------- Navigation ---------- */
+const VIEWS = ["budget", "invest", "conj", "reglages"];
+let view = "budget";
+function show(v, anchor) {
+  if (!VIEWS.includes(v)) v = "budget";
+  view = v;
+  VIEWS.forEach(x => { $("v-" + x).hidden = x !== v });
+  document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-current", b.dataset.tab === v ? "page" : "false"));
+  $("fab").hidden = v !== "budget";
+  renderView();
+  if (anchor && $(anchor)) $(anchor).scrollIntoView({ block: "start" }); else window.scrollTo(0, 0);
+}
+function renderView() {
+  if (view === "budget") renderBudget(); else if (view === "invest") renderInvest(); else if (view === "conj") renderConj(); else renderSettings();
+  renderSync();
+}
+document.querySelector(".tabs").addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if (b) { if (location.hash.slice(1) === b.dataset.tab) show(b.dataset.tab); else location.hash = b.dataset.tab } });
+document.addEventListener("click", e => {
+  const g = e.target.closest("[data-goto]"); if (!g) return;
+  const a = g.dataset.anchor; if (location.hash.slice(1) !== g.dataset.goto) { history.replaceState(null, "", "#" + g.dataset.goto) } show(g.dataset.goto, a);
+});
+window.addEventListener("hashchange", () => show(location.hash.slice(1)));
+
+/* ---------- Budget : cycles ---------- */
+function payDate(y, m) {
+  const dim = new Date(y, m + 1, 0).getDate(), d = new Date(y, m, Math.min(S.budget.payday, dim));
+  if (S.budget.shiftWeekend) { const w = d.getDay(); if (w === 6) d.setDate(d.getDate() - 1); else if (w === 0) d.setDate(d.getDate() - 2) }
+  return d;
+}
+function cycleOf(date) {
+  let y = date.getFullYear(), m = date.getMonth(), start = payDate(y, m);
+  if (date < start) { m--; if (m < 0) { m = 11; y-- } start = payDate(y, m) }
+  let ny = y, nm = m + 1; if (nm > 11) { nm = 0; ny++ }
+  const end = payDate(ny, nm); end.setDate(end.getDate() - 1);
+  return { key: `${y}-${pad(m + 1)}`, y, m, start, end };
+}
+function shiftCycle(c, delta) { let y = c.y, m = c.m + delta; while (m < 0) { m += 12; y-- } while (m > 11) { m -= 12; y++ } return cycleOf(payDate(y, m)) }
+let viewCycle = cycleOf(new Date()), envFilter = null, lastEnv = null;
+const envById = id => S.budget.envelopes.find(e => e.id === id);
+const cycleExpenses = c => { const a = ymd(c.start), b = ymd(c.end); return S.budget.expenses.filter(e => e.date >= a && e.date <= b) };
+const cycleIncome = c => { const x = S.budget.cycles[c.key]?.income; return typeof x === "number" && isFinite(x) ? x : (+S.budget.income || 0) };
+const isCurrent = c => cycleOf(new Date()).key === c.key;
+
+function renderBudget() {
+  const c = viewCycle, cur = isCurrent(c), now = new Date();
+  $("clabel").textContent = `${fmtDay(c.start)} → ${fmtDay(c.end)} ${c.end.getFullYear()}`;
+  $("csub").textContent = cur ? "Cycle en cours" : (c.start > now ? "Cycle à venir" : "Cycle terminé");
+  $("cnow").hidden = cur;
+  const custom = S.budget.cycles[c.key]?.income;
+  if (document.activeElement !== $("b-income")) $("b-income").value = typeof custom === "number" ? fmtIn(custom) : "";
+  $("b-income").placeholder = fmtIn(S.budget.income) || "0";
+  $("b-incnote").textContent = typeof custom === "number" ? "propre à ce cycle" : "revenu habituel";
+  updateSummary();
+
+  const ex = cycleExpenses(c), spentBy = {};
+  ex.forEach(e => { spentBy[e.env] = (spentBy[e.env] || 0) + (+e.amount || 0) });
+  const envs = S.budget.envelopes;
+  const orphan = Object.keys(spentBy).filter(id => !envById(id)).reduce((s, id) => s + spentBy[id], 0);
+  const envRow = (id, name, sp, pl, kind) => {
+    const pct = pl > 0 ? Math.min(100, sp / pl * 100) : (sp > 0 ? 100 : 0), over = pl > 0 ? sp > pl + 0.005 : sp > 0;
+    const rest = pl - sp;
+    return `<button type="button" class="env${envFilter === id ? " on" : ""}" data-env="${esc(id)}">
+      <span><b>${esc(name)}</b>${kind === "save" ? '<span class="tag">épargne</span>' : ""}<br><span class="small muted num">${fmtEUR(sp)} / ${fmtEUR(pl)}</span></span>
+      <span class="num small" style="font-weight:600;color:${over ? "var(--down)" : "var(--fg)"}">${pl > 0 || sp > 0 ? (rest >= 0 ? "reste " + fmtEUR(rest) : "dépassé de " + fmtEUR(-rest)) : "—"}</span>
+      <span class="bar"><i class="${over ? "over" : ""}" style="width:${pct}%${kind === "save" && !over ? ";background:var(--up)" : ""}"></i></span></button>`;
+  };
+  $("envlist").innerHTML = (envs.length ? envs.map(e => envRow(e.id, e.name, spentBy[e.id] || 0, +e.planned || 0, e.kind)).join("") : `<div class="notice">Aucune enveloppe : ajoutez-en dans Réglages.</div>`)
+    + (orphan ? envRow("__none", "Sans enveloppe", orphan, 0, "spend") : "");
+
+  const list = ex.filter(e => !envFilter || (envFilter === "__none" ? !envById(e.env) : e.env === envFilter))
+    .sort((a, b) => b.date.localeCompare(a.date) || (b.at || 0) - (a.at || 0));
+  $("expcount").textContent = list.length ? `· ${list.length}` : "";
+  $("expclear").hidden = !envFilter;
+  $("explist").innerHTML = list.length ? list.map(e => {
+    const d = parseYmd(e.date), en = envById(e.env);
+    return `<button type="button" class="exp" data-exp="${esc(e.id)}"><span class="d">${pad(d.getDate())}/${pad(d.getMonth() + 1)}</span>
+      <span class="l"><b>${esc(e.label || en?.name || "Dépense")}</b><small>${esc(en?.name || "Sans enveloppe")}</small></span>
+      <span class="num" style="font-weight:600;color:${e.amount < 0 ? "var(--up)" : "var(--fg)"}">${e.amount < 0 ? "+" + fmtEUR(-e.amount) : fmtEUR(e.amount)}</span></button>`;
+  }).join("") : `<div class="notice">${envFilter ? "Aucune dépense dans cette enveloppe sur ce cycle." : "Aucune dépense sur ce cycle. Touchez + pour en ajouter une."}</div>`;
+
+  renderSavings();
+}
+function updateSummary() {
+  const c = viewCycle, ex = cycleExpenses(c), inc = cycleIncome(c);
+  const kind = id => envById(id)?.kind || "spend";
+  const out = ex.reduce((s, e) => s + (+e.amount || 0), 0);
+  const saved = ex.filter(e => kind(e.env) === "save").reduce((s, e) => s + (+e.amount || 0), 0);
+  const planned = S.budget.envelopes.reduce((s, e) => s + (+e.planned || 0), 0);
+  const plannedSpend = S.budget.envelopes.filter(e => e.kind !== "save").reduce((s, e) => s + (+e.planned || 0), 0);
+  const left = inc - out, free = inc - planned;
+  $("b-left").textContent = fmtEUR(left); $("b-left").style.color = left < 0 ? "var(--down)" : "";
+  $("b-out").textContent = fmtEUR(out);
+  $("b-saved").textContent = saved ? `dont ${fmtEUR(saved)} vers l'épargne` : "";
+  $("b-planned").textContent = fmtEUR(planned);
+  $("b-free").textContent = fmtEUR(free); $("b-free").style.color = free < 0 ? "var(--down)" : "";
+  const pct = inc > 0 ? Math.min(100, out / inc * 100) : (out > 0 ? 100 : 0);
+  $("b-bar").style.width = pct + "%"; $("b-bar").className = left < 0 ? "over" : "";
+  let pace = "";
+  if (!inc && !S.budget.income) pace = "Indiquez votre revenu habituel dans Réglages (ou le revenu de ce cycle ci-dessus).";
+  else if (isCurrent(c)) {
+    const t = new Date(), t0 = new Date(t.getFullYear(), t.getMonth(), t.getDate());
+    const days = Math.round((c.end - t0) / 864e5) + 1, restSpend = Math.max(0, plannedSpend - (out - saved));
+    pace = `${days} jour${days > 1 ? "s" : ""} restant${days > 1 ? "s" : ""}` + (plannedSpend > 0 ? ` · environ ${fmtEUR(restSpend / days)} par jour pour les dépenses prévues` : "");
+  } else if (c.end < new Date()) pace = left >= 0 ? `Cycle terminé avec ${fmtEUR(left)} de reste.` : `Cycle terminé avec un dépassement de ${fmtEUR(-left)}.`;
+  $("b-pace").textContent = pace;
+}
+function renderSavings() {
+  const sv = S.budget.savings;
+  $("savlist").innerHTML = sv.length ? sv.map(a => {
+    const g = +a.goal || 0, b = +a.balance || 0;
+    return `<div class="sav" data-sid="${esc(a.id)}"><div class="savtop"><b>${esc(a.name)}</b>
+      <input class="n" data-sk="balance" type="text" inputmode="decimal" autocomplete="off" value="${fmtIn(b)}" placeholder="0" aria-label="Solde ${esc(a.name)}"></div>
+      ${g > 0 ? `<div class="bar"><i style="width:${Math.min(100, Math.max(0, b / g * 100))}%;background:var(--up)"></i></div><div class="small muted">Objectif ${fmtEUR(g)} · ${b >= g ? "atteint" : "reste " + fmtEUR(g - b)}</div>` : ""}</div>`;
+  }).join("") : `<div class="notice">Aucun compte : ajoutez-en dans Réglages.</div>`;
+  updateSavTotals();
+}
+function updateSavTotals() {
+  const t = S.budget.savings.reduce((s, a) => s + (+a.balance || 0), 0), inv = grandTotal();
+  $("sav-total").textContent = fmtEUR(t); $("sav-inv").textContent = fmtEUR(inv); $("sav-all").textContent = fmtEUR(t + inv);
+}
+$("cprev").addEventListener("click", () => { viewCycle = shiftCycle(viewCycle, -1); renderBudget() });
+$("cnext").addEventListener("click", () => { viewCycle = shiftCycle(viewCycle, 1); renderBudget() });
+$("cnow").addEventListener("click", () => { viewCycle = cycleOf(new Date()); renderBudget() });
+$("b-income").addEventListener("input", e => {
+  const v = e.target.value.trim();
+  if (v === "") delete S.budget.cycles[viewCycle.key]; else S.budget.cycles[viewCycle.key] = { income: parseNum(v) };
+  $("b-incnote").textContent = v === "" ? "revenu habituel" : "propre à ce cycle";
+  commit(false); updateSummary();
+});
+$("envlist").addEventListener("click", e => { const b = e.target.closest("[data-env]"); if (!b) return; envFilter = envFilter === b.dataset.env ? null : b.dataset.env; renderBudget() });
+$("expclear").addEventListener("click", () => { envFilter = null; renderBudget() });
+$("explist").addEventListener("click", e => { const b = e.target.closest("[data-exp]"); if (b) openSheet(S.budget.expenses.find(x => x.id === b.dataset.exp)) });
+$("savlist").addEventListener("input", e => {
+  const inp = e.target.closest("[data-sk]"); if (!inp) return;
+  const a = S.budget.savings.find(x => x.id === inp.closest("[data-sid]").dataset.sid); if (!a) return;
+  a.balance = parseNum(inp.value); commit(false); updateSavTotals();
+});
+$("savlist").addEventListener("change", () => renderSavings());
+
+/* ---------- Feuille de saisie ---------- */
+let editing = null;
+function defaultDate() {
+  const c = viewCycle, t = new Date();
+  if (isCurrent(c)) return ymd(t);
+  return ymd(c.end < t ? c.end : c.start);
+}
+function openSheet(exp) {
+  editing = exp ? exp.id : null;
+  $("sheettitle").textContent = exp ? "Modifier la dépense" : "Nouvelle dépense";
+  const envs = S.budget.envelopes;
+  $("f-env").innerHTML = envs.map(e => `<option value="${esc(e.id)}">${esc(e.name)}</option>`).join("")
+    + (exp && !envById(exp.env) ? `<option value="${esc(exp.env)}">Sans enveloppe</option>` : "");
+  $("f-amount").value = exp ? fmtIn(exp.amount) : "";
+  $("f-env").value = exp?.env || (envFilter && envById(envFilter) ? envFilter : null) || (lastEnv && envById(lastEnv) ? lastEnv : envs[0]?.id || "");
+  $("f-label").value = exp?.label || "";
+  $("f-date").value = exp?.date || defaultDate();
+  $("f-err").textContent = "";
+  const del = $("f-del"); del.hidden = !exp; delete del.dataset.confirm; del.textContent = "Supprimer";
+  $("sheet").hidden = false;
+  setTimeout(() => $("f-amount").focus(), 60);
+}
+function closeSheet() { $("sheet").hidden = true; editing = null; if (renderLater) { renderLater = false; renderView() } }
+$("fab").addEventListener("click", () => openSheet(null));
+$("sheet").addEventListener("click", e => { if (e.target.closest("[data-close]")) closeSheet() });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("sheet").hidden) closeSheet() });
+$("expform").addEventListener("submit", e => {
+  e.preventDefault();
+  const amount = round2(parseNum($("f-amount").value));
+  if (!amount) { $("f-err").textContent = "Indiquez un montant."; $("f-amount").focus(); return }
+  const date = /^\d{4}-\d{2}-\d{2}$/.test($("f-date").value) ? $("f-date").value : ymd(new Date());
+  const env = $("f-env").value, label = $("f-label").value.trim();
+  const ex = editing && S.budget.expenses.find(x => x.id === editing);
+  if (ex) Object.assign(ex, { amount, date, env, label });
+  else S.budget.expenses.push({ id: rid(), amount, date, env, label, at: Date.now() });
+  lastEnv = env; const wasEdit = !!ex;
+  closeSheet();
+  viewCycle = cycleOf(parseYmd(date));
+  commit();
+  toast(wasEdit ? "Dépense modifiée." : `${fmtEUR(amount)} ajoutés à ${envById(env)?.name || "la dépense"}.`);
+});
+$("f-del").addEventListener("click", e => {
+  const b = e.currentTarget;
+  if (!b.dataset.confirm) { b.dataset.confirm = "1"; b.textContent = "Confirmer la suppression"; return }
+  S.budget.expenses = S.budget.expenses.filter(x => x.id !== editing);
+  closeSheet(); commit(); toast("Dépense supprimée.");
+});
+
+/* ---------- Investissements ---------- */
+const P = () => S.invest.portfolio;
+const cname = id => S.invest.classNames[id] || id;
+const normSym = s => String(s || "").trim().toUpperCase().replace(/\s+/g, "");
+// Cours en direct : ligne « live » quand elle a une quantité et un cours connu ; sinon valeur saisie ou importée.
+function quoteFor(a) {
+  const q = a.sym ? quotes.map[normSym(a.sym)] : null;
+  if (!q || !(q.price > 0)) return null;
+  const eur = toEUR(q.price, q.cur);
+  return eur ? { ...q, eur } : null;
+}
+const live = a => (+a.units > 0 ? quoteFor(a) : null);
+const val = a => { const q = live(a); return q ? +a.units * q.eur : (+a.amount || 0) };
+const totalOf = id => P()[id].reduce((s, a) => s + val(a), 0);
+const grandTotal = () => CLASSES.reduce((s, c) => s + totalOf(c.id), 0);
+const allAssets = () => CLASSES.flatMap(c => P()[c.id]);
+const newAsset = name => ({ id: rid(), name: name || "Nouvel actif", isin: "", amount: 0 });
+let apport = 0, impRows = [], degiroTx = null;
+
+function isinOk(s) {
+  if (!/^[A-Z]{2}[A-Z0-9]{9}[0-9]$/.test(s)) return false;
+  const digits = [...s].map(c => /[A-Z]/.test(c) ? String(c.charCodeAt(0) - 55) : c).join("");
+  let sum = 0, dbl = false;
+  for (let i = digits.length - 1; i >= 0; i--) { let n = +digits[i]; if (dbl) { n *= 2; if (n > 9) n -= 9 } sum += n; dbl = !dbl }
+  return sum % 10 === 0;
+}
+function renderInvest() {
+  $("classes").innerHTML = CLASSES.map(c => `
+    <section class="cls" data-cls="${c.id}">
+      <div class="clshead">
+        <h2><span class="dot" style="background:${c.c}"></span>${esc(cname(c.id))}</h2>
+        <button class="btn" type="button" data-add="${c.id}">+ Ajouter</button>
+      </div>
+      ${P()[c.id].length ? `<div class="tablewrap"><table>
+        <thead><tr><th style="width:26%">Actif</th><th>Symbole</th><th class="r">Qté</th><th class="r">Cours</th><th class="r">Valeur (€)</th><th class="r">+/- value</th><th></th></tr></thead>
+        <tbody>${P()[c.id].map(a => rowHTML(c.id, a)).join("")}</tbody>
+      </table></div>` : `<div class="notice">Aucune ligne. Importez vos positions DEGIRO ou touchez « Ajouter ».</div>`}
+      <div class="clsfoot"><span>Total ${esc(cname(c.id).toLowerCase())}</span><span class="num" data-total="${c.id}"></span></div>
+    </section>`).join("");
+  $("band").value = S.invest.band;
+  renderTotals();
+  renderHistory();
+  renderQuoteNote();
+}
+function priceCell(a) {
+  const q = quoteFor(a);
+  if (!q) {
+    const why = !a.sym ? "sans symbole" : (!S.invest.quotesUrl ? "pas de tableau" : (quotes.map[normSym(a.sym)] ? "cours introuvable" : "absent du tableau"));
+    return `<td class="calc quote muted">—<small>${why}</small></td>`;
+  }
+  const old = quotes.at && Date.now() - quotes.at > 36e5;
+  const unit = q.cur === "GBX" ? "p" : q.cur;
+  return `<td class="calc quote" title="${esc(normSym(a.sym))} · ${esc(unit)} → ${fmtEUR(q.eur)}">${q.price.toLocaleString("fr-FR", { maximumFractionDigits: 2 })} ${esc(unit)}<small${old ? ' class="stale"' : ""}>${q.cur === "EUR" ? "" : fmtEUR(q.eur) + " · "}${new Date(quotes.at).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}</small></td>`;
+}
+function rowHTML(cls, a) {
+  const f = (k, klass, v, extra = "") => `<input data-k="${k}" class="${klass}" type="text" value="${esc(v)}" aria-label="${k}" ${extra}>`;
+  const lv = live(a);
+  return `<tr data-id="${esc(a.id)}">
+    <td>${f("name", "", a.name)}</td>
+    <td>${f("sym", "isin", a.sym || "", 'autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="ex. EPA:MC"')}${a.isin ? `<small class="tk">${esc(a.isin)}</small>` : ""}</td>
+    <td style="width:5.5em">${f("units", "n", fmtIn(a.units), 'inputmode="decimal" placeholder="—"')}</td>
+    ${priceCell(a)}
+    ${lv ? `<td class="calc live" data-v>${fmtEUR(val(a))}<small class="tk" style="padding:0">en direct</small></td>` : `<td>${f("amount", "n", fmtIn(a.amount), 'inputmode="decimal" placeholder="0"')}</td>`}
+    <td class="calc" data-g></td>
+    <td class="acts"><select class="mv" data-mv aria-label="Déplacer vers une autre classe" title="Déplacer vers une autre classe"><option value="">⇄</option>${CLASSES.filter(x => x.id !== cls).map(x => `<option value="${x.id}">${esc(cname(x.id))}</option>`).join("")}</select><button class="del" type="button" aria-label="Supprimer l'actif" data-del>✕</button></td></tr>`;
+}
+function renderTotals() {
+  const grand = grandTotal();
+  CLASSES.forEach(c => {
+    P()[c.id].forEach(a => {
+      const tr = document.querySelector(`#classes tr[data-id="${CSS.escape(a.id)}"]`); if (!tr) return;
+      const vEl = tr.querySelector("[data-v]"); if (vEl && live(a)) vEl.firstChild.textContent = fmtEUR(val(a));
+      const el = tr.querySelector("[data-g]"), has = isFinite(a.cost) && a.cost > 0;
+      el.textContent = has ? `${val(a) - a.cost >= 0 ? "+" : "−"}${fmtEUR(Math.abs(val(a) - a.cost))} · ${fmtPct((val(a) / a.cost - 1) * 100)}` : "—";
+      el.style.color = has ? (val(a) >= a.cost ? "var(--up)" : "var(--down)") : "";
+    });
+    const tEl = document.querySelector(`[data-total="${c.id}"]`); if (tEl) tEl.textContent = fmtEUR(totalOf(c.id));
+  });
+  $("grand").textContent = fmtEUR(grand);
+  $("alloc").innerHTML = CLASSES.map(c => grand ? `<i style="width:${totalOf(c.id) / grand * 100}%;background:${c.c}"></i>` : "").join("");
+  $("legend").innerHTML = CLASSES.map(c => `<div><span class="dot" style="background:${c.c}"></span><span>${esc(cname(c.id))}</span><span class="pct num muted">${grand ? (totalOf(c.id) / grand * 100).toLocaleString("fr-FR", { maximumFractionDigits: 1 }) : "0"} %</span></div>`).join("");
+  renderRebalance(grand);
+  renderPerf();
+}
+function renderPerf() {
+  const el = $("perf"), withCost = allAssets().filter(a => isFinite(a.cost) && a.cost > 0);
+  if (!withCost.length) { el.innerHTML = `<div class="small muted">Importez vos exports DEGIRO (Portefeuille + Transactions) pour afficher le montant investi et vos plus ou moins-values.</div>`; return }
+  const row = (label, v, p) => `<div class="prow"><span>${label}</span><span class="num" style="color:${v >= 0 ? "var(--up)" : "var(--down)"}">${v >= 0 ? "+" : "−"}${fmtEUR(Math.abs(v))} · ${fmtPct(p)}</span></div>`;
+  const V = withCost.reduce((s, a) => s + val(a), 0), C = withCost.reduce((s, a) => s + a.cost, 0);
+  const now = Date.now(), yrs = a => a.costDate ? Math.max(0, (now - Date.parse(a.costDate)) / (365.25 * 864e5)) : 0;
+  const nb = allAssets().filter(a => val(a) > 0).length, cpi = macro.data[S.invest.country]?.cpi, pi = cpi?.value;
+  let html = `<div class="small muted">Montant investi (frais inclus) : ${fmtEUR(C)}${withCost.length < nb ? ` · calcul sur ${withCost.length} ligne${withCost.length > 1 ? "s" : ""} sur ${nb}` : ""}</div>`
+    + row("Plus ou moins-value", V - C, (V / C - 1) * 100);
+  if (typeof pi === "number" && isFinite(pi)) {
+    // Coût réévalué de l'inflation sur la durée de détention de chaque ligne (date d'achat moyenne pondérée).
+    const RC = withCost.reduce((s, a) => s + a.cost * Math.pow(1 + pi / 100, yrs(a)), 0);
+    const months = Math.round(withCost.reduce((s, a) => s + a.cost * yrs(a), 0) / C * 12);
+    html += row("Après inflation", V - RC, (V / RC - 1) * 100)
+      + `<div class="small muted">Inflation ${esc(countryName(S.invest.country))} : ${pi.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} % sur un an (${esc(fmtPeriod(cpi.period))}), appliquée sur la durée de détention moyenne (${months} mois). Pays choisi dans Conjoncture.</div>`;
+  }
+  el.innerHTML = html;
+}
+function splitApport(C) {
+  // Répartition « par remplissage » : on monte d'abord les classes les plus basses jusqu'au même niveau.
+  const items = CLASSES.map(c => ({ id: c.id, t: totalOf(c.id) })).sort((a, b) => a.t - b.t);
+  let L = 0, sum = 0;
+  for (let k = 0; k < items.length; k++) {
+    sum += items[k].t; L = (C + sum) / (k + 1);
+    if (k === items.length - 1 || L <= items[k + 1].t) break;
+  }
+  return Object.fromEntries(items.map(i => [i.id, Math.max(0, L - i.t)]));
+}
+function renderRebalance(grand) {
+  const band = S.invest.band;
+  $("bandv").textContent = band;
+  const st = $("rbstatus");
+  const reg = regimeOf(macro.data[S.invest.country], S.invest.method), fav = FAVOR[reg] || [];
+  $("rbregime").innerHTML = reg
+    ? `Situation actuelle (${esc(countryName(S.invest.country))}) : <b>${REGIMES[reg].name}</b>. Classes historiquement favorisées dans ce contexte : <b>${fav.map(id => esc(cname(id))).join(", ")}</b>. Repère indicatif, pas un conseil en investissement.`
+    : `La situation économique n'est pas encore disponible : ouvrez l'onglet Conjoncture.`;
+  if (apport > 0) {
+    const sp = splitApport(apport), newTot = grand + apport;
+    const maxGap = Math.max(...CLASSES.map(c => Math.abs((totalOf(c.id) + sp[c.id]) / newTot * 100 - 25)));
+    $("aprows").innerHTML = CLASSES.filter(c => sp[c.id] >= 0.5).map(c => `<div class="aprow"><span><span class="dot" style="background:${c.c}"></span>${esc(cname(c.id))}</span><span class="act buy">Investir ${fmtEUR(sp[c.id])}</span></div>`).join("")
+      + `<div class="notice">Après cet apport, l'écart maximal à 25 % sera de ${maxGap.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} point${maxGap >= 2 ? "s" : ""}.</div>`;
+  } else $("aprows").innerHTML = "";
+  if (!grand) {
+    $("rbrows").innerHTML = ""; st.textContent = "—"; st.className = "pill";
+    $("rbnote").textContent = "Renseignez la valeur de vos actifs pour voir le rééquilibrage.";
+    return;
+  }
+  const target = grand / 4; let out = false;
+  $("rbrows").innerHTML = CLASSES.map(c => {
+    const t = totalOf(c.id), pct = t / grand * 100, gap = target - t, off = Math.abs(pct - 25) > band;
+    if (off) out = true;
+    const act = !off ? `<span class="act ok">Dans la marge</span>`
+      : gap > 0 ? `<span class="act buy">Acheter ${fmtEUR(gap)}</span>` : `<span class="act sell">Vendre ${fmtEUR(-gap)}</span>`;
+    return `<div class="rbrow"><div><b>${esc(cname(c.id))}</b>${fav.includes(c.id) ? '<span class="fav">▲ favorisée</span>' : ""} <span class="num muted small">${pct.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} % · ${fmtEUR(t)}</span></div>${act}
+      <div class="rbbar"><i style="width:${Math.min(pct, 50) * 2}%;background:${c.c}"></i><span class="band" style="left:${(25 - band) * 2}%;right:${100 - (25 + band) * 2}%"></span><span class="target"></span></div></div>`;
+  }).join("");
+  st.textContent = out ? "À rééquilibrer" : "Équilibré"; st.className = "pill " + (out ? "warn" : "good");
+  $("rbnote").textContent = out
+    ? `Cible : ${fmtEUR(target)} par classe. Les ventes financent les achats : la valeur totale ne change pas.`
+    : `Chaque classe reste à moins de ${band} points de 25 %. Aucun mouvement nécessaire.`;
+}
+// Un point d'historique par jour où la valeur totale change.
+// Après une modification : point du jour mis à jour. Après une actualisation des cours : au plus une fois par heure
+// (évite d'écrire en ligne toutes les 5 minutes).
+let histTimer = null, histForce = false;
+function scheduleHistory(force = true) { histForce = histForce || force; clearTimeout(histTimer); histTimer = setTimeout(recordHistory, 2500) }
+function recordHistory() {
+  const force = histForce; histForce = false;
+  const by = Object.fromEntries(CLASSES.map(c => [c.id, round2(totalOf(c.id))]));
+  const total = round2(Object.values(by).reduce((s, v) => s + v, 0));
+  if (!total) return;
+  const d = todayKey(), H = S.invest.history, last = H.at(-1);
+  if (last && last.d === d && (last.total === total || (!force && Date.now() - (last.at || 0) < 36e5))) return;
+  S.invest.history = [...H.filter(p => p.d !== d), { d, total, by, at: Date.now() }].slice(-730);
+  S.updatedAt = Date.now(); save(); sync.push();
+  if (view === "invest") renderHistory();
+}
+function renderHistory() {
+  const el = $("chart"), pts = S.invest.history.filter(p => isFinite(p.total));
+  if (pts.length < 2) {
+    el.innerHTML = ""; el.hidden = true; $("histdelta").textContent = "";
+    $("histnote").textContent = pts.length ? "Premier point enregistré. La courbe apparaîtra dès qu'un deuxième jour sera enregistré (un point par jour où la valeur change)."
+      : "Renseignez la valeur de vos actifs : un point sera enregistré chaque jour.";
+    return;
+  }
+  el.hidden = false; $("histnote").textContent = "";
+  const W = Math.max(280, el.clientWidth || 600), H = 180, pl = 56, pr = 14, pt = 10, pb = 24;
+  const vals = pts.map(p => p.total), lo0 = Math.min(...vals), hi0 = Math.max(...vals);
+  const padv = (hi0 - lo0) * 0.12 || hi0 * 0.05 || 1, lo = Math.max(0, lo0 - padv), hi = hi0 + padv;
+  const t0 = Date.parse(pts[0].d), t1 = Date.parse(pts.at(-1).d);
+  const x = d => pl + (Date.parse(d) - t0) / (t1 - t0 || 1) * (W - pl - pr);
+  const y = v => pt + (1 - (v - lo) / (hi - lo)) * (H - pt - pb);
+  const line = pts.map((p, i) => `${i ? "L" : "M"}${x(p.d).toFixed(1)},${y(p.total).toFixed(1)}`).join("");
+  const area = `${line}L${x(pts.at(-1).d).toFixed(1)},${H - pb}L${pl},${H - pb}Z`;
+  const fmtK = v => v >= 10000 ? (v / 1000).toLocaleString("fr-FR", { maximumFractionDigits: 0 }) + " k€" : v.toLocaleString("fr-FR", { maximumFractionDigits: 0 }) + " €";
+  const fmtD = d => new Date(d).toLocaleDateString("fr-FR", { day: "2-digit", month: "short" });
+  const last = pts.at(-1);
+  el.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Évolution de la valeur totale du portefeuille">
+    ${[0, .5, 1].map(f => lo + f * (hi - lo)).map(v => `<line x1="${pl}" x2="${W - pr}" y1="${y(v)}" y2="${y(v)}" class="grid"/><text x="${pl - 8}" y="${y(v) + 4}" text-anchor="end" class="ax">${fmtK(v)}</text>`).join("")}
+    <text x="${pl}" y="${H - 6}" class="ax">${fmtD(pts[0].d)}</text><text x="${W - pr}" y="${H - 6}" text-anchor="end" class="ax">${fmtD(last.d)}</text>
+    <path d="${area}" class="area"/><path d="${line}" class="ln"/>
+    <circle cx="${x(last.d)}" cy="${y(last.total)}" r="4.5" class="end"/>
+    <line class="xh" y1="${pt}" y2="${H - pb}" display="none"/><circle class="end hd" r="4.5" display="none"/>
+    <rect x="${pl}" y="0" width="${W - pl - pr}" height="${H}" fill="transparent" class="hit"/>
+  </svg><div class="tip" hidden></div>`;
+  const hit = el.querySelector(".hit"), tip = el.querySelector(".tip"), xh = el.querySelector(".xh"), hd = el.querySelector(".hd");
+  const onMove = ev => {
+    const px = ev.clientX - el.getBoundingClientRect().left;
+    let i = 0, best = Infinity;
+    pts.forEach((p, j) => { const dd = Math.abs(x(p.d) - px); if (dd < best) { best = dd; i = j } });
+    const p = pts[i], cx = x(p.d), cy = y(p.total);
+    xh.setAttribute("x1", cx); xh.setAttribute("x2", cx); xh.removeAttribute("display");
+    hd.setAttribute("cx", cx); hd.setAttribute("cy", cy); hd.removeAttribute("display");
+    tip.innerHTML = `<b>${fmtEUR(p.total)}</b><span>${new Date(p.d).toLocaleDateString("fr-FR", { dateStyle: "medium" })}</span>`;
+    tip.hidden = false; tip.style.left = Math.min(Math.max(cx - 62, 0), W - 124) + "px"; tip.style.top = Math.max(cy - 54, 0) + "px";
+  };
+  hit.addEventListener("pointermove", onMove); hit.addEventListener("pointerdown", onMove);
+  hit.addEventListener("pointerleave", () => { tip.hidden = true; xh.setAttribute("display", "none"); hd.setAttribute("display", "none") });
+  const ch = (last.total / pts[0].total - 1) * 100;
+  $("histdelta").textContent = `${fmtPct(ch)} depuis le ${fmtD(pts[0].d)}`;
+}
+let resizeTimer = null;
+window.addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { if (view === "invest") renderHistory() }, 150) });
+
+$("classes").addEventListener("input", e => {
+  const inp = e.target.closest("input[data-k]"); if (!inp) return;
+  const cls = inp.closest("[data-cls]").dataset.cls, a = P()[cls].find(x => x.id === inp.closest("tr").dataset.id), k = inp.dataset.k; if (!a) return;
+  if (k === "sym") { const p = inp.selectionStart; inp.value = inp.value.toUpperCase().replace(/\s+/g, ""); try { inp.setSelectionRange(p, p) } catch {} }
+  a[k] = (k === "amount" || k === "units") ? parseNum(inp.value) : inp.value;
+  commit(false); renderTotals();
+});
+$("classes").addEventListener("change", e => {
+  // Symbole ou quantité modifiés : la ligne peut passer en cours direct (ou en revenir)
+  const inp = e.target.closest("input[data-k]");
+  if (inp && (inp.dataset.k === "sym" || inp.dataset.k === "units")) {
+    const cls = inp.closest("[data-cls]").dataset.cls, a = P()[cls].find(x => x.id === inp.closest("tr").dataset.id); if (!a) return;
+    setTimeout(() => {
+      const tr = document.querySelector(`#classes tr[data-id="${CSS.escape(a.id)}"]`); if (!tr) return;
+      if (!tr.contains(document.activeElement)) tr.outerHTML = rowHTML(cls, a);
+      renderTotals(); renderQuoteNote();
+    }, 0);
+    return;
+  }
+  const sel = e.target.closest("[data-mv]"); if (!sel || !sel.value) return;
+  const from = sel.closest("[data-cls]").dataset.cls, id = sel.closest("tr").dataset.id, a = P()[from].find(x => x.id === id); if (!a) return;
+  P()[from] = P()[from].filter(x => x.id !== id); P()[sel.value].push(a);
+  commit();
+});
+$("classes").addEventListener("click", e => {
+  const add = e.target.closest("[data-add]");
+  if (add) { P()[add.dataset.add].push(newAsset()); commit(); return }
+  const del = e.target.closest("[data-del]"); if (!del) return;
+  const cls = del.closest("[data-cls]").dataset.cls, id = del.closest("tr").dataset.id;
+  if (del.dataset.confirm) { P()[cls] = P()[cls].filter(a => a.id !== id); commit() }
+  else { del.dataset.confirm = "1"; del.textContent = "Suppr. ?"; del.style.color = "var(--down)";
+    setTimeout(() => { if (del.isConnected) { delete del.dataset.confirm; del.textContent = "✕"; del.style.color = "" } }, 3000) }
+});
+$("band").addEventListener("input", e => { S.invest.band = +e.target.value; commit(false); renderTotals() });
+$("apport").addEventListener("input", e => { apport = parseNum(e.target.value); renderTotals() });
+
+/* ---------- Import DEGIRO ---------- */
+function loadXLSX() {
+  if (window.XLSX) return Promise.resolve();
+  return new Promise((res, rej) => {
+    const s = document.createElement("script");
+    s.src = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
+    s.onload = res; s.onerror = rej; document.head.appendChild(s);
+  });
+}
+// Exports du site DEGIRO : « Portefeuille » (Produit, Symbole/ISIN, Quantité, Clôture, Valeur locale, Valeur en EUR)
+// et « Transactions » (Date, Heure, Produit, ISIN, Quantité, Cours, Valeur, Frais, Total…). Libellés FR, EN, NL ou DE.
+const normH = s => String(s ?? "").trim().toLowerCase();
+const RE_QTY = /^(quantité|quantite|quantity|amount|aantal|anzahl|nombre)$/;
+function parseCSV(text) {
+  text = String(text).replace(/^﻿/, "");
+  const first = text.split(/\r?\n/).find(l => l.trim()) || "";
+  const sep = [",", ";", "\t"].map(c => [c, first.split(c).length]).sort((a, b) => b[1] - a[1])[0][0];
+  const rows = []; let row = [], cell = "", q = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) { if (c === '"') { if (text[i + 1] === '"') { cell += '"'; i++ } else q = false } else cell += c }
+    else if (c === '"') q = true;
+    else if (c === sep) { row.push(cell); cell = "" }
+    else if (c === "\n" || c === "\r") { if (c === "\r" && text[i + 1] === "\n") i++; row.push(cell); rows.push(row); row = []; cell = "" }
+    else cell += c;
+  }
+  if (cell || row.length) { row.push(cell); rows.push(row) }
+  return rows;
+}
+const numAt = (r, i) => { if (i < 0) return NaN; const n = toNum(r[i]); return isFinite(n) ? n : toNum(r[i + 1]) };
+function dmyTime(d, h) {
+  if (d instanceof Date) return d.getTime();
+  if (typeof d === "number" && d > 20000) return Math.round((d - 25569) * 864e5);
+  const m = String(d ?? "").match(/(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})/);
+  if (!m) { const t = Date.parse(String(d ?? "")); return isFinite(t) ? t : null }
+  const hm = String(h ?? "").match(/(\d{1,2}):(\d{2})/);
+  return new Date(+m[3], +m[2] - 1, +m[1], hm ? +hm[1] : 0, hm ? +hm[2] : 0).getTime();
+}
+async function sheetsOf(file) {
+  if (/\.(csv|txt)$/i.test(file.name) || /csv|text\/plain/.test(file.type)) return [parseCSV(await file.text())];
+  await loadXLSX();
+  const wb = XLSX.read(await file.arrayBuffer(), { type: "array", cellDates: true });
+  return wb.SheetNames.map(n => XLSX.utils.sheet_to_json(wb.Sheets[n], { header: 1, raw: true, defval: "" }));
+}
+function parseDegiroPortfolio(rows) {
+  const isVal = h => /\beur\b/.test(h) && /(valeur|value|waarde|wert|montant)/.test(h);
+  const hi = rows.findIndex(r => r.some(c => /isin/.test(normH(c))) && r.some(c => isVal(normH(c))));
+  if (hi < 0) return null;
+  const H = rows[hi].map(normH), col = re => H.findIndex(h => re.test(h));
+  const iName = Math.max(0, col(/^(produit|product|produkt|nom|name)$/)), iIsin = col(/isin/), iQty = col(RE_QTY), iVal = H.findIndex(isVal);
+  const out = [];
+  for (const r of rows.slice(hi + 1)) {
+    const name = String(r[iName] ?? "").trim(); if (!name) continue;
+    let value = numAt(r, iVal);
+    for (let j = r.length - 1; j >= 0 && !isFinite(value); j--) value = toNum(r[j]);
+    if (!(value > 0)) continue;
+    const raw = String(r[iIsin] ?? "").trim().toUpperCase(), isin = isinOk(raw) ? raw : "";
+    out.push({ tk: isin || name, isin, name, units: iQty >= 0 ? toNum(r[iQty]) : NaN, value, cost: null, costDate: null,
+      cash: !isin && /cash|espèces|especes|liquidit|geld/i.test(name) });
+  }
+  return out;
+}
+function parseDegiroTx(rows) {
+  const hi = rows.findIndex(r => { const h = r.map(normH); return h.some(c => /isin/.test(c)) && h.some(c => /^(date|datum)$/.test(c)) && h.some(c => RE_QTY.test(c)) });
+  if (hi < 0) return null;
+  const H = rows[hi].map(normH), col = re => H.findIndex(h => re.test(h));
+  const iDate = col(/^(date|datum)$/), iTime = col(/^(heure|time|tijd|zeit|uhrzeit)$/), iIsin = col(/isin/), iQty = col(RE_QTY),
+    iVal = col(/^(valeur|value|montant|waarde|wert)( eur)?$/), iFee = col(/frais|fee|cost|kosten|geb[uü]hr/), iTot = col(/^(total|totaal|gesamt)( eur)?$/);
+  const tx = [];
+  for (const r of rows.slice(hi + 1)) {
+    const isin = String(r[iIsin] ?? "").trim().toUpperCase(), q = toNum(r[iQty]);
+    if (!isinOk(isin) || !isFinite(q) || !q) continue;
+    let eur = Math.abs(numAt(r, iTot));
+    if (!(eur > 0)) eur = Math.abs(numAt(r, iVal)) + (Math.abs(numAt(r, iFee)) || 0);
+    tx.push({ isin, q, eur, t: dmyTime(r[iDate], iTime >= 0 ? r[iTime] : "") });
+  }
+  // Coût moyen pondéré, frais inclus : une vente retire sa part du coût ; date d'achat = moyenne pondérée par le coût.
+  tx.sort((a, b) => (a.t ?? 0) - (b.t ?? 0));
+  const pos = {};
+  for (const x of tx) {
+    const p = pos[x.isin] ||= { units: 0, cost: 0, tw: 0 };
+    if (x.q > 0) { if (!(x.eur > 0)) continue; p.units += x.q; p.cost += x.eur; p.tw += x.eur * (x.t ?? Date.now()) }
+    else { const k = p.units > 0 ? Math.max(0, 1 + x.q / p.units) : 0; p.units = Math.max(0, p.units + x.q); p.cost *= k; p.tw *= k }
+  }
+  return Object.fromEntries(Object.entries(pos).filter(([, p]) => p.units > 1e-9 && p.cost > 0)
+    .map(([isin, p]) => [isin, { units: p.units, cost: p.cost, costDate: new Date(p.tw / p.cost).toISOString() }]));
+}
+// Classe proposée par défaut pour une nouvelle ligne (modifiable dans l'aperçu).
+function guessClass(name) {
+  const n = String(name || "").toLowerCase(), energy = CLASSES.find(c => /énergie|energie|energy/i.test(cname(c.id)))?.id;
+  if (/gold|silver|physical|commodit|\betc\b/.test(n)) return "gold";
+  if (/bond|oblig|treasury|govt|aggregate/.test(n)) return "bonds";
+  if (energy && /energ|oil|petrol|uranium|nuclear|solar|wind/.test(n)) return energy;
+  return "stocks";
+}
+function guessTarget(p) {
+  const known = allAssets().find(a => a.degiro === p.tk) || (p.isin && allAssets().find(a => (a.isin || "").toUpperCase() === p.isin));
+  if (known) return known.id;
+  const words = s => new Set(String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").split(/[^a-z0-9]+/)
+    .filter(w => w.length > 2 && !["etf", "etc", "ucits", "usd", "eur", "acc", "dist", "the", "fund", "inc", "corp", "common"].includes(w)));
+  const pw = words(p.name); let best = "", bs = 0;
+  allAssets().filter(a => !a.degiro).forEach(a => {
+    const aw = words(a.name); let s = 0; pw.forEach(w => { if (aw.has(w)) s++ });
+    if (s > bs) { bs = s; best = a.id }
+  });
+  return bs >= 2 ? best : "new:" + guessClass(p.name);
+}
+function renderImpPreview() {
+  const el = $("impprev");
+  if (!impRows.length) { el.hidden = true; el.innerHTML = ""; return }
+  const opts = sel => CLASSES.map(c => `<optgroup label="${esc(cname(c.id))}">${P()[c.id].map(a => `<option value="${esc(a.id)}"${sel === a.id ? " selected" : ""}>${esc(a.name)}${a.isin ? " · " + a.isin : ""}</option>`).join("")}<option value="new:${c.id}"${sel === "new:" + c.id ? " selected" : ""}>+ Nouvelle ligne dans ${esc(cname(c.id))}</option></optgroup>`).join("")
+    + `<option value="skip"${sel === "skip" ? " selected" : ""}>Ne pas importer</option>`;
+  const total = impRows.reduce((s, p) => s + p.value, 0);
+  el.hidden = false;
+  el.innerHTML = `<div class="small muted">${impRows.length} position${impRows.length > 1 ? "s" : ""} trouvée${impRows.length > 1 ? "s" : ""} · total ${fmtEUR(total)}. Vérifiez la ligne de destination de chacune :</div>`
+    + impRows.map((p, i) => `<div class="xrow"><div><b>${esc(p.name)}</b> <span class="tk">${esc(p.isin || (p.cash ? "liquidités" : ""))}</span>${p.cost > 0 ? ` <span class="tk">· investi ${fmtEUR(p.cost)}</span>` : ""}</div><span class="num">${fmtEUR(p.value)}</span>
+      <select data-xi="${i}" aria-label="Ligne de destination pour ${esc(p.name)}">${opts(p.target)}</select></div>`).join("")
+    + `<div class="actions"><button class="btn" type="button" id="impcancel">Annuler</button><button class="btn primary" type="button" id="impapply">Mettre à jour le portefeuille</button></div>`;
+}
+$("impfile").addEventListener("change", async e => {
+  const files = [...(e.target.files || [])]; e.target.value = ""; if (!files.length) return;
+  $("impnote").textContent = "Lecture du fichier…";
+  try {
+    let pos = null, found = false;
+    for (const file of files) for (const rows of await sheetsOf(file)) {
+      const t = parseDegiroTx(rows); if (t) { degiroTx = t; found = true; break }
+      const p = parseDegiroPortfolio(rows); if (p?.length) { pos = p; found = true; break }
+    }
+    if (!found) throw new Error("format");
+    if (pos) impRows = pos.map(p => ({ ...p, target: p.cash ? "skip" : guessTarget(p) }));
+    if (!impRows.length) { $("impnote").textContent = "Historique des transactions lu. Choisissez maintenant l'export « Portefeuille » de DEGIRO."; return }
+    // Montant investi : repris de l'historique quand la quantité recalculée correspond à celle du portefeuille.
+    let miss = 0;
+    impRows.forEach(p => {
+      const c = p.isin && degiroTx?.[p.isin];
+      if (c && (!isFinite(p.units) || Math.abs(c.units - p.units) < 1e-4)) { p.cost = c.cost; p.costDate = c.costDate }
+      else { p.cost = null; p.costDate = null; if (degiroTx && p.isin) miss++ }
+    });
+    $("impnote").textContent = "Fichiers lus. Rien n'est modifié tant que vous n'avez pas validé."
+      + (degiroTx ? "" : " Ajoutez l'export « Transactions » pour calculer le montant investi.")
+      + (miss ? ` ${miss} position${miss > 1 ? "s" : ""} sans historique complet : exportez les transactions depuis l'ouverture du compte.` : "");
+    renderImpPreview();
+  } catch (err) {
+    impRows = []; renderImpPreview();
+    $("impnote").textContent = err?.message === "format"
+      ? "Ce fichier ne ressemble pas à un export DEGIRO. Sur le site DEGIRO, exportez « Portefeuille » (et « Transactions ») au format CSV."
+      : "Le fichier n'a pas pu être lu. Pour un fichier Excel, une connexion internet est nécessaire ; sinon, exportez en CSV.";
+  }
+});
+$("impprev").addEventListener("change", e => { const i = e.target.dataset?.xi; if (i !== undefined) impRows[+i].target = e.target.value });
+$("impprev").addEventListener("click", e => {
+  if (e.target.closest("#impcancel")) { impRows = []; renderImpPreview(); $("impnote").textContent = "Import annulé."; return }
+  if (!e.target.closest("#impapply")) return;
+  // Regroupe les positions par ligne de destination (plusieurs positions peuvent aller sur la même ligne).
+  const acc = new Map(); let n = 0;
+  impRows.forEach(p => {
+    if (p.target === "skip") return;
+    let a;
+    if (p.target.startsWith("new:")) { a = newAsset(p.name); P()[p.target.slice(4)].push(a) }
+    else a = allAssets().find(x => x.id === p.target);
+    if (!a) return;
+    const g = acc.get(a) || { value: 0, units: 0, cost: 0, tw: 0, noCost: false, list: [] };
+    g.value += p.value; g.units += isFinite(p.units) ? p.units : NaN; g.list.push(p);
+    if (p.cost > 0) { g.cost += p.cost; g.tw += p.cost * (Date.parse(p.costDate) || Date.now()) } else g.noCost = true;
+    acc.set(a, g); n++;
+  });
+  acc.forEach((g, a) => {
+    const one = g.list.length === 1 ? g.list[0] : null;
+    // Sans export Transactions, le coût déjà connu est gardé si la quantité détenue n'a pas changé.
+    const keep = g.noCost && one && isFinite(a.cost) && a.degiro === one.tk && a.units === g.units;
+    a.amount = round2(g.value);
+    if (!g.noCost) { a.cost = round2(g.cost); a.costDate = new Date(g.tw / g.cost).toISOString() }
+    else if (!keep) { delete a.cost; delete a.costDate }
+    a.units = isFinite(g.units) ? g.units : null; a.degiro = one ? one.tk : (a.degiro || g.list[0].tk);
+    if (one?.isin && !a.isin) a.isin = one.isin;
+    if (!a.sym && a.isin) { const s = symForIsin(a.isin); if (s) a.sym = s }
+  });
+  S.invest.importAt = new Date().toISOString(); impRows = []; renderImpPreview();
+  commit();
+  $("impnote").textContent = `${n} position${n > 1 ? "s" : ""} importée${n > 1 ? "s" : ""} depuis DEGIRO. Les prochains imports reconnaîtront automatiquement ces lignes.`;
+});
+
+/* ---------- Cours en direct (Google Sheets publié + taux BCE) ---------- */
+// Le tableau contient au minimum les colonnes « Symbole » et « Cours » (=GOOGLEFINANCE(A2)) ; « Devise » et « ISIN » sont facultatives.
+const EXCH_CUR = { NASDAQ: "USD", NYSE: "USD", NYSEARCA: "USD", NYSEAMERICAN: "USD", BATS: "USD", OTCMKTS: "USD",
+  EPA: "EUR", ETR: "EUR", FRA: "EUR", AMS: "EUR", EBR: "EUR", BIT: "EUR", BME: "EUR", ELI: "EUR", VIE: "EUR", HEL: "EUR", ISE: "EUR",
+  LON: "GBX", SWX: "CHF", VTX: "CHF", WSE: "PLN", STO: "SEK", CPH: "DKK", OSL: "NOK", TYO: "JPY", TSE: "CAD", CVE: "CAD", HKG: "HKD", ASX: "AUD" };
+const curOf = sym => { const s = normSym(sym), p = s.includes(":") ? s.split(":")[0] : ""; return p ? (EXCH_CUR[p] || "EUR") : "USD" };
+let quotes = (() => { try { const q = JSON.parse(ls.get("fin.quotes")); if (q && q.map) return q } catch {} return { at: 0, map: {} } })();
+let fx = (() => { try { return JSON.parse(ls.get("fin.fx")) } catch { return null } })();
+let qBusy = false, qErr = "";
+function toEUR(price, cur) {
+  if (!(price > 0)) return null;
+  let p = price, c = String(cur || "EUR").toUpperCase();
+  if (c === "EUR") return p;
+  if (c === "GBX" || c === "GBP_PENCE") { p = price / 100; c = "GBP" }
+  const r = fx?.rates?.[c]; return r ? p / r : null;
+}
+async function loadFX() {
+  if (fx && Date.now() - fx.at < 6 * 36e5) return fx;
+  const r = await fetch("https://api.frankfurter.dev/v1/latest?base=EUR"); if (!r.ok) throw new Error("fx");
+  const j = await r.json(); fx = { date: j.date, rates: j.rates, at: Date.now() }; ls.set("fin.fx", JSON.stringify(fx)); return fx;
+}
+function parseQuotesCSV(text) {
+  const rows = parseCSV(text).filter(r => r.some(c => String(c).trim()));
+  const hi = rows.findIndex(r => r.some(c => /^(symbole|symbol|ticker)$/.test(normH(c))));
+  if (hi < 0) return {};
+  const H = rows[hi].map(normH), col = re => H.findIndex(h => re.test(h));
+  const iS = col(/^(symbole|symbol|ticker)$/), iP = col(/^(cours|price|prix)$/), iC = col(/^(devise|currency)$/), iI = col(/^isin$/);
+  const out = {};
+  for (const r of rows.slice(hi + 1)) {
+    const sym = normSym(r[iS]); if (!sym) continue;
+    const price = iP >= 0 ? toNum(r[iP]) : NaN, cur = iC >= 0 ? String(r[iC] ?? "").trim().toUpperCase() : "";
+    out[sym] = { price: isFinite(price) && price > 0 ? price : null, cur: /^[A-Z_]{3,9}$/.test(cur) ? cur : curOf(sym), isin: iI >= 0 ? String(r[iI] ?? "").trim().toUpperCase() : "" };
+  }
+  return out;
+}
+const symForIsin = isin => Object.entries(quotes.map).find(([, q]) => q.isin && q.isin === String(isin).toUpperCase())?.[0] || "";
+async function refreshQuotes() {
+  const url = S.invest.quotesUrl.trim();
+  if (!url || qBusy) { renderQuoteNote(); return }
+  qBusy = true; $("qrefresh").classList.add("spin"); renderQuoteNote();
+  try {
+    const [res] = await Promise.all([fetch(url, { cache: "no-store" }), loadFX().catch(() => null)]);
+    if (!res.ok) throw new Error("http");
+    const text = await res.text();
+    if (/^\s*</.test(text)) throw new Error("html");
+    const map = parseQuotesCSV(text);
+    if (!Object.keys(map).length) throw new Error("empty");
+    quotes = { at: Date.now(), map }; ls.set("fin.quotes", JSON.stringify(quotes)); qErr = "";
+    if (!fx) qErr = "Taux de change indisponibles : les lignes hors euro gardent leur dernière valeur.";
+  } catch (e) {
+    qErr = e.message === "html" ? "Le lien ne renvoie pas un fichier CSV : dans Google Sheets, publiez la feuille au format CSV (Fichier › Partager › Publier sur le Web)."
+      : e.message === "empty" ? "Aucune ligne lue : la première ligne du tableau doit contenir « Symbole » et « Cours »."
+      : e.message === "http" ? "Le tableau n'est pas accessible : vérifiez qu'il est bien publié sur le Web et que le lien est complet."
+      : navigator.onLine === false ? "Hors ligne : derniers cours connus affichés." : "Cours indisponibles pour le moment : nouvel essai automatique dans 5 minutes.";
+  }
+  qBusy = false; $("qrefresh").classList.remove("spin");
+  if (view === "invest") { if (document.activeElement?.closest?.("#classes")) renderTotals(); else renderInvest() }
+  else if (view === "budget") updateSavTotals();
+  renderQuoteNote(); scheduleHistory(false);
+}
+function renderQuoteNote() {
+  const el = $("qnote"); if (!el) return;
+  const assets = allAssets().filter(a => val(a) > 0 || a.sym || +a.units > 0);
+  const nLive = assets.filter(live).length, missing = assets.filter(a => !live(a)).length;
+  if (!S.invest.quotesUrl) { el.innerHTML = `Pour des cours automatiques, reliez un Google Sheets : <button class="linkbtn small" type="button" data-goto="reglages" data-anchor="set-quotes">Réglages › Cours en direct</button>.`; return }
+  if (qBusy) { el.textContent = "Actualisation des cours…"; return }
+  const when = quotes.at ? new Date(quotes.at).toLocaleString("fr-FR", { weekday: "short", hour: "2-digit", minute: "2-digit" }) : "jamais";
+  el.textContent = (qErr ? qErr + " " : "")
+    + `${nLive} ligne${nLive > 1 ? "s" : ""} au cours du marché · actualisé ${when} (différé d'environ 20 min, toutes les 5 min quand l'appli est ouverte).`
+    + (missing ? ` ${missing} ligne${missing > 1 ? "s" : ""} sans cours : indiquez la quantité et le symbole.` : "");
+  el.className = "notice" + (qErr ? " err" : "");
+}
+function sheetTSV() {
+  const seen = new Set(), rows = [["Symbole", "Cours", "Devise", "ISIN", "Nom"]];
+  allAssets().filter(a => a.sym).forEach(a => {
+    const s = normSym(a.sym); if (seen.has(s)) return; seen.add(s);
+    rows.push([s, `=GOOGLEFINANCE(A${rows.length + 1})`, curOf(s), a.isin || "", String(a.name || "").replace(/[\t\r\n]+/g, " ")]);
+  });
+  return rows.length > 1 ? rows.map(r => r.join("\t")).join("\n") : "";
+}
+$("qrefresh").addEventListener("click", () => { if (!S.invest.quotesUrl) show("reglages", "set-quotes"); else refreshQuotes() });
+
+/* ---------- Conjoncture (OCDE) ---------- */
+const COUNTRIES = [
+  ["FRA", "🇫🇷 France"], ["USA", "🇺🇸 États-Unis"], ["DEU", "🇩🇪 Allemagne"], ["GBR", "🇬🇧 Royaume-Uni"],
+  ["ITA", "🇮🇹 Italie"], ["ESP", "🇪🇸 Espagne"], ["CHE", "🇨🇭 Suisse"], ["CAN", "🇨🇦 Canada"],
+  ["JPN", "🇯🇵 Japon"], ["CHN", "🇨🇳 Chine"]
+];
+const countryName = id => (COUNTRIES.find(c => c[0] === id)?.[1] || id).replace(/^\S+\s/, "");
+const REGIMES = {
+  boomdef: { name: "Boom déflationniste", sub: "Volume en hausse · Prix en baisse", c: "--boomdef" },
+  boominf: { name: "Boom inflationniste", sub: "Volume en hausse · Prix en hausse", c: "--boominf" },
+  recinf: { name: "Récession inflationniste", sub: "Volume en baisse · Prix en hausse", c: "--recinf" },
+  dep: { name: "Dépression", sub: "Volume en baisse · Prix en baisse", c: "--dep" }
+};
+// Classes historiquement favorisées dans chaque régime (repère indicatif).
+const FAVOR = { boominf: ["gold", "cash", "stocks"], boomdef: ["stocks", "bonds"], recinf: ["gold", "cash"], dep: ["bonds"] };
+let macro = (() => { try { const m = JSON.parse(ls.get("fin.macro")); if (m && m.data) return m } catch {} return { at: 0, data: {} } })();
+let mBusy = false, mErr = "";
+function regimeOf(d, method) {
+  if (!d?.gdp || !d?.cpi) return null;
+  const volUp = method === "trend" ? d.gdp.value > d.gdp.prev : d.gdp.value > 0;
+  const priceUp = method === "trend" ? d.cpi.value > d.cpi.prev : d.cpi.value > 0;
+  return volUp ? (priceUp ? "boominf" : "boomdef") : (priceUp ? "recinf" : "dep");
+}
+const fmtPeriod = p => { let m; if ((m = /^(\d{4})-Q(\d)$/.exec(p || ""))) return `T${m[2]} ${m[1]}`; if ((m = /^(\d{4})-(\d{2})$/.exec(p || ""))) return new Date(+m[1], +m[2] - 1, 1).toLocaleDateString("fr-FR", { month: "short", year: "numeric" }); return p || "" };
+// Réponse SDMX-JSON de l'OCDE -> { pays: [{ t, v }, …] } trié par période
+function sdmxSeries(j) {
+  const st = j.data.structures ? j.data.structures[0] : j.data.structure, dims = st.dimensions.observation, ds = j.data.dataSets[0];
+  const iA = dims.findIndex(d => d.id === "REF_AREA"), iT = dims.findIndex(d => d.id === "TIME_PERIOD"), by = {};
+  for (const [k, v] of Object.entries(ds.observations || {})) {
+    const idx = k.split(":").map(Number), area = dims[iA].values[idx[iA]].id, t = dims[iT].values[idx[iT]].id, x = +v[0];
+    if (isFinite(x)) (by[area] ||= []).push({ t, v: x });
+  }
+  Object.values(by).forEach(a => a.sort((x, y) => x.t.localeCompare(y.t)));
+  return by;
+}
+async function refreshMacro() {
+  if (mBusy) return;
+  mBusy = true; mErr = ""; $("mrefresh").classList.add("spin"); $("mrefresh").disabled = true; if (view === "conj") renderConj();
+  const OECD = "https://sdmx.oecd.org/public/rest/data/", CC = COUNTRIES.map(c => c[0]).join("+");
+  const Q = "?lastNObservations=2&dimensionAtObservation=AllDimensions&format=jsondata";
+  const get = url => fetch(url).then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json() });
+  try {
+    // PIB réel : variation sur un trimestre (comptes nationaux trimestriels) ; inflation : glissement annuel de l'IPC.
+    // L'IPC de certains pays est publié dans la base COICOP 2018 : on garde, pays par pays, la série la plus récente.
+    const [g, c1, c2] = await Promise.all([
+      get(`${OECD}OECD.SDD.NAD,DSD_NAMAIN1@DF_QNA,1.1/Q.Y.${CC}.S1.S1.B1GQ._Z._Z._Z.PC.L.G1.T0102${Q}`),
+      get(`${OECD}OECD.SDD.TPS,DSD_PRICES@DF_PRICES_ALL,1.0/${CC}.M.N.CPI.PA._T.N.GY${Q}`).catch(() => null),
+      get(`${OECD}OECD.SDD.TPS,DSD_PRICES_COICOP2018@DF_PRICES_C2018_ALL,1.0/${CC}.M.N.CPI.PA._T.N.GY${Q}`).catch(() => null)
+    ]);
+    const G = sdmxSeries(g), A = c1 ? sdmxSeries(c1) : {}, B = c2 ? sdmxSeries(c2) : {};
+    const pack = (s, basis) => !s?.length ? null : { value: s.at(-1).v, prev: (s.at(-2) || s.at(-1)).v, period: s.at(-1).t, prevPeriod: s.length > 1 ? s.at(-2).t : "", basis };
+    const data = {};
+    COUNTRIES.forEach(([id]) => {
+      const cs = [A[id], B[id]].filter(s => s?.length).sort((x, y) => y.at(-1).t.localeCompare(x.at(-1).t))[0];
+      data[id] = { gdp: pack(G[id], "trimestre"), cpi: pack(cs, "an") };
+    });
+    macro = { at: Date.now(), data }; ls.set("fin.macro", JSON.stringify(macro));
+  } catch {
+    mErr = navigator.onLine === false ? "Hors ligne : derniers chiffres enregistrés affichés." : "OCDE injoignable pour le moment : derniers chiffres enregistrés affichés.";
+  }
+  mBusy = false; $("mrefresh").classList.remove("spin"); $("mrefresh").disabled = false;
+  if (view === "conj") renderConj(); else if (view === "invest") renderTotals();
+}
+$("country").innerHTML = COUNTRIES.map(([id, n]) => `<option value="${id}">${n}</option>`).join("");
+function renderConj() {
+  const country = S.invest.country, method = S.invest.method;
+  $("country").value = country;
+  document.querySelectorAll("#method button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.m === method)));
+  $("methodNote").textContent = method === "trend"
+    ? "Hausse ou baisse par rapport à la période précédente (accélération ou ralentissement)."
+    : "Hausse si la croissance ou l'inflation est positive, baisse si elle est négative.";
+  const d = macro.data[country], r = regimeOf(d, method), box = $("regime");
+  if (r) {
+    const R = REGIMES[r];
+    box.className = "regime"; box.style.setProperty("--rc", `var(${R.c})`);
+    box.innerHTML = `<div class="eyebrow" style="color:inherit;opacity:.85">${esc(COUNTRIES.find(c => c[0] === country)[1])}</div>
+      <div class="name">${R.name}</div><div class="sub">${R.sub}</div>
+      <div class="meta">PIB ${esc(fmtPeriod(d.gdp.period))} · inflation ${esc(fmtPeriod(d.cpi.period))}</div>`;
+  } else {
+    box.className = "regime empty"; box.style.removeProperty("--rc");
+    box.innerHTML = d && (d.gdp || d.cpi)
+      ? `<div class="name">Données incomplètes</div><div class="sub muted">${d.gdp ? "L'inflation" : "La croissance du PIB"} n'est pas disponible pour ce pays.</div>`
+      : mBusy ? `<div class="name">Chargement…</div><div class="sub muted">Lecture des derniers chiffres publiés par l'OCDE.</div>`
+      : `<div class="name">Pas encore de données</div><div class="sub muted">Touchez « Actualiser » (connexion internet nécessaire).</div>`;
+  }
+  const cell = k => { const R = REGIMES[k]; return `<div class="cell${k === r ? " on" : ""}" style="--c:var(${R.c})"><b>${R.name}</b><span>${R.sub}</span></div>` };
+  $("quad").innerHTML = `
+    <div class="axis ylab">Volume ↑</div>${cell("boomdef")}${cell("boominf")}
+    <div class="axis ylab">Volume ↓</div>${cell("dep")}${cell("recinf")}
+    <div></div><div class="axis xlab">Prix ↓</div><div class="axis xlab">Prix ↑</div>`;
+  const tile = (label, x) => {
+    if (!x) return `<div class="panel"><div class="eyebrow">${label}</div><div class="v muted">—</div></div>`;
+    const up = x.value >= x.prev;
+    return `<div class="panel"><div class="eyebrow">${label}</div>
+      <div class="v">${fmtPct(x.value)}</div>
+      ${x.prevPeriod ? `<div class="trend ${up ? "up" : "down"}">${up ? "▲" : "▼"} contre ${fmtPct(x.prev)} (${esc(fmtPeriod(x.prevPeriod))})</div>` : ""}
+      <div class="small muted">${esc(fmtPeriod(x.period))} · ${x.basis === "trimestre" ? "sur un trimestre" : "sur un an"}</div></div>`;
+  };
+  $("ind").innerHTML = tile("Volume · PIB réel", d?.gdp) + tile("Prix · Inflation", d?.cpi);
+  const st = $("mstatus");
+  st.textContent = mBusy ? "Actualisation en cours…" : (mErr ? mErr + " " : "") + (macro.at ? `Chiffres de l'OCDE récupérés le ${new Date(macro.at).toLocaleString("fr-FR", { dateStyle: "medium", timeStyle: "short" })}. Actualisation automatique une fois par jour.` : "");
+  st.className = "notice" + (mErr ? " err" : "");
+  $("msources").innerHTML = `Sources : <a href="https://data-explorer.oecd.org/" target="_blank" rel="noopener">OCDE</a> — comptes nationaux trimestriels (PIB réel) et prix à la consommation (inflation). Les dernières données publiées ont souvent 1 à 3 mois de décalage.`;
+}
+$("country").addEventListener("change", e => { S.invest.country = e.target.value; commit(false); renderConj() });
+$("method").addEventListener("click", e => { const m = e.target.closest("button")?.dataset.m; if (!m) return; S.invest.method = m; commit(false); renderConj() });
+$("mrefresh").addEventListener("click", () => refreshMacro());
+
+/* ---------- Réglages ---------- */
+function renderSettings() {
+  const b = S.budget;
+  if (document.activeElement !== $("s-payday")) $("s-payday").value = b.payday;
+  if (document.activeElement !== $("s-income")) $("s-income").value = fmtIn(b.income);
+  $("s-shift").setAttribute("aria-checked", String(!!b.shiftWeekend));
+  $("s-envs").innerHTML = b.envelopes.map(e => `<div class="erow" data-eid="${esc(e.id)}">
+      <input class="full" data-ek="name" type="text" value="${esc(e.name)}" aria-label="Nom de l'enveloppe" placeholder="Nom">
+      <input class="n" data-ek="planned" type="text" inputmode="decimal" value="${fmtIn(e.planned)}" placeholder="Prévu (€)" aria-label="Montant prévu pour ${esc(e.name)}">
+      <select data-ek="kind" aria-label="Type"><option value="spend"${e.kind !== "save" ? " selected" : ""}>Dépense</option><option value="save"${e.kind === "save" ? " selected" : ""}>Épargne</option></select>
+      <button class="del" type="button" data-edel aria-label="Supprimer l'enveloppe ${esc(e.name)}">✕</button></div>`).join("") || `<div class="notice">Aucune enveloppe.</div>`;
+  updateEnvTotal();
+  $("s-savs").innerHTML = b.savings.map(a => `<div class="erow" data-said="${esc(a.id)}">
+      <input class="full" data-sak="name" type="text" value="${esc(a.name)}" aria-label="Nom du compte" placeholder="Nom du compte">
+      <input class="n" data-sak="goal" type="text" inputmode="decimal" value="${fmtIn(a.goal)}" placeholder="Objectif (€)" aria-label="Objectif pour ${esc(a.name)}" style="grid-column:1 / 3">
+      <button class="del" type="button" data-sadel aria-label="Supprimer le compte ${esc(a.name)}">✕</button></div>`).join("") || `<div class="notice">Aucun compte.</div>`;
+  $("s-classes").innerHTML = CLASSES.map(c => `<label class="field"><span class="small muted" style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:${c.c}"></span>Classe ${CLASSES.indexOf(c) + 1}</span><input type="text" data-cn="${c.id}" value="${esc(cname(c.id))}"></label>`).join("");
+  if (document.activeElement !== $("q-url")) $("q-url").value = S.invest.quotesUrl || "";
+  $("appver").textContent = APP_VERSION;
+}
+function updateEnvTotal() { const t = S.budget.envelopes.reduce((s, e) => s + (+e.planned || 0), 0); $("s-envtotal").textContent = "Total prévu " + fmtEUR(t) }
+$("s-payday").addEventListener("change", e => { S.budget.payday = Math.min(31, Math.max(1, Math.round(+e.target.value) || 25)); e.target.value = S.budget.payday; viewCycle = cycleOf(new Date()); commit(false) });
+$("s-income").addEventListener("input", e => { S.budget.income = parseNum(e.target.value); commit(false) });
+$("s-shift").addEventListener("click", e => { S.budget.shiftWeekend = !S.budget.shiftWeekend; viewCycle = cycleOf(new Date()); commit() });
+$("s-envs").addEventListener("input", e => {
+  const inp = e.target.closest("[data-ek]"); if (!inp || inp.tagName === "SELECT") return;
+  const env = envById(inp.closest("[data-eid]").dataset.eid); if (!env) return;
+  env[inp.dataset.ek] = inp.dataset.ek === "planned" ? parseNum(inp.value) : inp.value;
+  commit(false); updateEnvTotal();
+});
+$("s-envs").addEventListener("change", e => {
+  const sel = e.target.closest("select[data-ek]"); if (!sel) return;
+  const env = envById(sel.closest("[data-eid]").dataset.eid); if (env) { env.kind = sel.value; commit(false) }
+});
+$("s-envs").addEventListener("click", e => {
+  const del = e.target.closest("[data-edel]"); if (!del) return;
+  const id = del.closest("[data-eid]").dataset.eid, used = S.budget.expenses.some(x => x.env === id);
+  if (!del.dataset.confirm) { del.dataset.confirm = "1"; del.textContent = used ? "Suppr. ? (dépenses gardées)" : "Suppr. ?"; del.style.color = "var(--down)";
+    setTimeout(() => { if (del.isConnected) { delete del.dataset.confirm; del.textContent = "✕"; del.style.color = "" } }, 3500); return }
+  S.budget.envelopes = S.budget.envelopes.filter(x => x.id !== id); if (envFilter === id) envFilter = null; commit();
+});
+$("s-envadd").addEventListener("click", () => { S.budget.envelopes.push({ id: rid(), name: "Nouvelle enveloppe", planned: 0, kind: "spend" }); commit(); const rows = document.querySelectorAll("#s-envs [data-ek=name]"); rows[rows.length - 1]?.select() });
+$("s-savs").addEventListener("input", e => {
+  const inp = e.target.closest("[data-sak]"); if (!inp) return;
+  const a = S.budget.savings.find(x => x.id === inp.closest("[data-said]").dataset.said); if (!a) return;
+  a[inp.dataset.sak] = inp.dataset.sak === "goal" ? parseNum(inp.value) : inp.value; commit(false);
+});
+$("s-savs").addEventListener("click", e => {
+  const del = e.target.closest("[data-sadel]"); if (!del) return;
+  if (!del.dataset.confirm) { del.dataset.confirm = "1"; del.textContent = "Suppr. ?"; del.style.color = "var(--down)";
+    setTimeout(() => { if (del.isConnected) { delete del.dataset.confirm; del.textContent = "✕"; del.style.color = "" } }, 3000); return }
+  const id = del.closest("[data-said]").dataset.said; S.budget.savings = S.budget.savings.filter(x => x.id !== id); commit();
+});
+$("s-savadd").addEventListener("click", () => { S.budget.savings.push({ id: rid(), name: "Nouveau compte", balance: 0, goal: 0 }); commit(); const rows = document.querySelectorAll("#s-savs [data-sak=name]"); rows[rows.length - 1]?.select() });
+$("s-classes").addEventListener("input", e => { const inp = e.target.closest("[data-cn]"); if (!inp) return; S.invest.classNames[inp.dataset.cn] = inp.value.trim() || defaultState().invest.classNames[inp.dataset.cn]; commit(false) });
+$("q-copy").addEventListener("click", async () => {
+  const tsv = sheetTSV(), msg = $("q-msg");
+  if (!tsv) { msg.textContent = "Indiquez d'abord le symbole de vos lignes dans l'onglet Portefeuille (colonne « Symbole »)."; msg.className = "notice err"; return }
+  $("q-tsv").value = tsv; $("q-tsvbox").hidden = false;
+  try { await navigator.clipboard.writeText(tsv); msg.textContent = `${tsv.split("\n").length - 1} ligne(s) copiée(s). Collez-les en A1 d'un Google Sheets.`; msg.className = "notice" }
+  catch { msg.textContent = "Copie automatique refusée : sélectionnez le texte ci-dessus et copiez-le."; msg.className = "notice"; $("q-tsv").select() }
+});
+$("q-url").addEventListener("change", e => {
+  const v = e.target.value.trim(), msg = $("q-msg");
+  if (v && !/^https:\/\//.test(v)) { msg.textContent = "Le lien doit commencer par https://"; msg.className = "notice err"; return }
+  S.invest.quotesUrl = v; commit(false);
+  if (!v) { msg.textContent = "Cours en direct désactivés."; msg.className = "notice"; return }
+  msg.textContent = "Lecture du tableau…"; msg.className = "notice";
+  refreshQuotes().then(() => {
+    const n = Object.keys(quotes.map).length;
+    msg.textContent = qErr ? qErr : `Tableau lu : ${n} symbole${n > 1 ? "s" : ""}. Les cours s'affichent dans l'onglet Portefeuille.`;
+    msg.className = "notice" + (qErr ? " err" : "");
+  });
+});
+$("reload").addEventListener("click", async () => { try { const r = await navigator.serviceWorker?.getRegistration(); await r?.update() } catch {} location.reload() });
+
+// Sauvegarde
+$("bk-export").addEventListener("click", () => {
+  const data = JSON.stringify({ app: "mes-finances", version: APP_VERSION, exportedAt: new Date().toISOString(), state: S }, null, 2);
+  try {
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([data], { type: "application/json" }));
+    a.download = `finances-${todayKey()}.json`; document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove() }, 2000);
+    $("bk-msg").textContent = "Sauvegarde exportée.";
+  } catch { $("bk-msg").textContent = "Export impossible sur cet appareil." }
+});
+function confirmBox(text, label, onOk) {
+  const box = $("bk-confirm"); box.hidden = false;
+  box.innerHTML = `<div class="hint notice" style="color:var(--fg)">${text}</div><div class="actions"><button class="btn" type="button" data-cx>Annuler</button><button class="btn danger" type="button" data-ok>${label}</button></div>`;
+  box.querySelector("[data-cx]").onclick = () => { box.hidden = true; box.innerHTML = "" };
+  box.querySelector("[data-ok]").onclick = () => { box.hidden = true; box.innerHTML = ""; onOk() };
+}
+$("bk-file").addEventListener("change", async e => {
+  const f = e.target.files?.[0]; e.target.value = ""; if (!f) return;
+  try {
+    const j = JSON.parse(await f.text()), st = j.state || j;
+    if (!st.budget && !st.invest) throw new Error("format");
+    const ns = normalize(st), when = j.exportedAt ? new Date(j.exportedAt).toLocaleString("fr-FR", { dateStyle: "medium", timeStyle: "short" }) : "date inconnue";
+    confirmBox(`Remplacer toutes les données par cette sauvegarde (${esc(when)}, ${ns.budget.expenses.length} dépenses) ?${sync.user ? " Elle sera aussi envoyée en ligne." : ""}`, "Remplacer", () => {
+      S = ns; viewCycle = cycleOf(new Date()); commit(); $("bk-msg").textContent = "Sauvegarde importée.";
+    });
+  } catch { $("bk-msg").textContent = "Ce fichier n'est pas une sauvegarde valide." }
+});
+$("bk-reset").addEventListener("click", () => confirmBox(`Effacer toutes les dépenses, comptes et positions ?${sync.user ? " Les données en ligne seront aussi effacées." : ""} Pensez à exporter une sauvegarde avant.`, "Tout effacer", () => {
+  S = defaultState(); viewCycle = cycleOf(new Date()); commit(); $("bk-msg").textContent = "Données effacées.";
+}));
+
+/* ---------- Synchronisation (Firebase) ---------- */
+// Un document par utilisateur : users/{uid}/app/state = { json, updatedAt, device }.
+// Le dernier appareil qui enregistre l'emporte ; Firestore met les envois en attente hors ligne.
+function parseFbConfig(text) {
+  const t = String(text || "").trim(); let o = null;
+  try { o = JSON.parse(t) } catch {
+    o = {}; const re = /["']?(\w+)["']?\s*:\s*["']([^"']+)["']/g; let m;
+    while ((m = re.exec(t))) o[m[1]] = m[2];
+  }
+  return o && o.apiKey && o.projectId && o.appId ? { apiKey: o.apiKey, authDomain: o.authDomain || `${o.projectId}.firebaseapp.com`, projectId: o.projectId, appId: o.appId, ...(o.storageBucket ? { storageBucket: o.storageBucket } : {}), ...(o.messagingSenderId ? { messagingSenderId: o.messagingSenderId } : {}) } : null;
+}
+function authMsg(e) {
+  const c = e?.code || "";
+  if (/invalid-credential|wrong-password|user-not-found|invalid-login/.test(c)) return "E-mail ou mot de passe incorrect.";
+  if (/email-already-in-use/.test(c)) return "Un compte existe déjà avec cet e-mail : utilisez « Se connecter ».";
+  if (/weak-password/.test(c)) return "Mot de passe trop court (6 caractères minimum).";
+  if (/invalid-email|missing-email/.test(c)) return "Adresse e-mail invalide.";
+  if (/missing-password/.test(c)) return "Indiquez un mot de passe.";
+  if (/too-many-requests/.test(c)) return "Trop de tentatives. Réessayez dans quelques minutes.";
+  if (/network-request-failed/.test(c)) return "Pas de connexion internet.";
+  if (/operation-not-allowed|configuration-not-found/.test(c)) return "Activez « Adresse e-mail/Mot de passe » dans Firebase › Authentication › Méthode de connexion.";
+  if (/api-key/.test(c)) return "Clé API invalide : recollez la configuration Firebase.";
+  if (/unauthorized-domain|requests-from-referer|referer/.test(c)) return "Ce site n'est pas autorisé : ajoutez son adresse dans Firebase › Authentication › Paramètres › Domaines autorisés.";
+  return "Erreur : " + (c || e?.message || "inconnue");
+}
+function fsMsg(e) {
+  const c = e?.code || "";
+  if (/permission-denied/.test(c)) return "Accès refusé par Firestore : vérifiez les règles de sécurité (voir le guide).";
+  if (/not-found|failed-precondition/.test(c)) return "Base Firestore introuvable : créez-la dans la console Firebase (Firestore Database).";
+  if (/unavailable/.test(c)) return "Firestore injoignable pour le moment : nouvel essai automatique.";
+  return "Erreur de synchronisation : " + (c || e?.message || "inconnue");
+}
+const sync = {
+  fb: null, user: null, ref: null, unsub: null, timer: null, status: "off", msg: "", remote: null, remoteAt: 0, serverSeen: false, mode: "",
+  cfg() { try { return JSON.parse(ls.get(LS.fb)) } catch { return null } },
+  set(status, msg = "") { this.status = status; this.msg = msg; renderSync() },
+  async start() {
+    const cfg = this.cfg(); if (!cfg) { this.set("off"); return }
+    this.set("loading", "Connexion à Firebase…");
+    try {
+      const base = `https://www.gstatic.com/firebasejs/${FB_VERSION}/`;
+      const [A, U, F] = await Promise.all([import(base + "firebase-app.js"), import(base + "firebase-auth.js"), import(base + "firebase-firestore.js")]);
+      const app = A.initializeApp(cfg);
+      let db;
+      try { db = F.initializeFirestore(app, { localCache: F.persistentLocalCache({ tabManager: F.persistentMultipleTabManager() }) }) }
+      catch { db = F.getFirestore(app) }
+      this.fb = { A, U, F, app, db, auth: U.getAuth(app) };
+      U.onAuthStateChanged(this.fb.auth, u => this.onUser(u));
+    } catch (e) {
+      this.set("error", navigator.onLine === false ? "Hors ligne : la synchronisation reprendra au prochain lancement avec internet." : "Impossible de charger Firebase. Vérifiez la configuration collée.");
+    }
+  },
+  onUser(u) {
+    this.user = u; this.serverSeen = false; this.remote = null;
+    if (this.unsub) { this.unsub(); this.unsub = null }
+    if (!u) { this.ref = null; this.set("signedout"); return }
+    const { F, db } = this.fb;
+    this.ref = F.doc(db, "users", u.uid, "app", "state");
+    this.set("syncing", "Synchronisation…");
+    this.unsub = F.onSnapshot(this.ref, { includeMetadataChanges: true }, snap => this.onSnap(snap), err => this.set("error", fsMsg(err)));
+  },
+  onSnap(snap) {
+    if (snap.metadata.hasPendingWrites) { this.set("syncing", "Envoi en cours…"); return }
+    if (snap.metadata.fromCache) { if (this.status !== "choice") this.set(this.serverSeen ? "offline" : "syncing", this.serverSeen ? "Hors ligne : les modifications seront envoyées au retour du réseau." : "Synchronisation…"); return }
+    this.serverSeen = true;
+    const d = snap.exists() ? snap.data() : null, uid = this.user.uid, linked = ls.get(LS.link) === uid;
+    if (!d) { this.link(); this.pushNow(); return }                    // rien en ligne : on envoie les données de cet appareil
+    if (d.device === DEVICE && linked) { this.set("ok"); return }       // écho de notre propre envoi
+    let remote; try { remote = normalize(JSON.parse(d.json)) } catch { this.set("error", "Les données en ligne sont illisibles."); return }
+    if (!linked) {
+      if (!S.updatedAt || d.json === JSON.stringify(S)) { applyRemote(remote); this.link(); this.set("ok"); return }
+      this.remote = remote; this.remoteAt = +d.updatedAt || 0; this.set("choice"); return;
+    }
+    applyRemote(remote); this.set("ok");
+  },
+  link() { ls.set(LS.link, this.user.uid) },
+  push() { if (!this.ref || this.status === "choice") return; clearTimeout(this.timer); this.timer = setTimeout(() => this.pushNow(), 800) },
+  cancelPush() { clearTimeout(this.timer); this.timer = null },
+  pushNow() {
+    if (!this.ref) return; this.cancelPush();
+    const { F } = this.fb;
+    F.setDoc(this.ref, { json: JSON.stringify(S), updatedAt: S.updatedAt || Date.now(), device: DEVICE, app: APP_VERSION })
+      .catch(e => this.set("error", fsMsg(e)));
+  },
+  chooseRemote() { if (!this.remote) return; const r = this.remote; this.remote = null; this.link(); applyRemote(r); this.set("ok"); toast("Données en ligne chargées sur cet appareil.") },
+  chooseLocal() { this.remote = null; this.link(); this.set("syncing", "Envoi en cours…"); this.pushNow(); toast("Les données de cet appareil ont été envoyées en ligne.") },
+  async signIn(email, pw, create) {
+    const { U, auth } = this.fb; $("syncmsg").textContent = create ? "Création du compte…" : "Connexion…"; $("syncmsg").className = "notice";
+    try { create ? await U.createUserWithEmailAndPassword(auth, email, pw) : await U.signInWithEmailAndPassword(auth, email, pw) }
+    catch (e) { $("syncmsg").textContent = authMsg(e); $("syncmsg").className = "notice err" }
+  },
+  async reset(email) {
+    const { U, auth } = this.fb;
+    try { await U.sendPasswordResetEmail(auth, email); $("syncmsg").textContent = "E-mail de réinitialisation envoyé (vérifiez aussi les spams)."; $("syncmsg").className = "notice" }
+    catch (e) { $("syncmsg").textContent = authMsg(e); $("syncmsg").className = "notice err" }
+  },
+  async signOut() { try { await this.fb.U.signOut(this.fb.auth) } catch {} },
+  async remove() { if (this.user) await this.signOut(); ls.del(LS.fb); ls.del(LS.link); location.reload() }
+};
+const PILL = { off: ["Local", ""], loading: ["Synchro…", ""], syncing: ["Synchro…", ""], ok: ["Synchronisé", "good"], offline: ["Hors ligne", "warn"], error: ["Erreur synchro", "bad"], signedout: ["Non connecté", "warn"], choice: ["Action requise", "warn"] };
+function renderSync() {
+  const [txt, cls] = PILL[sync.status] || PILL.off;
+  document.querySelectorAll("[data-syncpill]").forEach(p => { p.textContent = txt; p.className = "pill " + cls });
+  // Bandeau : choix au premier branchement, ou erreur
+  const bn = $("banner");
+  if (sync.status === "choice") {
+    bn.hidden = false; bn.className = "banner";
+    bn.innerHTML = `<div><b>Des données existent déjà en ligne</b> (dernière modification le ${esc(new Date(sync.remoteAt || Date.now()).toLocaleString("fr-FR", { dateStyle: "medium", timeStyle: "short" }))}). Que faire sur cet appareil ?</div>
+      <div class="actions" style="justify-content:flex-start"><button class="btn primary" type="button" data-sc="remote">Utiliser les données en ligne</button><button class="btn" type="button" data-sc="local">Garder celles de cet appareil</button></div>`;
+  } else if (sync.status === "error" && sync.user) {
+    bn.hidden = false; bn.className = "banner err";
+    bn.innerHTML = `<div>${esc(sync.msg)}</div><div class="actions" style="justify-content:flex-start"><button class="btn" type="button" data-sc="retry">Réessayer</button></div>`;
+  } else { bn.hidden = true; bn.innerHTML = "" }
+  if (view !== "reglages") return;
+  // Boîte de réglage : reconstruite seulement quand l'étape change, pour ne pas effacer une saisie en cours
+  const mode = !sync.cfg() ? "config" : sync.user ? "in" : (sync.status === "signedout" ? "login" : "wait");
+  const box = $("syncbox");
+  if (mode !== sync.mode || !box.innerHTML) {
+    sync.mode = mode;
+    if (mode === "config") box.innerHTML = `<div class="notice" style="color:var(--fg)">Pour retrouver les mêmes données sur votre téléphone et votre PC, reliez l'appli à votre projet Firebase (gratuit). Collez ci-dessous la configuration copiée depuis la console Firebase (bloc <code>firebaseConfig</code>).</div>
+      <label class="field"><span class="small muted">Configuration Firebase</span><textarea id="fbcfg" spellcheck="false" autocomplete="off" placeholder='const firebaseConfig = {&#10;  apiKey: "…",&#10;  authDomain: "…",&#10;  projectId: "…",&#10;  appId: "…"&#10;};'></textarea></label>
+      <div class="actions"><button class="btn primary" type="button" id="fbsave">Enregistrer</button></div>`;
+    else if (mode === "login") box.innerHTML = `<div class="notice" style="color:var(--fg)">Connectez-vous avec le même compte sur chaque appareil. Première fois : choisissez « Créer mon compte ».</div>
+      <label class="field"><span class="small muted">E-mail</span><input id="au-mail" type="email" autocomplete="username" inputmode="email"></label>
+      <label class="field"><span class="small muted">Mot de passe</span><input id="au-pw" type="password" autocomplete="current-password"></label>
+      <div class="actions"><button class="btn" type="button" id="au-new">Créer mon compte</button><button class="btn primary" type="button" id="au-in">Se connecter</button></div>
+      <div class="actions" style="justify-content:space-between"><button class="linkbtn small" type="button" id="au-reset">Mot de passe oublié</button><button class="linkbtn small" type="button" id="fbremove" style="color:var(--down)">Retirer la configuration</button></div>`;
+    else if (mode === "in") box.innerHTML = `<div class="kv"><span>Compte</span><code id="au-who"></code></div>
+      <div class="kv"><span>Identifiant (pour les règles)</span><code id="au-uid"></code></div>
+      <div class="actions"><button class="btn" type="button" id="au-copy">Copier l'identifiant</button><button class="btn" type="button" id="au-out">Se déconnecter</button></div>
+      <div><button class="linkbtn small" type="button" id="fbremove" style="color:var(--down)">Retirer la configuration</button></div>`;
+    else box.innerHTML = `<div class="notice">Connexion à Firebase…</div><div><button class="linkbtn small" type="button" id="fbremove" style="color:var(--down)">Retirer la configuration</button></div>`;
+  }
+  if (mode === "in") { $("au-who").textContent = sync.user.email || "—"; $("au-uid").textContent = sync.user.uid }
+  const m = $("syncmsg");
+  const STATUS_TXT = { ok: "Données synchronisées.", offline: sync.msg, syncing: sync.msg, loading: sync.msg, error: sync.msg, choice: "Choisissez quelles données garder (bandeau en haut).", off: "Mode local : les données restent sur cet appareil.", signedout: "" };
+  if (!(sync.status === "signedout" && m.textContent)) { m.textContent = STATUS_TXT[sync.status] ?? ""; m.className = "notice" + (sync.status === "error" ? " err" : "") }
+}
+$("banner").addEventListener("click", e => {
+  const b = e.target.closest("[data-sc]"); if (!b) return;
+  if (b.dataset.sc === "remote") sync.chooseRemote(); else if (b.dataset.sc === "local") sync.chooseLocal(); else if (sync.user) sync.onUser(sync.user);
+});
+$("syncbox").addEventListener("click", e => {
+  const id = e.target.closest("button")?.id; if (!id) return;
+  const mail = () => $("au-mail")?.value.trim() || "", pw = () => $("au-pw")?.value || "";
+  if (id === "fbsave") {
+    const cfg = parseFbConfig($("fbcfg").value);
+    if (!cfg) { $("syncmsg").textContent = "Configuration incomplète : il faut au moins apiKey, projectId et appId."; $("syncmsg").className = "notice err"; return }
+    ls.set(LS.fb, JSON.stringify(cfg)); sync.start();
+  }
+  else if (id === "au-in") sync.signIn(mail(), pw(), false);
+  else if (id === "au-new") sync.signIn(mail(), pw(), true);
+  else if (id === "au-reset") { if (!mail()) { $("syncmsg").textContent = "Indiquez d'abord votre e-mail."; $("syncmsg").className = "notice err" } else sync.reset(mail()) }
+  else if (id === "au-out") sync.signOut();
+  else if (id === "au-copy") navigator.clipboard?.writeText(sync.user?.uid || "").then(() => toast("Identifiant copié."), () => toast("Copie impossible : sélectionnez-le à la main."));
+  else if (id === "fbremove") { const b = e.target.closest("button"); if (!b.dataset.confirm) { b.dataset.confirm = "1"; b.textContent = "Confirmer : retirer la synchronisation de cet appareil"; return } sync.remove() }
+});
+$("syncbox").addEventListener("keydown", e => { if (e.key === "Enter" && e.target.id === "au-pw") sync.signIn($("au-mail").value.trim(), $("au-pw").value, false) });
+
+/* ---------- Démarrage ---------- */
+show(location.hash.slice(1) || "budget");
+sync.start();
+refreshQuotes();
+if (Date.now() - macro.at > 12 * 36e5) refreshMacro();
+setInterval(() => { if (document.visibilityState === "visible") refreshQuotes() }, 5 * 60e3);
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState !== "visible") return;
+  if (Date.now() - quotes.at > 5 * 60e3) refreshQuotes();
+  if (Date.now() - macro.at > 12 * 36e5) refreshMacro();
+});
+if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) navigator.serviceWorker.register("./sw.js").catch(() => {});
+// Au retour sur l'appli (ex. le lendemain), on recale le cycle affiché sur la date du jour.
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && view === "budget" && $("sheet").hidden) { const c = cycleOf(new Date()); if (c.key !== viewCycle.key && isCurrent(shiftCycle(viewCycle, 1))) { viewCycle = c; renderBudget() } } });
+</script>
+</body>
+</html>
