@@ -48,7 +48,7 @@ Les intitulés de la console peuvent varier légèrement.
 
 ## 3. Relier l'appli à Firebase
 
-1. Sur le PC, ouvrez l'adresse GitHub Pages → onglet **Réglages** → **Synchronisation**.
+1. Sur le PC, ouvrez l'adresse GitHub Pages → menu ☰ → **Réglages** → **Synchronisation**.
 2. Collez le bloc `firebaseConfig` → **Enregistrer**.
 3. Saisissez votre e-mail et un mot de passe → **Créer mon compte**.
 4. Sur le téléphone, ouvrez la même adresse, collez la même configuration, puis **Se connecter** avec le même compte.
@@ -76,20 +76,36 @@ La configuration Firebase (`apiKey`, etc.) n'est pas un secret : la protection v
 
 ## Utilisation
 
-**Budget**
-- Le bouton **+** ajoute une **dépense** ou une **entrée d'argent** (onglet en haut de la fenêtre).
+**Navigation**
+- Le bouton **☰** en haut à gauche ouvre le menu : **Accueil** (le cycle de paie en cours), **Bilan**, **Comptes**, **Budget**, **Portefeuille**, **Conjoncture** et **Réglages**. En haut du menu : votre patrimoine suivi ; en bas : l'état et l'heure de la dernière synchronisation.
+- Pour fermer le menu : touchez une rubrique, la zone grisée, ou faites-le glisser vers la gauche. Sur un écran large (PC), le menu reste affiché à gauche.
+- Le bouton Retour du téléphone revient à la rubrique précédente.
+- Couleurs : **vert** pour les revenus, **orange** pour les dépenses, **bleu** pour l'épargne. Une enveloppe de dépense dépassée est hachurée en rouge, avec ⚠.
+
+**Accueil (cycle de paie)**
+- Le bouton **+** ajoute une **dépense** ou une **entrée d'argent** (choix en haut de la fenêtre).
 - Une entrée a une **catégorie** (remboursement mutuelle, remboursement d'un proche, vente, prime, cadeau…) pour savoir d'où vient l'argent. Elle peut aussi être **déduite d'une enveloppe** : un remboursement de mutuelle redonne le montant à l'enveloppe Santé, et un ami qui rembourse sa part du resto le redonne à Restaurants. Sans enveloppe, l'argent s'ajoute simplement au reste du cycle (vente, prime…).
 - Les catégories d'entrées et leur enveloppe par défaut se règlent dans **Réglages › Catégories d'entrées**.
 - Touchez un mouvement pour le modifier ou le supprimer, et une enveloppe pour filtrer la liste (ses dépenses et ses remboursements).
-- Le **revenu du cycle** reprend le revenu habituel défini dans les Réglages. Modifiez-le sur un cycle pour une prime, un salaire différent, etc.
-- Les enveloppes de type **Épargne** (virements vers l'épargne ou les placements) comptent dans les sorties, mais pas dans le « reste par jour ».
-- Les soldes des comptes d'épargne se mettent à jour dans l'onglet Budget. Le nom et l'objectif se règlent dans les Réglages.
+- Le **revenu du cycle** reprend le revenu habituel défini dans **Budget**. Modifiez-le sur un cycle pour une prime, un salaire différent, etc.
+- Les enveloppes de type **Épargne** (virements vers l'épargne ou les placements) comptent dans les sorties, mais pas dans le « reste par jour ». Mettre plus que prévu y est une bonne nouvelle : la barre reste bleue, avec ✓.
+
+**Budget (montants prévus)**
+- Fixez le **revenu habituel** et le montant prévu de chaque enveloppe ; en haut : total prévu, part de dépenses et d'épargne, et ce qui reste **non affecté**.
+- Sous chaque enveloppe, la **moyenne** de ce que vous y avez mis sur les 12 derniers cycles terminés (remboursements déduits). **Mettre X €** reprend cette moyenne arrondie à 5 €, **Remplir avec les moyennes** le fait pour toutes les enveloppes.
+- Par défaut, les dépenses exceptionnelles (900 € et plus) sont ignorées dans les moyennes, sauf pour l'épargne.
+- **Coller un budget** : collez le budget mis au point avec Claude, une enveloppe par ligne (`Courses : 230 €`, liste ou tableau). Les enveloppes reconnues sont mises à jour, les autres sont créées (en type Épargne si le nom l'évoque : livret, PEA, placement…). Les lignes « Total » ou « Salaire » sont ignorées. **Annuler** rétablit le budget d'avant.
+
+**Comptes**
+- Solde et objectif (facultatif) de chaque compte d'épargne, avec la progression vers l'objectif.
+- Le patrimoine suivi additionne les comptes d'épargne et le portefeuille.
 
 **Bilan**
-- En haut de l'onglet Budget, basculez de **Cycle** à **Bilan**.
 - Choisissez la période : 12 derniers cycles, une année, ou tout l'historique.
 - **Dépenses** = sorties hors virements vers l'épargne et les placements. **Épargne** = revenus − dépenses (dont la part virée sur vos livrets et placements).
-- Le graphique montre les dépenses de chaque cycle (barre rouge si elles dépassent les revenus) ; touchez une barre pour ouvrir ce cycle.
+- Le graphique montre, pour chaque cycle, trois barres : revenus, dépenses et épargne (sous la ligne de zéro si vous avez dépensé plus que gagné).
+- **Touchez une barre** : une bulle affiche les montants exacts du cycle, avec **Voir le cycle**. Touchez-la à nouveau, ou ailleurs, pour la fermer. Avec beaucoup de cycles, faites glisser le graphique.
+- **Voir les chiffres par cycle** affiche les mêmes montants en tableau.
 
 **Importer un historique (Excel / CSV)**
 1. **Réglages** → **Importer un historique** → **Choisir le fichier**.
@@ -99,7 +115,7 @@ La configuration Firebase (`apiKey`, etc.) n'est pas un secret : la protection v
 5. Par défaut, seuls les mouvements **antérieurs** à votre premier mouvement saisi dans l'appli sont importés, pour éviter les doubles saisies. Videz la case « Importer jusqu'au » pour tout importer.
 6. En cas d'erreur : **Annuler cet import** retire tout ce que le dernier import a ajouté.
 
-Vos choix de catégories sont mémorisés pour les imports suivants. Les enveloppes sans budget ni mouvement sur un cycle sont masquées dans la vue Cycle.
+Vos choix de catégories sont mémorisés pour les imports suivants. Les enveloppes sans budget ni mouvement sur un cycle sont masquées dans l'Accueil.
 
 **Investissements (DEGIRO)**
 1. Sur le site DEGIRO : **Portefeuille** → **Exporter** → **CSV**.
@@ -111,7 +127,7 @@ Vos choix de catégories sont mémorisés pour les imports suivants. Les envelop
 
 Les services de cours gratuits ne couvrent que les actions américaines. L'appli passe donc par la fonction `GOOGLEFINANCE` de Google Sheets, gratuite et valable pour toutes les places (New York, Paris, Varsovie, Londres…), avec un différé d'environ 20 minutes.
 
-1. Onglet **Portefeuille** : pour chaque ligne, indiquez la **quantité** (remplie automatiquement par l'import DEGIRO) et le **symbole** Google Finance, au format `PLACE:CODE` :
+1. Rubrique **Portefeuille** : pour chaque ligne, indiquez la **quantité** (remplie automatiquement par l'import DEGIRO) et le **symbole** Google Finance, au format `PLACE:CODE` :
 
    | Exemple | Symbole |
    |---|---|
@@ -149,7 +165,7 @@ Réglages → **Exporter** crée un fichier `.json`. Gardez-en une copie de temp
 
 ## Mettre à jour l'appli
 
-1. Dans GitHub : **Add file** → **Upload files** → déposez les fichiers modifiés (versions 1.2 et 1.3 : `index.html`, et `README.md` si vous voulez le guide à jour ; version 1.1 : `index.html`, `sw.js` et `README.md`) → **Commit changes**. GitHub remplace les anciens fichiers du même nom.
+1. Dans GitHub : **Add file** → **Upload files** → déposez les fichiers modifiés (versions 1.2 à 1.4 : `index.html`, et `README.md` si vous voulez le guide à jour ; version 1.1 : `index.html`, `sw.js` et `README.md`) → **Commit changes**. GitHub remplace les anciens fichiers du même nom.
 2. Attendez une minute, puis dans l'appli : **Réglages** → **Recharger l'appli**. La version affichée en bas des Réglages doit changer.
 3. Si vous changez aussi les icônes ou le manifeste, augmentez le numéro `CACHE` en haut de `sw.js` (`finances-v3`, etc.).
 
@@ -157,9 +173,10 @@ Vos données ne sont pas touchées par une mise à jour.
 
 ## Historique des versions
 
+- **1.4** : menu latéral (patrimoine, rubriques, heure de synchronisation), rubriques Bilan, Comptes et Budget séparées ; page Budget avec moyennes des derniers cycles et budget à coller ; couleurs par type (revenus, dépenses, épargne), épargne au-dessus de l'objectif en bleu ; Bilan en barres groupées avec bulle des montants exacts au toucher ; plus de zoom au double-tap.
 - **1.3** : vue Bilan (période, revenus, dépenses, épargne, graphique par cycle, totaux par enveloppe et par catégorie d'entrée) ; import d'historique Excel / CSV (feuilles dépenses, revenus et transferts, catégories → enveloppes, salaires → revenu du cycle, doublons ignorés, annulation).
 - **1.2** : entrées d'argent avec catégories (remboursements, ventes, primes…), déductibles d'une enveloppe ; liste « Mouvements » ; détail des entrées dans le résumé du cycle.
-- **1.1** : cours en direct (Google Sheets), colonnes Quantité / Symbole / Cours, onglet Conjoncture (OCDE), classes favorisées dans le rééquilibrage, inflation réelle du pays dans le calcul « après inflation ».
+- **1.1** : cours en direct (Google Sheets), colonnes Quantité / Symbole / Cours, rubrique Conjoncture (OCDE), classes favorisées dans le rééquilibrage, inflation réelle du pays dans le calcul « après inflation ».
 - **1.0** : budget par cycle de paie, portefeuille et import DEGIRO, synchronisation Firebase, mode hors ligne.
 
 ## Fichiers

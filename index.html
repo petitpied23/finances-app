@@ -2,9 +2,10 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <title>Mes Finances</title>
-<meta name="theme-color" content="#2346d8">
+<meta name="theme-color" content="#f3f5f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e1419" media="(prefers-color-scheme: dark)">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -15,12 +16,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* Appli mobile à trois onglets (Budget / Investissements / Réglages), colonne centrée, barre d'onglets fixe en bas */
+/* Appli mobile : barre du haut + menu latéral (fixe à gauche sur grand écran), colonne centrée */
 :root {
   --bg: #f3f5f7; --surface: #ffffff; --fg: #14202b; --muted: #5d6b78; --line: #dde3e9;
   --accent: #2346d8; --accent-fg: #ffffff; --warn: #c97a0a;
   --up: #138a5b; --down: #c4342d;
   --boomdef: #138a5b; --boominf: #c97a0a; --recinf: #c4342d; --dep: #2b6cb0;
+  /* Couleurs des types de mouvement : revenus, dépenses, épargne */
+  --c-rev: #1baf7a; --c-exp: #eb6834; --c-sav: #2a78d6;
   --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --body: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
@@ -30,14 +33,14 @@
   --bg: #0e1419; --surface: #172029; --fg: #e6ecf1; --muted: #93a1ae; --line: #26323d;
   --accent: #7d97ff; --accent-fg: #0e1419; --warn: #f0a63a;
   --up: #3cc28b; --down: #f06a5f; color-scheme: dark;
-  --boomdef: #3cc28b; --boominf: #f0a63a; --recinf: #f06a5f; --dep: #6aa7ea } }
+  --boomdef: #3cc28b; --boominf: #f0a63a; --recinf: #f06a5f; --dep: #6aa7ea;
+  --c-rev: #199e70; --c-exp: #d95926; --c-sav: #3987e5 } }
 
 * { box-sizing: border-box }
 [hidden] { display: none !important }
-html { -webkit-text-size-adjust: 100% }
-body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.45;
-  padding-top: env(safe-area-inset-top, 0px); -webkit-tap-highlight-color: transparent }
-.wrap { max-width: 720px; margin: 0 auto; padding-top: 12px; padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px));
+html { -webkit-text-size-adjust: 100%; touch-action: manipulation }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.45; -webkit-tap-highlight-color: transparent }
+.wrap { max-width: 720px; margin: 0 auto; padding-top: 6px; padding-bottom: calc(104px + env(safe-area-inset-bottom, 0px));
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
   display: flex; flex-direction: column; gap: 16px }
 h1, h2 { font-family: var(--display); margin: 0; text-wrap: balance }
@@ -48,7 +51,7 @@ h2 { font-size: 1.15rem; font-weight: 600 }
 .muted { color: var(--muted) }
 .small { font-size: .82rem }
 .num { font-family: var(--mono); font-variant-numeric: tabular-nums }
-.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; min-width: 0 }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; min-width: 0; scroll-margin-top: calc(70px + env(safe-area-inset-top, 0px)) }
 .stack { display: flex; flex-direction: column; gap: 12px }
 button, select, input, textarea { font: inherit; color: inherit }
 input, select, textarea { font-size: 16px }
@@ -82,24 +85,59 @@ label.field { display: flex; flex-direction: column; gap: 6px; min-width: 0 }
 .del:hover { color: var(--down) }
 .bar { height: 8px; border-radius: 99px; background: var(--line); overflow: hidden }
 .bar i { display: block; height: 100%; background: var(--accent); border-radius: 99px }
-.bar i.over { background: var(--down) }
+.bar i.over { background: repeating-linear-gradient(135deg, var(--down) 0 5px, color-mix(in srgb, var(--down) 45%, var(--surface)) 5px 8px) }
+.bar i.t-exp { background: var(--c-exp) }
+.bar i.t-sav { background: var(--c-sav) }
+.bar i.t-rev { background: var(--c-rev) }
+.tdot { display: inline-block; width: 9px; height: 9px; border-radius: 3px; flex: none; vertical-align: baseline; margin-right: 6px }
+.tdot.t-rev { background: var(--c-rev) } .tdot.t-exp { background: var(--c-exp) } .tdot.t-sav { background: var(--c-sav) }
 
-/* Barre d'onglets */
-.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; display: grid; grid-template-columns: repeat(4, 1fr);
-  background: var(--surface); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom, 0px) }
-.tabs button { border: 0; background: transparent; padding: 8px 4px 10px; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: .72rem; font-weight: 600; color: var(--muted) }
-.tabs button svg { width: 24px; height: 24px }
-.tabs button[aria-current="page"] { color: var(--accent) }
+/* Barre du haut */
+.appbar { position: sticky; top: 0; z-index: 8; background: var(--bg); padding-top: env(safe-area-inset-top, 0px); border-bottom: 1px solid transparent; transition: border-color .15s }
+.appbar.scrolled { border-bottom-color: var(--line) }
+.appbar .in { max-width: 720px; margin: 0 auto; display: flex; align-items: center; gap: 8px; min-height: 56px;
+  padding: 0 max(10px, env(safe-area-inset-right, 0px)) 0 max(6px, env(safe-area-inset-left, 0px)) }
+.appbar h1 { font-size: 1.35rem; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.iconbtn { border: 0; background: transparent; width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; flex: none; color: var(--fg) }
+.iconbtn:hover { background: color-mix(in srgb, var(--fg) 7%, transparent) }
+.iconbtn svg { width: 24px; height: 24px }
+
+/* Menu latéral */
+.drawer { position: fixed; top: 0; bottom: 0; left: 0; z-index: 25; width: min(300px, 84vw); background: var(--surface); border-right: 1px solid var(--line);
+  display: flex; flex-direction: column; transform: translateX(-102%); transition: transform .22s ease; visibility: hidden;
+  padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px) }
+.drawer.open { transform: none; visibility: visible; box-shadow: 0 0 40px rgb(0 0 0 / .25) }
+.scrim { position: fixed; inset: 0; z-index: 24; background: rgb(10 16 22 / .45) }
+.dhead { padding: 22px 20px 16px; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 4px }
+.dhead .brand { font-family: var(--display); font-weight: 800; font-size: 1.2rem }
+.dhead .big { font-size: 1.6rem }
+.dnav { flex: 1; overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 2px }
+.dnav button { display: flex; align-items: center; gap: 14px; border: 0; background: transparent; padding: 11px 14px; border-radius: 12px; font-weight: 600; text-align: left; color: var(--fg); width: 100% }
+.dnav button svg { width: 22px; height: 22px; flex: none; color: var(--muted) }
+.dnav button:hover { background: color-mix(in srgb, var(--fg) 6%, transparent) }
+.dnav button[aria-current="page"] { background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent) }
+.dnav button[aria-current="page"] svg { color: var(--accent) }
+.dnav hr { border: 0; border-top: 1px solid var(--line); margin: 6px 8px }
+.dfoot { border: 0; border-top: 1px solid var(--line); background: transparent; padding: 14px 20px; text-align: left; display: flex; flex-direction: column; gap: 2px; width: 100% }
+.dfoot b { font-size: .88rem }
+@media (prefers-reduced-motion: reduce) { .drawer { transition: none } }
+/* Grand écran : menu toujours visible à gauche */
+@media (min-width: 1024px) {
+  .drawer { transform: none; visibility: visible; width: 272px; box-shadow: none !important }
+  .scrim, #menubtn { display: none !important }
+  body { padding-left: 272px }
+  .appbar .in { padding-left: 16px }
+}
 .fab { position: fixed; z-index: 5; width: 60px; height: 60px; border-radius: 50%; border: 0;
-  right: calc(18px + env(safe-area-inset-right, 0px)); bottom: calc(82px + env(safe-area-inset-bottom, 0px));
+  right: calc(18px + env(safe-area-inset-right, 0px)); bottom: calc(22px + env(safe-area-inset-bottom, 0px));
   background: var(--accent); color: var(--accent-fg); display: grid; place-items: center; box-shadow: 0 6px 18px rgb(20 32 43 / .28) }
 .fab svg { width: 28px; height: 28px }
 
 /* Bandeau et notifications */
-.banner { position: sticky; top: 0; z-index: 7; max-width: 720px; margin: 0 auto; padding: 12px 16px; display: flex; flex-direction: column; gap: 10px;
+.banner { position: relative; z-index: 7; max-width: 720px; margin: 0 auto; padding: 12px 16px; display: flex; flex-direction: column; gap: 10px;
   background: color-mix(in srgb, var(--warn) 14%, var(--surface)); border-bottom: 1px solid var(--line); font-size: .88rem }
 .banner.err { background: color-mix(in srgb, var(--down) 12%, var(--surface)) }
-.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(156px + env(safe-area-inset-bottom, 0px)); z-index: 30;
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(96px + env(safe-area-inset-bottom, 0px)); z-index: 30;
   background: var(--fg); color: var(--bg); padding: 10px 14px; border-radius: 10px; font-size: .86rem; max-width: 90vw; box-shadow: 0 6px 18px rgb(0 0 0 / .2) }
 
 /* Budget */
@@ -114,7 +152,7 @@ label.field { display: flex; flex-direction: column; gap: 6px; min-width: 0 }
 .env:last-child { border-bottom: 0 }
 .env .bar { grid-column: 1 / -1 }
 .env.on { background: color-mix(in srgb, var(--accent) 8%, transparent) }
-.env .tag { font-size: .7rem; font-weight: 600; color: var(--up); margin-left: 6px }
+.env .tag { font-size: .7rem; font-weight: 600; color: var(--fg); margin-left: 6px; padding: 1px 7px; border-radius: 99px; background: color-mix(in srgb, var(--c-sav) 18%, transparent) }
 .exp { display: grid; grid-template-columns: 3.4em minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px 2px; border: 0; border-bottom: 1px solid var(--line); background: none; text-align: left; width: 100%; border-radius: 0 }
 .exp:last-child { border-bottom: 0 }
 .exp .d { font-family: var(--mono); font-size: .75rem; color: var(--muted) }
@@ -169,7 +207,7 @@ tr:last-child td { border-bottom: 0 }
 td input { width: 100%; border: 1px solid transparent; background: transparent; padding: 7px 6px; border-radius: 6px }
 td input:hover { border-color: var(--line) }
 td input:focus { border-color: var(--accent); background: var(--bg); outline: none }
-td input.isin { font-family: var(--mono); width: 9.5em; text-transform: uppercase; font-size: 14px }
+td input.isin { font-family: var(--mono); width: 9.5em; text-transform: uppercase; font-size: 16px }
 td input.bad { border-color: var(--down) }
 td.calc { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; padding: 0 8px }
 td.acts { text-align: right }
@@ -241,20 +279,71 @@ td.live { color: var(--fg) }
 .trend { font-size: .8rem; font-weight: 600 }
 .trend.up { color: var(--up) } .trend.down { color: var(--down) }
 .sources a { color: var(--accent) }
+
+/* Bilan : barres groupées revenus / dépenses / épargne */
+.vlegend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .84rem; color: var(--muted) }
+.vlegend span { display: inline-flex; align-items: center }
+.bchart { position: relative; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; min-width: 0 }
+.bchart svg { display: block; touch-action: pan-x pan-y }
+.bchart .grid { stroke: var(--line); stroke-width: 1 }
+.bchart .base { stroke: var(--muted); stroke-width: 1 }
+.bchart .ax { fill: var(--muted); font: 11px var(--mono) }
+.bchart g[data-ck] { cursor: pointer; outline: none }
+.bchart .hl { fill: var(--fg); opacity: 0 }
+.bchart g[data-ck]:hover .hl, .bchart g[data-ck]:focus-visible .hl { opacity: .05 }
+.bchart g.sel .hl { opacity: .09 }
+.btip { position: absolute; top: 4px; width: 188px; padding: 10px 12px; border-radius: 12px; background: var(--fg); color: var(--bg); font-size: .82rem;
+  display: flex; flex-direction: column; gap: 4px; box-shadow: 0 6px 18px rgb(0 0 0 / .22); z-index: 2; pointer-events: none }
+.btip.pinned { pointer-events: auto }
+.btip .r { display: flex; align-items: center; justify-content: space-between; gap: 8px }
+.btip .r span { display: inline-flex; align-items: center }
+.btip b { font-family: var(--mono); font-weight: 500 }
+.btip .go { margin-top: 4px; border: 0; border-radius: 8px; padding: 6px 8px; background: var(--bg); color: var(--fg); font-weight: 600; font-size: .8rem }
+details.tbl summary { cursor: pointer; color: var(--accent); font-weight: 600; font-size: .88rem }
+details.tbl table { min-width: 0; margin-top: 8px }
+details.tbl table { font-size: .8rem }
+details.tbl td, details.tbl th { padding: 6px 5px }
+details.tbl td.calc { padding: 6px 5px }
+
+/* Budget prévu et comptes */
+.prow2 { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: .8rem; color: var(--muted) }
+.prow2 .linkbtn { font-size: .8rem; padding: 2px 0 }
+.erow .cap { font-size: .72rem; color: var(--muted) }
+.erow label { display: flex; flex-direction: column; gap: 3px; min-width: 0 }
+.acct .bar { margin-top: 2px }
+.bigline { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap }
 </style>
 </head>
 <body>
+
+<header class="appbar" id="appbar">
+  <div class="in">
+    <button class="iconbtn" id="menubtn" type="button" aria-label="Ouvrir le menu" aria-controls="drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <h1 id="vtitle">Accueil</h1>
+    <button class="pill" type="button" data-syncpill data-goto="reglages" data-anchor="set-sync">Local</button>
+  </div>
+</header>
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" aria-label="Menu">
+  <div class="dhead"><span class="brand">Mes Finances</span><span class="eyebrow" style="margin-top:8px">Patrimoine suivi</span><span class="big" id="d-total">0,00 €</span><span class="small muted" id="d-detail"></span></div>
+  <nav class="dnav" id="dnav" aria-label="Rubriques">
+    <button type="button" data-view="budget"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 10.5 12 4l8.5 6.5"/><path d="M5.5 9v10.5h13V9"/><path d="M10 19.5v-5h4v5"/></svg>Accueil</button>
+    <button type="button" data-view="bilan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5h16"/><path d="M6.5 16V10"/><path d="M10.5 16V5.5"/><path d="M14.5 16v-4"/><path d="M18.5 16V8"/></svg>Bilan</button>
+    <button type="button" data-view="comptes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 9.5 12 4.5l8.5 5"/><path d="M5.5 10v7.5M9.5 10v7.5M14.5 10v7.5M18.5 10v7.5"/><path d="M3.5 19.5h17"/></svg>Comptes</button>
+    <button type="button" data-view="plan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5V12l6 6"/></svg>Budget</button>
+    <hr>
+    <button type="button" data-view="invest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19h16"/><path d="m5 15 4.5-5 3.5 3 6-7"/><path d="M15 6h4v4"/></svg>Portefeuille</button>
+    <button type="button" data-view="conj"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5c2.3 2.4 3.5 5.2 3.5 8.5s-1.2 6.1-3.5 8.5c-2.3-2.4-3.5-5.2-3.5-8.5s1.2-6.1 3.5-8.5z"/></svg>Conjoncture</button>
+    <hr>
+    <button type="button" data-view="reglages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Réglages</button>
+  </nav>
+  <button class="dfoot" type="button" id="dfoot" data-goto="reglages" data-anchor="set-sync"><b id="d-sync">Données sur cet appareil</b><span class="small muted" id="d-synctime"></span></button>
+</aside>
 
 <div id="banner" class="banner" hidden></div>
 
 <!-- ============ BUDGET ============ -->
 <section id="v-budget" class="wrap" hidden>
-  <div class="top">
-    <div><div class="eyebrow">Budget</div><h1>Cycle de paie</h1></div>
-    <button class="pill" type="button" data-syncpill data-goto="reglages">Local</button>
-  </div>
-  <div class="seg" id="bmode" role="group" aria-label="Affichage du budget"><button type="button" data-bm="cycle" aria-pressed="true">Cycle</button><button type="button" data-bm="bilan" aria-pressed="false">Bilan</button></div>
-  <div id="b-cycle" class="stack" style="gap:16px">
   <div class="panel cyclenav">
     <button class="arrow" type="button" id="cprev" aria-label="Cycle précédent">‹</button>
     <div><b id="clabel"></b><div class="small muted"><span id="csub"></span> <button class="linkbtn small" type="button" id="cnow" hidden>Revenir au cycle en cours</button></div></div>
@@ -267,8 +356,8 @@ td.live { color: var(--fg) }
     <div class="bar" aria-hidden="true"><i id="b-bar" style="width:0"></i></div>
     <div class="stats">
       <label class="stat"><span class="eyebrow">Revenu du cycle</span><input id="b-income" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><span class="small muted" id="b-incnote"></span></label>
-      <div class="stat"><span class="eyebrow">Autres entrées</span><span class="v" id="b-extra" style="color:var(--up)">0,00 €</span><span class="small muted" id="b-extranote"></span></div>
-      <div class="stat"><span class="eyebrow">Sorties</span><span class="v" id="b-out">0,00 €</span><span class="small muted" id="b-saved"></span></div>
+      <div class="stat"><span class="eyebrow"><span class="tdot t-rev"></span>Autres entrées</span><span class="v" id="b-extra">0,00 €</span><span class="small muted" id="b-extranote"></span></div>
+      <div class="stat"><span class="eyebrow"><span class="tdot t-exp"></span>Sorties</span><span class="v" id="b-out">0,00 €</span><span class="small muted" id="b-saved"></span></div>
       <div class="stat"><span class="eyebrow">Prévu</span><span class="v" id="b-planned">0,00 €</span><span class="small muted" id="b-free"></span></div>
     </div>
     <div class="notice" id="b-incdetail" hidden></div>
@@ -276,7 +365,7 @@ td.live { color: var(--fg) }
   </div>
 
   <div class="panel">
-    <div class="clshead"><h2>Enveloppes</h2><button class="linkbtn" type="button" data-goto="reglages" data-anchor="set-env">Modifier</button></div>
+    <div class="clshead"><h2>Enveloppes</h2><button class="linkbtn" type="button" data-goto="plan">Modifier le budget</button></div>
     <div id="envlist"></div>
   </div>
 
@@ -284,38 +373,79 @@ td.live { color: var(--fg) }
     <div class="clshead"><h2>Mouvements <span class="small muted" id="expcount"></span></h2><button class="linkbtn" type="button" id="expclear" hidden>Tout afficher</button></div>
     <div id="explist"></div>
   </div>
+</section>
 
-  <div class="panel">
-    <div class="clshead"><h2>Épargne & patrimoine</h2><button class="linkbtn" type="button" data-goto="reglages" data-anchor="set-sav">Comptes</button></div>
-    <div id="savlist"></div>
-    <div class="totrow"><span>Total épargne</span><span class="num" id="sav-total">0,00 €</span></div>
-    <div class="totrow muted" style="font-weight:500"><span>Investissements</span><span class="num" id="sav-inv">0,00 €</span></div>
-    <div class="totrow"><span>Patrimoine suivi</span><span class="num" id="sav-all">0,00 €</span></div>
+<!-- ============ BILAN ============ -->
+<section id="v-bilan" class="wrap" hidden>
+  <div class="panel stack">
+    <label class="field"><span class="eyebrow">Période</span><select id="bl-period"></select></label>
+    <div class="stats" id="bl-stats"></div>
   </div>
+  <div class="panel total">
+    <div class="clshead"><h2>Par cycle</h2></div>
+    <div class="vlegend" id="bl-legend"><span><span class="tdot t-rev"></span>Revenus</span><span><span class="tdot t-exp"></span>Dépenses</span><span><span class="tdot t-sav"></span>Épargne</span></div>
+    <div class="bchart" id="bl-chart"></div>
+    <div class="notice" id="bl-chartnote"></div>
+    <details class="tbl" id="bl-tblbox" hidden><summary>Voir les chiffres par cycle</summary><div class="tablewrap"><table id="bl-tbl"></table></div></details>
+  </div>
+  <div class="panel"><div class="clshead"><h2>Par enveloppe</h2></div><div id="bl-env"></div></div>
+  <div class="panel"><div class="clshead"><h2>Entrées</h2></div><div id="bl-inc"></div></div>
+  <div class="notice">Un cycle va d'une paie à la suivante. Touchez une barre pour voir les montants exacts. Pour importer vos anciennes dépenses : Réglages › Importer un historique.</div>
+</section>
+
+<!-- ============ COMPTES ============ -->
+<section id="v-comptes" class="wrap" hidden>
+  <div class="panel total">
+    <div class="eyebrow">Patrimoine suivi</div>
+    <div class="big" id="c-all">0,00 €</div>
+    <div class="totrow" style="font-weight:500"><span><span class="tdot t-sav"></span>Comptes d'épargne</span><span class="num" id="c-sav">0,00 €</span></div>
+    <div class="totrow" style="font-weight:500"><span>Investissements <button class="linkbtn small" type="button" data-goto="invest">Portefeuille ›</button></span><span class="num" id="c-inv">0,00 €</span></div>
+  </div>
+  <div class="panel stack">
+    <div class="clshead"><h2>Comptes d'épargne</h2></div>
+    <div class="notice">Mettez à jour le solde quand vous consultez votre banque. L'objectif est facultatif.</div>
+    <div id="c-savs"></div>
+    <div><button class="btn" type="button" id="c-savadd">+ Ajouter un compte</button></div>
+  </div>
+</section>
+
+<!-- ============ BUDGET PRÉVU ============ -->
+<section id="v-plan" class="wrap" hidden>
+  <div class="panel total">
+    <div class="eyebrow">Budget de chaque cycle</div>
+    <div class="bigline"><div class="big" id="p-total">0,00 €</div><span class="small muted" id="p-of"></span></div>
+    <div class="stats">
+      <label class="stat"><span class="eyebrow"><span class="tdot t-rev"></span>Revenu habituel</span><input id="p-income" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+      <div class="stat"><span class="eyebrow">Non affecté</span><span class="v" id="p-free">0,00 €</span><span class="small muted" id="p-freenote"></span></div>
+      <div class="stat"><span class="eyebrow"><span class="tdot t-exp"></span>Dépenses prévues</span><span class="v" id="p-spend">0,00 €</span></div>
+      <div class="stat"><span class="eyebrow"><span class="tdot t-sav"></span>Épargne prévue</span><span class="v" id="p-save">0,00 €</span><span class="small muted" id="p-savepct"></span></div>
+    </div>
   </div>
 
-  <div id="b-bilan" class="stack" style="gap:16px" hidden>
-    <div class="panel stack">
-      <label class="field"><span class="eyebrow">Période</span><select id="bl-period"></select></label>
-      <div class="stats" id="bl-stats"></div>
+  <div class="panel stack" id="set-env">
+    <div class="clshead"><h2>Enveloppes</h2><span class="small muted num" id="s-envtotal"></span></div>
+    <div class="notice">Montant prévu par cycle. Sous chaque enveloppe : ce que vous y avez mis en moyenne sur les derniers cycles. Le type « Épargne » sert aux virements vers l'épargne ou les placements : ils comptent dans les sorties, mais pas dans le reste à dépenser par jour.</div>
+    <label class="chk"><input type="checkbox" id="p-excl" checked> Ignorer les dépenses exceptionnelles (900 € et plus) dans les moyennes</label>
+    <div id="s-envs"></div>
+    <div class="actions" style="justify-content:flex-start">
+      <button class="btn" type="button" id="s-envadd">+ Ajouter une enveloppe</button>
+      <button class="btn" type="button" id="p-fill">Remplir avec les moyennes</button>
     </div>
-    <div class="panel total">
-      <div class="clshead"><h2>Par cycle</h2></div>
-      <div class="chart" id="bl-chart"></div>
-      <div class="notice" id="bl-chartnote"></div>
-    </div>
-    <div class="panel"><div class="clshead"><h2>Par enveloppe</h2></div><div id="bl-env"></div></div>
-    <div class="panel"><div class="clshead"><h2>Entrées</h2></div><div id="bl-inc"></div></div>
-    <div class="notice">Un cycle va d'une paie à la suivante. Pour importer vos anciennes dépenses : Réglages › Importer un historique.</div>
+    <div class="notice" id="p-fillmsg" aria-live="polite"></div>
+  </div>
+
+  <div class="panel stack" id="p-paste">
+    <h2>Coller un budget</h2>
+    <div class="notice">Collez ici le budget mis au point avec Claude, une enveloppe par ligne (ex. <code>Courses : 230 €</code>). Les montants des enveloppes reconnues sont remplacés ; les nouvelles enveloppes sont créées.</div>
+    <label class="field"><span class="small muted">Budget à appliquer</span><textarea id="p-text" spellcheck="false" placeholder="Courses : 230 €&#10;Restaurants : 150 €&#10;Carburant : 120 €&#10;Livret A : 300 €"></textarea></label>
+    <label class="chk"><input type="checkbox" id="p-zero"> Mettre à 0 les enveloppes absentes du texte</label>
+    <div class="actions" style="justify-content:flex-start"><button class="btn primary" type="button" id="p-apply">Appliquer</button></div>
+    <div class="notice" id="p-msg" aria-live="polite"></div>
   </div>
 </section>
 
 <!-- ============ INVESTISSEMENTS ============ -->
 <section id="v-invest" class="wrap" hidden>
-  <div class="top">
-    <div><div class="eyebrow">Investissements</div><h1>Portefeuille</h1></div>
-    <button class="pill" type="button" data-syncpill data-goto="reglages">Local</button>
-  </div>
   <div class="panel total">
     <div class="eyebrow">Valeur totale</div>
     <div class="big" id="grand">0,00 €</div>
@@ -380,7 +510,7 @@ td.live { color: var(--fg) }
 <!-- ============ CONJONCTURE ============ -->
 <section id="v-conj" class="wrap" hidden>
   <div class="top">
-    <div><div class="eyebrow">Situation économique</div><h1>Conjoncture</h1></div>
+    <div class="eyebrow">Situation économique</div>
     <button id="mrefresh" class="btn primary" type="button">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>
       <span>Actualiser</span>
@@ -408,11 +538,6 @@ td.live { color: var(--fg) }
 
 <!-- ============ RÉGLAGES ============ -->
 <section id="v-reglages" class="wrap" hidden>
-  <div class="top">
-    <div><div class="eyebrow">Mes Finances</div><h1>Réglages</h1></div>
-    <button class="pill" type="button" data-syncpill>Local</button>
-  </div>
-
   <div class="panel stack" id="set-sync">
     <div class="clshead"><h2>Synchronisation</h2></div>
     <div id="syncbox" class="stack"></div>
@@ -431,13 +556,6 @@ td.live { color: var(--fg) }
     </div>
   </div>
 
-  <div class="panel stack" id="set-env">
-    <div class="clshead"><h2>Enveloppes</h2><span class="small muted num" id="s-envtotal"></span></div>
-    <div class="notice">Montant prévu par cycle. Le type « Épargne » sert aux virements vers l'épargne ou les placements : ils comptent dans les sorties, mais pas dans le reste à dépenser par jour.</div>
-    <div id="s-envs"></div>
-    <div><button class="btn" type="button" id="s-envadd">+ Ajouter une enveloppe</button></div>
-  </div>
-
   <div class="panel stack" id="set-inc">
     <h2>Catégories d'entrées</h2>
     <div class="notice">Pour savoir d'où vient l'argent qui rentre en plus du salaire. « Déduire par défaut » préremplit l'enveloppe à créditer (ex. mutuelle → Santé).</div>
@@ -445,18 +563,11 @@ td.live { color: var(--fg) }
     <div><button class="btn" type="button" id="s-incadd">+ Ajouter une catégorie</button></div>
   </div>
 
-  <div class="panel stack" id="set-sav">
-    <h2>Comptes d'épargne</h2>
-    <div class="notice">Nom et objectif (facultatif). Le solde se met à jour dans l'onglet Budget.</div>
-    <div id="s-savs"></div>
-    <div><button class="btn" type="button" id="s-savadd">+ Ajouter un compte</button></div>
-  </div>
-
   <div class="panel stack" id="set-quotes">
     <h2>Cours en direct</h2>
     <div class="notice">Les cours viennent d'un Google Sheets à vous (fonction GOOGLEFINANCE : toutes les places, différé d'environ 20 minutes), puis sont convertis en euros au taux du jour de la BCE.</div>
     <ol class="steps notice">
-      <li>Dans l'onglet Portefeuille, indiquez la <b>quantité</b> et le <b>symbole</b> de chaque ligne (ex. <code>NASDAQ:AAPL</code>, <code>EPA:MC</code>, <code>WSE:PKO</code> — le symbole s'affiche sur google.com/finance).</li>
+      <li>Dans la rubrique Portefeuille, indiquez la <b>quantité</b> et le <b>symbole</b> de chaque ligne (ex. <code>NASDAQ:AAPL</code>, <code>EPA:MC</code>, <code>WSE:PKO</code> — le symbole s'affiche sur google.com/finance).</li>
       <li>Touchez « Copier les lignes », ouvrez un nouveau Google Sheets (<code>sheets.new</code>), cliquez sur la case A1 et collez.</li>
       <li>Dans Google Sheets : Fichier › Partager › Publier sur le Web › choisissez la feuille et le format CSV › Publier. Copiez le lien et collez-le ci-dessous.</li>
     </ol>
@@ -504,12 +615,6 @@ td.live { color: var(--fg) }
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
 </button>
 
-<nav class="tabs" aria-label="Navigation">
-  <button type="button" data-tab="budget"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H18v3"/><rect x="3.5" y="8" width="17" height="11.5" rx="2.5"/><path d="M15.5 13.75h2.5"/></svg>Budget</button>
-  <button type="button" data-tab="invest"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><path d="m5 15 4.5-5 3.5 3 6-7"/><path d="M15 6h4v4"/></svg>Portefeuille</button>
-  <button type="button" data-tab="conj"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5c2.3 2.4 3.5 5.2 3.5 8.5s-1.2 6.1-3.5 8.5c-2.3-2.4-3.5-5.2-3.5-8.5s1.2-6.1 3.5-8.5z"/></svg>Conjoncture</button>
-  <button type="button" data-tab="reglages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Réglages</button>
-</nav>
 
 <!-- Feuille d'ajout / modification d'une dépense -->
 <div id="sheet" class="sheet" hidden>
@@ -539,9 +644,9 @@ td.live { color: var(--fg) }
 
 <script>
 "use strict";
-const APP_VERSION = "1.3.0";
+const APP_VERSION = "1.4.0";
 const FB_VERSION = "10.12.2"; // SDK Firebase chargé depuis gstatic uniquement si la synchronisation est configurée
-const LS = { state: "fin.state", fb: "fin.firebase", dev: "fin.device", link: "fin.linked" };
+const LS = { state: "fin.state", fb: "fin.firebase", dev: "fin.device", link: "fin.linked", lastSync: "fin.lastsync" };
 const CLASSES = [{ id: "stocks", c: "#2346d8" }, { id: "bonds", c: "#7a4fd0" }, { id: "gold", c: "#c99a0a" }, { id: "cash", c: "#138a5b" }];
 
 const $ = id => document.getElementById(id);
@@ -653,28 +758,74 @@ function applyRemote(remote) {
 }
 document.addEventListener("focusout", () => { if (renderLater) setTimeout(() => { if (renderLater && !document.activeElement?.matches?.("input, textarea, select")) { renderLater = false; renderView() } }, 50) });
 
-/* ---------- Navigation ---------- */
-const VIEWS = ["budget", "invest", "conj", "reglages"];
-let view = "budget";
+/* ---------- Navigation : menu latéral ---------- */
+const VIEWS = ["budget", "bilan", "comptes", "plan", "invest", "conj", "reglages"];
+const TITLES = { budget: "Accueil", bilan: "Bilan", comptes: "Comptes", plan: "Budget", invest: "Portefeuille", conj: "Conjoncture", reglages: "Réglages" };
+let view = "budget", pendingAnchor = null;
 function show(v, anchor) {
   if (!VIEWS.includes(v)) v = "budget";
   view = v;
   VIEWS.forEach(x => { $("v-" + x).hidden = x !== v });
-  document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-current", b.dataset.tab === v ? "page" : "false"));
+  document.querySelectorAll("#dnav [data-view]").forEach(b => b.setAttribute("aria-current", b.dataset.view === v ? "page" : "false"));
+  $("vtitle").textContent = TITLES[v];
+  document.title = v === "budget" ? "Mes Finances" : TITLES[v] + " · Mes Finances";
   $("fab").hidden = v !== "budget";
+  closeDrawer(false);
   renderView();
   if (anchor && $(anchor)) $(anchor).scrollIntoView({ block: "start" }); else window.scrollTo(0, 0);
 }
 function renderView() {
-  if (view === "budget") renderBudget(); else if (view === "invest") renderInvest(); else if (view === "conj") renderConj(); else renderSettings();
+  ({ budget: renderBudget, bilan: renderBilan, comptes: renderComptes, plan: renderPlan, invest: renderInvest, conj: renderConj, reglages: renderSettings })[view]();
   renderSync();
 }
-document.querySelector(".tabs").addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if (b) { if (location.hash.slice(1) === b.dataset.tab) show(b.dataset.tab); else location.hash = b.dataset.tab } });
-document.addEventListener("click", e => {
-  const g = e.target.closest("[data-goto]"); if (!g) return;
-  const a = g.dataset.anchor; if (location.hash.slice(1) !== g.dataset.goto) { history.replaceState(null, "", "#" + g.dataset.goto) } show(g.dataset.goto, a);
+// Changer de rubrique en passant par l'adresse (#bilan…), pour que le bouton Retour du téléphone fonctionne
+function go(v, anchor) { if (location.hash.slice(1) === v) show(v, anchor); else { pendingAnchor = anchor || null; location.hash = v } }
+document.addEventListener("click", e => { const g = e.target.closest("[data-goto]"); if (g) go(g.dataset.goto, g.dataset.anchor) });
+window.addEventListener("hashchange", () => { const a = pendingAnchor; pendingAnchor = null; show(location.hash.slice(1), a) });
+window.addEventListener("scroll", () => $("appbar").classList.toggle("scrolled", window.scrollY > 4), { passive: true });
+
+const wideScreen = () => matchMedia("(min-width: 1024px)").matches;
+function openDrawer() {
+  if (wideScreen()) return;
+  updateDrawer();
+  $("drawer").classList.add("open"); $("scrim").hidden = false; $("menubtn").setAttribute("aria-expanded", "true");
+  document.body.style.overflow = "hidden";
+  setTimeout(() => $("dnav").querySelector('[aria-current="page"]')?.focus({ preventScroll: true }), 60);
+}
+function closeDrawer(focusBtn = true) {
+  const d = $("drawer"); if (!d.classList.contains("open")) return;
+  d.classList.remove("open"); d.style.transform = ""; $("scrim").hidden = true; $("menubtn").setAttribute("aria-expanded", "false");
+  document.body.style.overflow = "";
+  if (focusBtn) $("menubtn").focus({ preventScroll: true });
+}
+$("menubtn").addEventListener("click", openDrawer);
+$("scrim").addEventListener("click", () => closeDrawer());
+$("dnav").addEventListener("click", e => { const b = e.target.closest("[data-view]"); if (b) go(b.dataset.view) });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && $("drawer").classList.contains("open")) closeDrawer() });
+// Glisser vers la gauche pour fermer le menu
+let dragX = null, dragDx = 0;
+$("drawer").addEventListener("touchstart", e => { if (!$("drawer").classList.contains("open")) return; dragX = e.touches[0].clientX; dragDx = 0 }, { passive: true });
+$("drawer").addEventListener("touchmove", e => {
+  if (dragX === null) return; dragDx = Math.min(0, e.touches[0].clientX - dragX);
+  $("drawer").style.transition = "none"; $("drawer").style.transform = `translateX(${dragDx}px)`;
+}, { passive: true });
+$("drawer").addEventListener("touchend", () => {
+  if (dragX === null) return; dragX = null; $("drawer").style.transition = ""; $("drawer").style.transform = "";
+  if (dragDx < -60) closeDrawer(false);
 });
-window.addEventListener("hashchange", () => show(location.hash.slice(1)));
+const savTotal = () => S.budget.savings.reduce((s, a) => s + (+a.balance || 0), 0);
+function fmtWhen(t) {
+  const d = new Date(t), time = d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+  return d.toDateString() === new Date().toDateString() ? "à " + time : `le ${fmtDay(d)} à ${time}`;
+}
+function updateDrawer() {
+  const sv = savTotal(), inv = grandTotal();
+  $("d-total").textContent = fmtEUR(sv + inv);
+  $("d-detail").textContent = `Épargne ${fmtEUR(sv)} · Placements ${fmtEUR(inv)}`;
+  const st = sync.status, [txt] = PILL[st] || PILL.off;
+  $("d-sync").textContent = st === "off" ? "Données sur cet appareil" : txt;
+  $("d-synctime").textContent = sync.lastOk ? "Dernière synchronisation " + fmtWhen(sync.lastOk) : (st === "off" ? "Synchronisation non configurée" : "");
+}
 
 /* ---------- Budget : cycles ---------- */
 function payDate(y, m) {
@@ -715,9 +866,6 @@ function cycleStats(c) {
 }
 
 function renderBudget() {
-  document.querySelectorAll("#bmode button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.bm === bMode)));
-  $("b-cycle").hidden = bMode !== "cycle"; $("b-bilan").hidden = bMode !== "bilan";
-  if (bMode === "bilan") { renderBilan(); return }
   const c = viewCycle, cur = isCurrent(c), now = new Date();
   $("clabel").textContent = `${fmtDay(c.start)} → ${fmtDay(c.end)} ${c.end.getFullYear()}`;
   $("csub").textContent = cur ? "Cycle en cours" : (c.start > now ? "Cycle à venir" : "Cycle terminé");
@@ -730,16 +878,23 @@ function renderBudget() {
 
   const st = cycleStats(c), envs = S.budget.envelopes;
   const orphan = Object.keys(st.spentBy).filter(id => !envById(id)).reduce((s, id) => s + st.spentBy[id], 0);
+  // Dépense : barre orange, hachurée en rouge si l'enveloppe est dépassée. Épargne : barre bleue, et mettre plus que prévu est une bonne nouvelle.
   const envRow = (id, name, sp, refund, pl, kind) => {
-    const net = sp - refund, pct = pl > 0 ? Math.min(100, Math.max(0, net / pl * 100)) : (net > 0 ? 100 : 0), over = pl > 0 ? net > pl + 0.005 : net > 0;
-    const rest = pl - net;
+    const net = sp - refund, save = kind === "save", rest = pl - net;
+    const pct = pl > 0 ? Math.min(100, Math.max(0, net / pl * 100)) : (net > 0 ? 100 : 0);
+    const over = !save && (pl > 0 ? net > pl + 0.005 : net > 0);
+    const ok = '<span style="color:var(--c-sav)">✓</span> ';
+    const right = save
+      ? (pl > 0 ? (rest > 0.005 ? "reste " + fmtEUR(rest) : rest < -0.005 ? ok + "+" + fmtEUR(-rest) : ok + "atteint") : (net > 0 ? ok + fmtEUR(net) : "—"))
+      : (pl > 0 || net ? (rest >= 0 ? "reste " + fmtEUR(rest) : "⚠ dépassé de " + fmtEUR(-rest)) : "—");
+    const note = save && pl > 0 ? (rest > 0.005 ? " · à épargner" : rest < -0.005 ? " · objectif dépassé" : " · objectif atteint") : "";
     return `<button type="button" class="env${envFilter === id ? " on" : ""}" data-env="${esc(id)}">
-      <span><b>${esc(name)}</b>${kind === "save" ? '<span class="tag">épargne</span>' : ""}<br><span class="small muted num">${fmtEUR(net)} / ${fmtEUR(pl)}${refund ? ` · dont ${fmtEUR(refund)} remboursés` : ""}</span></span>
-      <span class="num small" style="font-weight:600;color:${over ? "var(--down)" : "var(--fg)"}">${pl > 0 || net ? (rest >= 0 ? "reste " + fmtEUR(rest) : "dépassé de " + fmtEUR(-rest)) : "—"}</span>
-      <span class="bar"><i class="${over ? "over" : ""}" style="width:${pct}%${kind === "save" && !over ? ";background:var(--up)" : ""}"></i></span></button>`;
+      <span><b>${esc(name)}</b>${save ? '<span class="tag">épargne</span>' : ""}<br><span class="small muted num">${fmtEUR(net)} / ${fmtEUR(pl)}${refund ? ` · dont ${fmtEUR(refund)} remboursés` : ""}</span><span class="small muted">${note}</span></span>
+      <span class="num small" style="font-weight:600;text-align:right;color:${over ? "var(--down)" : "var(--fg)"}">${right}</span>
+      <span class="bar"><i class="${over ? "over" : save ? "t-sav" : "t-exp"}" style="width:${pct}%"></i></span></button>`;
   };
   const shown = envs.filter(e => +e.planned || st.spentBy[e.id] || st.refundBy[e.id] || envFilter === e.id), hidden = envs.length - shown.length;
-  $("envlist").innerHTML = (envs.length ? shown.map(e => envRow(e.id, e.name, st.spentBy[e.id] || 0, st.refundBy[e.id] || 0, +e.planned || 0, e.kind)).join("") : `<div class="notice">Aucune enveloppe : ajoutez-en dans Réglages.</div>`)
+  $("envlist").innerHTML = (envs.length ? shown.map(e => envRow(e.id, e.name, st.spentBy[e.id] || 0, st.refundBy[e.id] || 0, +e.planned || 0, e.kind)).join("") : `<div class="notice">Aucune enveloppe : ajoutez-en dans <button class="linkbtn small" type="button" data-goto="plan">Budget</button>.</div>`)
     + (orphan ? envRow("__none", "Sans enveloppe", orphan, 0, 0, "spend") : "")
     + (hidden ? `<div class="notice" style="padding-top:8px">${hidden} enveloppe${hidden > 1 ? "s" : ""} sans budget ni mouvement sur ce cycle ${hidden > 1 ? "sont masquées" : "est masquée"}.</div>` : "");
 
@@ -754,16 +909,14 @@ function renderBudget() {
     if (k === "inc") {
       const cat = incCat(o.cat), env = envById(refundEnv(o));
       return `<button type="button" class="exp" data-inc="${esc(o.id)}">${day}
-        <span class="l"><b>${esc(o.label || cat?.name || "Entrée")}</b><small>${esc(cat?.name || "Entrée")}${env ? " · déduit de " + esc(env.name) : ""}</small></span>
-        <span class="num" style="font-weight:600;color:var(--up)">+${fmtEUR(o.amount)}</span></button>`;
+        <span class="l"><b><span class="tdot t-rev"></span>${esc(o.label || cat?.name || "Entrée")}</b><small>${esc(cat?.name || "Entrée")}${env ? " · déduit de " + esc(env.name) : ""}</small></span>
+        <span class="num" style="font-weight:600">+${fmtEUR(o.amount)}</span></button>`;
     }
     const en = envById(o.env);
     return `<button type="button" class="exp" data-exp="${esc(o.id)}">${day}
-      <span class="l"><b>${esc(o.label || en?.name || "Dépense")}</b><small>${esc(en?.name || "Sans enveloppe")}</small></span>
-      <span class="num" style="font-weight:600;color:${o.amount < 0 ? "var(--up)" : "var(--fg)"}">${o.amount < 0 ? "+" + fmtEUR(-o.amount) : fmtEUR(o.amount)}</span></button>`;
+      <span class="l"><b><span class="tdot ${en?.kind === "save" ? "t-sav" : "t-exp"}"></span>${esc(o.label || en?.name || "Dépense")}</b><small>${esc(en?.name || "Sans enveloppe")}</small></span>
+      <span class="num" style="font-weight:600">${o.amount < 0 ? "+" + fmtEUR(-o.amount) : fmtEUR(o.amount)}</span></button>`;
   }).join("") : `<div class="notice">${envFilter ? "Aucun mouvement dans cette enveloppe sur ce cycle." : "Aucun mouvement sur ce cycle. Touchez + pour ajouter une dépense ou une entrée."}</div>`;
-
-  renderSavings();
 }
 function updateSummary() {
   const c = viewCycle, st = cycleStats(c), salary = cycleIncome(c);
@@ -783,27 +936,13 @@ function updateSummary() {
   const base = salary + st.extra, pct = base > 0 ? Math.min(100, Math.max(0, st.out / base * 100)) : (st.out > 0 ? 100 : 0);
   $("b-bar").style.width = pct + "%"; $("b-bar").className = left < 0 ? "over" : "";
   let pace = "";
-  if (!salary && !S.budget.income) pace = "Indiquez votre revenu habituel dans Réglages (ou le revenu de ce cycle ci-dessus).";
+  if (!salary && !S.budget.income) pace = "Indiquez votre revenu habituel dans Budget (ou le revenu de ce cycle ci-dessus).";
   else if (isCurrent(c)) {
     const t = new Date(), t0 = new Date(t.getFullYear(), t.getMonth(), t.getDate());
     const days = Math.round((c.end - t0) / 864e5) + 1, restSpend = Math.max(0, plannedSpend - (st.out - st.saved));
     pace = `${days} jour${days > 1 ? "s" : ""} restant${days > 1 ? "s" : ""}` + (plannedSpend > 0 ? ` · environ ${fmtEUR(restSpend / days)} par jour pour les dépenses prévues` : "");
   } else if (c.end < new Date()) pace = left >= 0 ? `Cycle terminé avec ${fmtEUR(left)} de reste.` : `Cycle terminé avec un dépassement de ${fmtEUR(-left)}.`;
   $("b-pace").textContent = pace;
-}
-function renderSavings() {
-  const sv = S.budget.savings;
-  $("savlist").innerHTML = sv.length ? sv.map(a => {
-    const g = +a.goal || 0, b = +a.balance || 0;
-    return `<div class="sav" data-sid="${esc(a.id)}"><div class="savtop"><b>${esc(a.name)}</b>
-      <input class="n" data-sk="balance" type="text" inputmode="decimal" autocomplete="off" value="${fmtIn(b)}" placeholder="0" aria-label="Solde ${esc(a.name)}"></div>
-      ${g > 0 ? `<div class="bar"><i style="width:${Math.min(100, Math.max(0, b / g * 100))}%;background:var(--up)"></i></div><div class="small muted">Objectif ${fmtEUR(g)} · ${b >= g ? "atteint" : "reste " + fmtEUR(g - b)}</div>` : ""}</div>`;
-  }).join("") : `<div class="notice">Aucun compte : ajoutez-en dans Réglages.</div>`;
-  updateSavTotals();
-}
-function updateSavTotals() {
-  const t = S.budget.savings.reduce((s, a) => s + (+a.balance || 0), 0), inv = grandTotal();
-  $("sav-total").textContent = fmtEUR(t); $("sav-inv").textContent = fmtEUR(inv); $("sav-all").textContent = fmtEUR(t + inv);
 }
 $("cprev").addEventListener("click", () => { viewCycle = shiftCycle(viewCycle, -1); renderBudget() });
 $("cnext").addEventListener("click", () => { viewCycle = shiftCycle(viewCycle, 1); renderBudget() });
@@ -820,12 +959,6 @@ $("explist").addEventListener("click", e => {
   const x = e.target.closest("[data-exp]"); if (x) { openSheet("exp", S.budget.expenses.find(o => o.id === x.dataset.exp)); return }
   const i = e.target.closest("[data-inc]"); if (i) openSheet("inc", S.budget.incomes.find(o => o.id === i.dataset.inc));
 });
-$("savlist").addEventListener("input", e => {
-  const inp = e.target.closest("[data-sk]"); if (!inp) return;
-  const a = S.budget.savings.find(x => x.id === inp.closest("[data-sid]").dataset.sid); if (!a) return;
-  a.balance = parseNum(inp.value); commit(false); updateSavTotals();
-});
-$("savlist").addEventListener("change", () => renderSavings());
 
 /* ---------- Feuille de saisie (dépense ou entrée) ---------- */
 let editing = null, sheetKind = "exp";
@@ -910,7 +1043,7 @@ $("f-del").addEventListener("click", e => {
 });
 
 /* ---------- Bilan (plusieurs cycles) ---------- */
-let bMode = "cycle", bPeriod = "12";
+let bPeriod = "12", blPer = [], blPin = null;
 function allCycles() {
   // Du premier mouvement enregistré jusqu'au cycle en cours
   let first = null;
@@ -922,6 +1055,7 @@ function allCycles() {
   return list;
 }
 const fmtCycle = c => c.start.toLocaleDateString("fr-FR", { month: "short", year: "2-digit" });
+const cycleRange = c => `${fmtDay(c.start)} → ${fmtDay(c.end)} ${c.end.getFullYear()}`;
 function renderBilan() {
   const all = allCycles(), years = [...new Set(all.map(c => c.key.slice(0, 4)))].reverse();
   if (bPeriod !== "12" && bPeriod !== "all" && !years.includes(bPeriod)) bPeriod = "12";
@@ -929,31 +1063,20 @@ function renderBilan() {
   $("bl-period").value = bPeriod;
   const cycles = bPeriod === "12" ? all.slice(-12) : bPeriod === "all" ? all : all.filter(c => c.key.startsWith(bPeriod));
   // Dépenses = sorties hors virements vers l'épargne et les placements ; épargne = revenus − dépenses
-  const per = cycles.map(c => { const st = cycleStats(c), sal = cycleIncome(c); return { c, st, sal, rev: sal + st.extra, spend: st.out - st.saved, placed: st.saved } });
+  const per = cycles.map(c => { const st = cycleStats(c), sal = cycleIncome(c), rev = sal + st.extra, spend = st.out - st.saved; return { c, st, sal, rev, spend, save: rev - spend, placed: st.saved } });
+  blPer = per;
   const n = per.length || 1, rev = per.reduce((s, p) => s + p.rev, 0), spend = per.reduce((s, p) => s + p.spend, 0), placed = per.reduce((s, p) => s + p.placed, 0), saved = rev - spend;
-  const stat = (label, v, sub, color) => `<div class="stat"><span class="eyebrow">${label}</span><span class="v"${color ? ` style="color:${color}"` : ""}>${v}</span>${sub ? `<span class="small muted">${sub}</span>` : ""}</div>`;
-  $("bl-stats").innerHTML = stat("Revenus", fmtEUR(rev), "salaires + autres entrées")
-    + stat("Dépenses", fmtEUR(spend), `moyenne ${fmtEUR(spend / n)} par cycle`)
-    + stat("Épargne", fmtEUR(saved), (rev > 0 ? `${(saved / rev * 100).toLocaleString("fr-FR", { maximumFractionDigits: 0 })} % des revenus · ` : "") + `dont ${fmtEUR(placed)} virés vers l'épargne et les placements`, saved < 0 ? "var(--down)" : "var(--up)")
-    + stat("Cycles", String(per.length), per.length ? `${fmtDay(per[0].c.start)} ${per[0].c.start.getFullYear()} → ${fmtDay(per.at(-1).c.end)} ${per.at(-1).c.end.getFullYear()}` : "");
-  // Graphique : dépenses par cycle (barres) et revenus (traits)
-  const el = $("bl-chart");
-  if (!per.length || (!spend && !rev)) { el.innerHTML = ""; $("bl-chartnote").textContent = "Pas encore de mouvements sur cette période." }
-  else {
-    $("bl-chartnote").textContent = "Barres : dépenses du cycle (hors épargne) · traits verts : revenus. Touchez une barre pour ouvrir le cycle.";
-    const W = Math.max(280, el.clientWidth || 600), H = 190, pl = 60, pr = 8, pt = 10, pb = 26;
-    const top = Math.max(1, ...per.map(p => Math.max(p.spend, p.rev))), max = top * 1.08, bw = (W - pl - pr) / per.length;
-    const y = v => pt + (1 - Math.max(0, v) / max) * (H - pt - pb), step = Math.max(1, Math.ceil(per.length / Math.max(1, Math.floor((W - pl) / 64))));
-    const fmtK = v => v >= 10000 ? (v / 1000).toLocaleString("fr-FR", { maximumFractionDigits: 0 }) + " k€" : v.toLocaleString("fr-FR", { maximumFractionDigits: 0 }) + " €";
-    el.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Dépenses et revenus par cycle">
-      ${[0, .5, 1].map(f => f * top).map(v => `<line x1="${pl}" x2="${W - pr}" y1="${y(v)}" y2="${y(v)}" class="grid"/><text x="${pl - 6}" y="${y(v) + 4}" text-anchor="end" class="ax">${fmtK(v)}</text>`).join("")}
-      ${per.map((p, i) => { const x = pl + i * bw, w = Math.max(2, bw * .64), over = p.spend > p.rev && p.rev > 0;
-        return `<g data-ck="${p.c.key}" style="cursor:pointer"><rect x="${x}" y="${pt}" width="${bw}" height="${H - pt - pb}" fill="transparent"/>
-          <rect x="${x + (bw - w) / 2}" y="${y(p.spend)}" width="${w}" height="${Math.max(0, H - pb - y(p.spend))}" rx="2" fill="${over ? "var(--down)" : "var(--accent)"}" opacity=".85"><title>${fmtCycle(p.c)} : dépenses ${fmtEUR(p.spend)}, revenus ${fmtEUR(p.rev)}</title></rect>
-          ${p.rev ? `<line x1="${x + bw * .1}" x2="${x + bw * .9}" y1="${y(p.rev)}" y2="${y(p.rev)}" stroke="var(--up)" stroke-width="2.5" stroke-linecap="round"/>` : ""}
-          ${i % step === 0 ? `<text x="${x + bw / 2}" y="${H - 8}" text-anchor="middle" class="ax">${fmtCycle(p.c)}</text>` : ""}</g>`; }).join("")}
-    </svg>`;
-  }
+  const stat = (dot, label, v, sub, color) => `<div class="stat"><span class="eyebrow">${dot ? `<span class="tdot ${dot}"></span>` : ""}${label}</span><span class="v"${color ? ` style="color:${color}"` : ""}>${v}</span>${sub ? `<span class="small muted">${sub}</span>` : ""}</div>`;
+  $("bl-stats").innerHTML = stat("t-rev", "Revenus", fmtEUR(rev), `salaires + autres entrées · moyenne ${fmtEUR(rev / n)}`)
+    + stat("t-exp", "Dépenses", fmtEUR(spend), `moyenne ${fmtEUR(spend / n)} par cycle`)
+    + stat("t-sav", "Épargne", fmtEUR(saved), (rev > 0 ? `${(saved / rev * 100).toLocaleString("fr-FR", { maximumFractionDigits: 0 })} % des revenus · ` : "") + `dont ${fmtEUR(placed)} virés vers l'épargne et les placements`, saved < 0 ? "var(--down)" : "")
+    + stat("", "Cycles", String(per.length), per.length ? `${fmtDay(per[0].c.start)} ${per[0].c.start.getFullYear()} → ${fmtDay(per.at(-1).c.end)} ${per.at(-1).c.end.getFullYear()}` : "");
+  drawBilanChart();
+  // Tableau des chiffres (accessible et lisible sans les couleurs)
+  const has = per.length && (spend || rev);
+  $("bl-tblbox").hidden = !has;
+  $("bl-tbl").innerHTML = has ? `<thead><tr><th>Cycle</th><th class="r">Revenus</th><th class="r">Dépenses</th><th class="r">Épargne</th></tr></thead><tbody>`
+    + per.slice().reverse().map(p => `<tr><td title="${esc(cycleRange(p.c))}">${esc(fmtCycle(p.c))}</td><td class="calc">${fmtEUR(p.rev)}</td><td class="calc">${fmtEUR(p.spend)}</td><td class="calc"${p.save < 0 ? ' style="color:var(--down)"' : ""}>${fmtEUR(p.save)}</td></tr>`).join("") + "</tbody>" : "";
   // Par enveloppe : total net, moyenne par cycle comparée au prévu
   const tot = {}; let orphan = 0;
   per.forEach(p => {
@@ -963,22 +1086,225 @@ function renderBilan() {
   const rows = S.budget.envelopes.map(e => ({ name: e.name, v: tot[e.id] || 0, pl: +e.planned || 0, kind: e.kind })).concat(orphan ? [{ name: "Sans enveloppe", v: orphan, pl: 0 }] : [])
     .filter(r => Math.abs(r.v) > 0.004).sort((a, b) => (a.kind === "save") - (b.kind === "save") || b.v - a.v);
   const maxv = Math.max(1, ...rows.map(r => r.v));
-  $("bl-env").innerHTML = rows.length ? rows.map(r => { const avg = r.v / n, over = r.pl > 0 && avg > r.pl;
-    return `<div class="env" style="cursor:default"><span><b>${esc(r.name)}</b>${r.kind === "save" ? '<span class="tag">épargne</span>' : ""}<br><span class="small muted num">moyenne ${fmtEUR(avg)} / cycle${r.pl ? ` · prévu ${fmtEUR(r.pl)}` : ""}</span></span>
-      <span class="num small" style="font-weight:600;color:${over ? "var(--down)" : "var(--fg)"};text-align:right">${fmtEUR(r.v)}<br><span class="muted" style="font-weight:500">${spend && r.kind !== "save" ? (r.v / spend * 100).toLocaleString("fr-FR", { maximumFractionDigits: 0 }) + " % des dépenses" : ""}</span></span>
-      <span class="bar"><i class="${over ? "over" : ""}" style="width:${Math.max(0, r.v / maxv * 100)}%${r.kind === "save" ? ";background:var(--up)" : ""}"></i></span></div>`; }).join("")
+  $("bl-env").innerHTML = rows.length ? rows.map(r => { const save = r.kind === "save", avg = r.v / n, over = !save && r.pl > 0 && avg > r.pl + 0.005, good = save && r.pl > 0 && avg >= r.pl - 0.005;
+    return `<div class="env" style="cursor:default"><span><b>${esc(r.name)}</b>${save ? '<span class="tag">épargne</span>' : ""}<br><span class="small muted num">moyenne ${fmtEUR(avg)} / cycle${r.pl ? ` · prévu ${fmtEUR(r.pl)}` : ""}</span></span>
+      <span class="num small" style="font-weight:600;color:${over ? "var(--down)" : "var(--fg)"};text-align:right">${over ? "⚠ " : good ? '<span style="color:var(--c-sav)">✓</span> ' : ""}${fmtEUR(r.v)}<br><span class="muted" style="font-weight:500">${spend && !save ? (r.v / spend * 100).toLocaleString("fr-FR", { maximumFractionDigits: 0 }) + " % des dépenses" : ""}</span></span>
+      <span class="bar"><i class="${over ? "over" : save ? "t-sav" : "t-exp"}" style="width:${Math.max(0, r.v / maxv * 100)}%"></i></span></div>`; }).join("")
     : `<div class="notice">Aucune dépense sur cette période.</div>`;
   // Entrées par catégorie (+ salaires)
   const byCat = {}; per.forEach(p => Object.entries(p.st.byCat).forEach(([id, v]) => { byCat[id] = (byCat[id] || 0) + v }));
   const sal = per.reduce((s, p) => s + p.sal, 0), custom = per.filter(p => typeof S.budget.cycles[p.c.key]?.income === "number").length;
   const incRows = [{ name: "Salaires (revenu des cycles)", v: sal, sub: custom < per.length ? `${per.length - custom} cycle${per.length - custom > 1 ? "s" : ""} au revenu habituel` : "montants propres à chaque cycle" }]
     .concat(Object.entries(byCat).map(([id, v]) => ({ name: incCat(id)?.name || "Autre entrée", v })).sort((a, b) => b.v - a.v));
-  $("bl-inc").innerHTML = incRows.filter(r => r.v).map(r => `<div class="totrow" style="font-weight:500"><span>${esc(r.name)}${r.sub ? `<br><span class="small muted">${esc(r.sub)}</span>` : ""}</span><span class="num" style="color:var(--up)">${fmtEUR(r.v)}</span></div>`).join("")
+  $("bl-inc").innerHTML = incRows.filter(r => r.v).map(r => `<div class="totrow" style="font-weight:500"><span><span class="tdot t-rev"></span>${esc(r.name)}${r.sub ? `<br><span class="small muted">${esc(r.sub)}</span>` : ""}</span><span class="num">${fmtEUR(r.v)}</span></div>`).join("")
     || `<div class="notice">Aucune entrée sur cette période.</div>`;
 }
-$("bl-period").addEventListener("change", e => { bPeriod = e.target.value; renderBilan() });
-$("bl-chart").addEventListener("click", e => { const g = e.target.closest("[data-ck]"); if (!g) return; const [y, m] = g.dataset.ck.split("-").map(Number); viewCycle = cycleOf(payDate(y, m - 1)); bMode = "cycle"; renderBudget(); window.scrollTo(0, 0) });
-$("bmode").addEventListener("click", e => { const b = e.target.closest("[data-bm]"); if (!b) return; bMode = b.dataset.bm; renderBudget() });
+// Pas « rond » pour les graduations (1, 2, 2,5 ou 5 × 10^n)
+function niceStep(range, ticks = 4) {
+  const raw = Math.max(range, 1) / ticks, p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p;
+  return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p;
+}
+const fmtK = v => { const a = Math.abs(v), s = v < 0 ? "−" : ""; return s + (a >= 10000 ? (a / 1000).toLocaleString("fr-FR", { maximumFractionDigits: 1 }) + " k€" : a.toLocaleString("fr-FR", { maximumFractionDigits: 0 }) + " €") };
+const BL_SERIES = [["rev", "Revenus"], ["spend", "Dépenses"], ["save", "Épargne"]], BL_COLOR = { rev: "var(--c-rev)", spend: "var(--c-exp)", save: "var(--c-sav)" }, BL_DOT = { rev: "t-rev", spend: "t-exp", save: "t-sav" };
+function drawBilanChart() {
+  const el = $("bl-chart"), per = blPer;
+  if (!per.length || !per.some(p => p.rev || p.spend)) { el.innerHTML = ""; $("bl-legend").hidden = true; $("bl-chartnote").textContent = "Pas encore de mouvements sur cette période."; return }
+  $("bl-legend").hidden = false;
+  const avail = Math.max(260, el.clientWidth || 600), H = 220, pl = 54, pr = 8, pt = 12, pb = 28;
+  const gw = Math.max(18, (avail - pl - pr) / per.length), W = Math.max(avail, Math.ceil(pl + pr + gw * per.length));
+  const vals = per.flatMap(p => [p.rev, p.spend, p.save]), hi = Math.max(1, ...vals), lo = Math.min(0, ...vals);
+  const step = niceStep(hi - lo), maxV = Math.ceil(hi * 1.04 / step) * step, minV = lo < 0 ? Math.floor(lo * 1.04 / step) * step : 0;
+  const y = v => pt + (maxV - v) / (maxV - minV) * (H - pt - pb), y0 = y(0);
+  const inner = Math.min(gw * .76, 54), bw = Math.max(2, (inner - 4) / 3), labStep = Math.max(1, Math.ceil(66 / gw));
+  // Barre aux coins arrondis côté valeur, posée sur la ligne de zéro
+  const bar = (x, v) => { const y1 = y(v), h = Math.abs(y0 - y1); if (h < .5) return ""; const r = Math.min(4, bw / 2, h), d = v >= 0 ? 1 : -1;
+    return `M${x},${y0}V${y1 + d * r}Q${x},${y1} ${x + r},${y1}H${x + bw - r}Q${x + bw},${y1} ${x + bw},${y1 + d * r}V${y0}Z` };
+  const ticks = []; for (let v = minV; v <= maxV + step / 2; v += step) ticks.push(v);
+  el.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="group" aria-label="Revenus, dépenses et épargne par cycle">
+    ${ticks.map(v => `<line x1="${pl}" x2="${W - pr}" y1="${y(v)}" y2="${y(v)}" class="${v === 0 ? "base" : "grid"}"/><text x="${pl - 6}" y="${y(v) + 4}" text-anchor="end" class="ax">${fmtK(v)}</text>`).join("")}
+    ${per.map((p, i) => { const gx = pl + i * gw, x0 = gx + (gw - (3 * bw + 4)) / 2;
+      return `<g data-ck="${p.c.key}" data-i="${i}" tabindex="0" role="button" aria-label="${esc(cycleRange(p.c))} : revenus ${fmtEUR(p.rev)}, dépenses ${fmtEUR(p.spend)}, épargne ${fmtEUR(p.save)}"${blPin === p.c.key ? ' class="sel"' : ""}>
+        <rect class="hl" x="${gx + 1}" y="${pt - 6}" width="${gw - 2}" height="${H - pt - pb + 6}" rx="6"/>
+        ${BL_SERIES.map(([k], j) => `<path d="${bar(x0 + j * (bw + 2), p[k])}" fill="${BL_COLOR[k]}"/>`).join("")}
+        ${i % labStep === 0 ? `<text x="${gx + gw / 2}" y="${H - 9}" text-anchor="middle" class="ax">${fmtCycle(p.c)}</text>` : ""}</g>`; }).join("")}
+  </svg><div class="btip" id="bl-tip" hidden></div>`;
+  $("bl-chartnote").textContent = W > avail ? "Faites glisser le graphique pour voir les cycles plus anciens. Touchez une barre pour voir les montants." : "Touchez une barre pour voir les montants exacts.";
+  if (W > avail) el.scrollLeft = el.scrollWidth;
+  if (blPin) { const i = per.findIndex(p => p.c.key === blPin); if (i >= 0) blTip(i, true); else blPin = null }
+}
+function blTip(i, pinned) {
+  const el = $("bl-chart"), tip = $("bl-tip"), p = blPer[i]; if (!tip || !p) return;
+  tip.innerHTML = `<b style="font-family:var(--body);font-weight:600">${esc(cycleRange(p.c))}</b>`
+    + BL_SERIES.map(([k, label]) => `<div class="r"><span><span class="tdot ${BL_DOT[k]}"></span>${label}</span><b>${fmtEUR(p[k])}</b></div>`).join("")
+    + (p.placed ? `<div style="opacity:.8;font-size:.76rem">dont ${fmtEUR(p.placed)} virés vers l'épargne</div>` : "")
+    + `<button class="go" type="button" data-open="${p.c.key}">Voir le cycle ›</button>`;
+  tip.hidden = false; tip.classList.toggle("pinned", !!pinned);
+  const g = el.querySelector(`g[data-i="${i}"] .hl`), gx = +g.getAttribute("x"), gw = +g.getAttribute("width"), tw = 188;
+  const vis0 = el.scrollLeft + 4, vis1 = el.scrollLeft + el.clientWidth - tw - 4, mid = el.scrollLeft + el.clientWidth / 2;
+  let left = gx + gw / 2 < mid ? gx + gw + 6 : gx - tw - 6;
+  tip.style.left = Math.max(vis0, Math.min(vis1, left)) + "px";
+  el.querySelectorAll("g.sel").forEach(x => x.classList.remove("sel"));
+  if (pinned) el.querySelector(`g[data-i="${i}"]`)?.classList.add("sel");
+}
+function blUnpin() { blPin = null; const t = $("bl-tip"); if (t) t.hidden = true; $("bl-chart").querySelectorAll("g.sel").forEach(x => x.classList.remove("sel")) }
+function openCycle(key) { const [y, m] = key.split("-").map(Number); viewCycle = cycleOf(payDate(y, m - 1)); envFilter = null; blPin = null; go("budget") }
+$("bl-period").addEventListener("change", e => { bPeriod = e.target.value; blPin = null; renderBilan() });
+$("bl-chart").addEventListener("click", e => {
+  const o = e.target.closest("[data-open]"); if (o) { openCycle(o.dataset.open); return }
+  if (e.target.closest("#bl-tip")) return;
+  const g = e.target.closest("[data-ck]");
+  if (!g || blPin === g.dataset.ck) { blUnpin(); return }
+  blPin = g.dataset.ck; blTip(+g.dataset.i, true);
+});
+$("bl-chart").addEventListener("keydown", e => {
+  const g = e.target.closest?.("[data-ck]"); if (!g || (e.key !== "Enter" && e.key !== " ")) return;
+  e.preventDefault(); if (blPin === g.dataset.ck) blUnpin(); else { blPin = g.dataset.ck; blTip(+g.dataset.i, true) }
+});
+// À la souris : la bulle suit le survol tant qu'aucune barre n'est sélectionnée
+$("bl-chart").addEventListener("pointermove", e => { if (e.pointerType !== "mouse" || blPin) return; const g = e.target.closest("[data-ck]"); if (g) blTip(+g.dataset.i, false); else if (!e.target.closest("#bl-tip")) { const t = $("bl-tip"); if (t) t.hidden = true } });
+$("bl-chart").addEventListener("pointerleave", e => { if (e.pointerType === "mouse" && !blPin) { const t = $("bl-tip"); if (t) t.hidden = true } });
+document.addEventListener("click", e => { if (blPin && view === "bilan" && !e.target.closest("#bl-chart")) blUnpin() });
+
+/* ---------- Comptes d'épargne et patrimoine ---------- */
+const goalBar = (b, g) => {
+  if (!(g > 0)) return "";
+  const pct = Math.min(100, Math.max(0, b / g * 100));
+  return `<div class="bar"><i class="t-sav" style="width:${pct}%"></i></div><div class="small muted" style="margin-top:4px">${b >= g
+    ? `<span style="color:var(--c-sav)">✓</span> Objectif de ${fmtEUR(g)} atteint${b > g + 0.005 ? ` (+${fmtEUR(b - g)})` : ""}`
+    : `Objectif ${fmtEUR(g)} · reste ${fmtEUR(g - b)} (${pct.toLocaleString("fr-FR", { maximumFractionDigits: 0 })} %)`}</div>`;
+};
+function renderComptes() {
+  $("c-savs").innerHTML = S.budget.savings.map(a => { const g = +a.goal || 0, b = +a.balance || 0;
+    return `<div class="erow acct" data-said="${esc(a.id)}">
+      <input class="full" data-sak="name" type="text" value="${esc(a.name)}" aria-label="Nom du compte" placeholder="Nom du compte">
+      <label><span class="cap">Solde (€)</span><input class="n" data-sak="balance" type="text" inputmode="decimal" autocomplete="off" value="${fmtIn(b)}" placeholder="0" aria-label="Solde ${esc(a.name)}"></label>
+      <label><span class="cap">Objectif (€)</span><input class="n" data-sak="goal" type="text" inputmode="decimal" autocomplete="off" value="${fmtIn(g)}" placeholder="facultatif" aria-label="Objectif ${esc(a.name)}"></label>
+      <button class="del" type="button" data-sadel aria-label="Supprimer le compte ${esc(a.name)}" style="align-self:end">✕</button>
+      <div class="full" data-sbar>${goalBar(b, g)}</div></div>` }).join("") || `<div class="notice">Aucun compte.</div>`;
+  updateComptesTotals();
+}
+function updateComptesTotals() {
+  const t = savTotal(), inv = grandTotal();
+  $("c-sav").textContent = fmtEUR(t); $("c-inv").textContent = fmtEUR(inv); $("c-all").textContent = fmtEUR(t + inv);
+  updateDrawer();
+}
+$("c-savs").addEventListener("input", e => {
+  const inp = e.target.closest("[data-sak]"); if (!inp) return;
+  const row = inp.closest("[data-said]"), a = S.budget.savings.find(x => x.id === row.dataset.said); if (!a) return;
+  a[inp.dataset.sak] = inp.dataset.sak === "name" ? inp.value : parseNum(inp.value);
+  commit(false);
+  row.querySelector("[data-sbar]").innerHTML = goalBar(+a.balance || 0, +a.goal || 0);
+  updateComptesTotals();
+});
+$("c-savs").addEventListener("click", e => {
+  const del = e.target.closest("[data-sadel]"); if (!del) return;
+  if (!del.dataset.confirm) { del.dataset.confirm = "1"; del.textContent = "Suppr. ?"; del.style.color = "var(--down)";
+    setTimeout(() => { if (del.isConnected) { delete del.dataset.confirm; del.textContent = "✕"; del.style.color = "" } }, 3000); return }
+  const id = del.closest("[data-said]").dataset.said; S.budget.savings = S.budget.savings.filter(x => x.id !== id); commit();
+});
+$("c-savadd").addEventListener("click", () => { S.budget.savings.push({ id: rid(), name: "Nouveau compte", balance: 0, goal: 0 }); commit(); const rows = document.querySelectorAll("#c-savs [data-sak=name]"); rows[rows.length - 1]?.select() });
+
+/* ---------- Budget prévu : enveloppes, moyennes, budget collé ---------- */
+let planExcl = true, planUndo = null;
+const roundBudget = v => v <= 0 ? 0 : Math.max(5, Math.round(v / 5) * 5);
+// Moyenne nette par enveloppe sur les 12 derniers cycles terminés (remboursements déduits)
+function envAverages() {
+  const cur = cycleOf(new Date()), done = allCycles().filter(c => c.key < cur.key).slice(-12), tot = {};
+  done.forEach(c => {
+    cycleExpenses(c).forEach(e => { const a = +e.amount || 0; if (planExcl && a >= 900 && envById(e.env)?.kind !== "save") return; tot[e.env] = (tot[e.env] || 0) + a });
+    cycleIncomes(c).forEach(i => { const env = refundEnv(i); if (env) tot[env] = (tot[env] || 0) - (+i.amount || 0) });
+  });
+  const n = done.length;
+  return { n, avg: id => n ? Math.max(0, (tot[id] || 0) / n) : 0 };
+}
+function renderPlan() {
+  const b = S.budget, A = envAverages();
+  if (document.activeElement !== $("p-income")) $("p-income").value = fmtIn(b.income);
+  $("p-excl").checked = planExcl;
+  $("s-envs").innerHTML = b.envelopes.map(e => { const avg = A.avg(e.id), r = roundBudget(avg), save = e.kind === "save";
+    return `<div class="erow" data-eid="${esc(e.id)}">
+      <input class="full" data-ek="name" type="text" value="${esc(e.name)}" aria-label="Nom de l'enveloppe" placeholder="Nom">
+      <label><span class="cap">Prévu par cycle (€)</span><input class="n" data-ek="planned" type="text" inputmode="decimal" value="${fmtIn(e.planned)}" placeholder="0" aria-label="Montant prévu pour ${esc(e.name)}"></label>
+      <label><span class="cap">Type</span><select data-ek="kind" aria-label="Type de ${esc(e.name)}"><option value="spend"${!save ? " selected" : ""}>Dépense</option><option value="save"${save ? " selected" : ""}>Épargne</option></select></label>
+      <button class="del" type="button" data-edel aria-label="Supprimer l'enveloppe ${esc(e.name)}" style="align-self:end">✕</button>
+      <div class="full prow2"><span><span class="tdot ${save ? "t-sav" : "t-exp"}"></span>${A.n ? `Moyenne : ${fmtEUR(avg)} / cycle` : "Pas encore de cycle terminé"}</span>${A.n && avg > 0 && r !== (+e.planned || 0) ? `<button class="linkbtn" type="button" data-euse="${r}">Mettre ${fmtEUR(r).replace(",00", "")}</button>` : ""}</div></div>`; }).join("") || `<div class="notice">Aucune enveloppe.</div>`;
+  $("p-fill").hidden = !A.n;
+  updatePlanTotals();
+}
+function updatePlanTotals() {
+  const envs = S.budget.envelopes, inc = +S.budget.income || 0;
+  const spend = envs.filter(e => e.kind !== "save").reduce((s, e) => s + (+e.planned || 0), 0), save = envs.filter(e => e.kind === "save").reduce((s, e) => s + (+e.planned || 0), 0);
+  const total = spend + save, free = inc - total;
+  $("p-total").textContent = fmtEUR(total); $("p-of").textContent = inc ? `sur ${fmtEUR(inc)} de revenu` : "";
+  $("p-spend").textContent = fmtEUR(spend); $("p-save").textContent = fmtEUR(save);
+  $("p-savepct").textContent = inc ? `${(save / inc * 100).toLocaleString("fr-FR", { maximumFractionDigits: 0 })} % du revenu` : "";
+  $("p-free").textContent = fmtEUR(free); $("p-free").style.color = free < -0.005 ? "var(--down)" : "";
+  $("p-freenote").textContent = !inc ? "indiquez votre revenu" : free < -0.005 ? "⚠ budget supérieur au revenu" : free > 0.005 ? "à répartir ou à épargner" : "tout est réparti";
+  $("s-envtotal").textContent = "Total " + fmtEUR(total);
+}
+const updateEnvTotal = updatePlanTotals;
+const undoBtn = '<button class="linkbtn small" type="button" data-planundo>Annuler</button>';
+$("p-income").addEventListener("input", e => { S.budget.income = parseNum(e.target.value); commit(false); updatePlanTotals() });
+$("p-excl").addEventListener("change", e => { planExcl = e.target.checked; renderPlan() });
+$("s-envs").addEventListener("click", e => {
+  const u = e.target.closest("[data-euse]"); if (!u) return;
+  const env = envById(u.closest("[data-eid]").dataset.eid); if (!env) return;
+  env.planned = +u.dataset.euse; commit();
+});
+$("p-fill").addEventListener("click", e => {
+  const b = e.currentTarget, A = envAverages(), msg = $("p-fillmsg");
+  if (!b.dataset.confirm) { b.dataset.confirm = "1"; b.textContent = "Confirmer : remplacer par les moyennes";
+    setTimeout(() => { if (b.dataset.confirm) { delete b.dataset.confirm; b.textContent = "Remplir avec les moyennes" } }, 4000); return }
+  delete b.dataset.confirm; b.textContent = "Remplir avec les moyennes";
+  planUndo = JSON.stringify(S.budget.envelopes);
+  let k = 0;
+  S.budget.envelopes.forEach(e => { const r = roundBudget(A.avg(e.id)); if (r > 0 && r !== (+e.planned || 0)) { e.planned = r; k++ } });
+  commit();
+  msg.innerHTML = `${k} enveloppe${k > 1 ? "s" : ""} mise${k > 1 ? "s" : ""} à jour d'après ${A.n} cycle${A.n > 1 ? "s" : ""} terminé${A.n > 1 ? "s" : ""} (arrondi à 5 €). ${k ? undoBtn : ""}`;
+});
+// « Courses : 230 € », « - Restaurants + café 150 », tableau Markdown… : une enveloppe par ligne
+function parseBudgetText(txt) {
+  const out = [];
+  for (const raw of String(txt).split(/\r?\n/)) {
+    let l = raw.replace(/\*\*|__/g, "").replace(/\|/g, " ").replace(/\(.*?\)/g, " ").replace(/^\s*(?:[-*•·–—>]+|\d{1,2}[.)])\s+/, "").trim();
+    if (!l || /^(total|salaire|revenu|reste|non affect|solde|sous-total)/.test(fold(l))) continue;
+    const nums = [...l.matchAll(/-?\d[\d   ]*(?:[.,]\d+)?/g)]; if (!nums.length) continue;
+    const last = nums.at(-1), after = l.slice(last.index + last[0].length);
+    if (!/^\s*(€|eur|euros?)?\s*((\/|par)\s*(cycle|mois|month))?\s*[.;,]?\s*$/i.test(after)) continue;
+    const amount = toNum(last[0]); if (!isFinite(amount)) continue;
+    const name = l.slice(0, last.index).replace(/[\s:=–—\-→>€]+$/, "").trim();
+    if (name && /[a-zà-ÿ]/i.test(name)) out.push({ name, amount: Math.max(0, round2(amount)) });
+  }
+  return out;
+}
+function matchEnv(name) {
+  const f = fold(name), envs = S.budget.envelopes;
+  return envs.find(e => fold(e.name) === f)
+    || envs.filter(e => { const g = fold(e.name); return g.length >= 3 && f.length >= 3 && (f.includes(g) || g.includes(f)) }).sort((a, b) => b.name.length - a.name.length)[0];
+}
+$("p-apply").addEventListener("click", () => {
+  const rows = parseBudgetText($("p-text").value), msg = $("p-msg");
+  if (!rows.length) { msg.textContent = "Aucune ligne reconnue. Écrivez une enveloppe par ligne, par exemple « Courses : 230 € »."; msg.className = "notice err"; return }
+  planUndo = JSON.stringify(S.budget.envelopes);
+  const touched = new Set(), created = [];
+  for (const r of rows) {
+    let e = matchEnv(r.name);
+    if (!e) { e = { id: rid(), name: r.name, planned: 0, kind: /epargn|livret|placement|invest|\bpea\b|assurance.?vie|bourse|reserve|ldds|\bpel\b/.test(fold(r.name)) ? "save" : "spend" }; S.budget.envelopes.push(e); created.push(e.name) }
+    e.planned = touched.has(e.id) ? round2((+e.planned || 0) + r.amount) : r.amount;
+    touched.add(e.id);
+  }
+  let zeroed = 0;
+  if ($("p-zero").checked) S.budget.envelopes.forEach(e => { if (!touched.has(e.id) && +e.planned) { e.planned = 0; zeroed++ } });
+  commit();
+  const upd = touched.size - created.length;
+  msg.className = "notice";
+  msg.innerHTML = `${upd} enveloppe${upd > 1 ? "s" : ""} mise${upd > 1 ? "s" : ""} à jour${created.length ? `, ${created.length} créée${created.length > 1 ? "s" : ""} (${esc(created.join(", "))})` : ""}${zeroed ? `, ${zeroed} remise${zeroed > 1 ? "s" : ""} à 0` : ""}. ${undoBtn}`;
+});
+document.addEventListener("click", e => {
+  if (!e.target.closest("[data-planundo]") || !planUndo) return;
+  S.budget.envelopes = JSON.parse(planUndo); planUndo = null; commit();
+  $("p-msg").textContent = ""; $("p-fillmsg").textContent = ""; toast("Budget précédent rétabli.");
+});
 
 /* ---------- Import d'historique (Excel / CSV) ---------- */
 // Lit un tableau de dépenses, l'export d'une appli de budget ou un relevé bancaire ; propose une correspondance
@@ -1273,7 +1599,7 @@ $("hx-box").addEventListener("click", e => {
   hx = null; $("hx-box").hidden = true; $("hx-box").innerHTML = "";
   commit();
   const size = JSON.stringify(S).length;
-  $("hx-msg").textContent = `Import terminé : ${nE} dépenses et transferts, ${nI} entrées${nS ? `, salaire renseigné sur ${nS} cycle${nS > 1 ? "s" : ""}` : ""}. Consultez Budget › Bilan.` + (size > 850000 ? " Attention : les données approchent la limite de la synchronisation (1 Mo)." : "");
+  $("hx-msg").textContent = `Import terminé : ${nE} dépenses et transferts, ${nI} entrées${nS ? `, salaire renseigné sur ${nS} cycle${nS > 1 ? "s" : ""}` : ""}. Consultez la rubrique Bilan (menu ☰).` + (size > 850000 ? " Attention : les données approchent la limite de la synchronisation (1 Mo)." : "");
   $("hx-msg").className = "notice";
 });
 function renderLastImport() {
@@ -1501,7 +1827,7 @@ function renderHistory() {
   $("histdelta").textContent = `${fmtPct(ch)} depuis le ${fmtD(pts[0].d)}`;
 }
 let resizeTimer = null;
-window.addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { if (view === "invest") renderHistory() }, 150) });
+window.addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { if (view === "invest") renderHistory(); else if (view === "bilan") drawBilanChart() }, 150) });
 
 $("classes").addEventListener("input", e => {
   const inp = e.target.closest("input[data-k]"); if (!inp) return;
@@ -1778,7 +2104,8 @@ async function refreshQuotes() {
   }
   qBusy = false; $("qrefresh").classList.remove("spin");
   if (view === "invest") { if (document.activeElement?.closest?.("#classes")) renderTotals(); else renderInvest() }
-  else if (view === "budget") updateSavTotals();
+  else if (view === "comptes") updateComptesTotals();
+  updateDrawer();
   renderQuoteNote(); scheduleHistory(false);
 }
 function renderQuoteNote() {
@@ -1801,7 +2128,7 @@ function sheetTSV() {
   });
   return rows.length > 1 ? rows.map(r => r.join("\t")).join("\n") : "";
 }
-$("qrefresh").addEventListener("click", () => { if (!S.invest.quotesUrl) show("reglages", "set-quotes"); else refreshQuotes() });
+$("qrefresh").addEventListener("click", () => { if (!S.invest.quotesUrl) go("reglages", "set-quotes"); else refreshQuotes() });
 
 /* ---------- Conjoncture (OCDE) ---------- */
 const COUNTRIES = [
@@ -1917,27 +2244,16 @@ function renderSettings() {
   if (document.activeElement !== $("s-payday")) $("s-payday").value = b.payday;
   if (document.activeElement !== $("s-income")) $("s-income").value = fmtIn(b.income);
   $("s-shift").setAttribute("aria-checked", String(!!b.shiftWeekend));
-  $("s-envs").innerHTML = b.envelopes.map(e => `<div class="erow" data-eid="${esc(e.id)}">
-      <input class="full" data-ek="name" type="text" value="${esc(e.name)}" aria-label="Nom de l'enveloppe" placeholder="Nom">
-      <input class="n" data-ek="planned" type="text" inputmode="decimal" value="${fmtIn(e.planned)}" placeholder="Prévu (€)" aria-label="Montant prévu pour ${esc(e.name)}">
-      <select data-ek="kind" aria-label="Type"><option value="spend"${e.kind !== "save" ? " selected" : ""}>Dépense</option><option value="save"${e.kind === "save" ? " selected" : ""}>Épargne</option></select>
-      <button class="del" type="button" data-edel aria-label="Supprimer l'enveloppe ${esc(e.name)}">✕</button></div>`).join("") || `<div class="notice">Aucune enveloppe.</div>`;
-  updateEnvTotal();
   const envOpts = sel => `<option value="">Aucune (argent en plus)</option>` + b.envelopes.map(e => `<option value="${esc(e.id)}"${sel === e.id ? " selected" : ""}>Déduire de « ${esc(e.name)} »</option>`).join("");
   $("s-incs").innerHTML = b.incomeCats.map(c => `<div class="erow" data-icid="${esc(c.id)}">
       <input class="full" data-ick="name" type="text" value="${esc(c.name)}" aria-label="Nom de la catégorie" placeholder="Nom">
       <select data-ick="env" aria-label="Enveloppe par défaut" style="grid-column:1 / 3">${envOpts(c.env)}</select>
       <button class="del" type="button" data-icdel aria-label="Supprimer la catégorie ${esc(c.name)}">✕</button></div>`).join("") || `<div class="notice">Aucune catégorie.</div>`;
-  $("s-savs").innerHTML = b.savings.map(a => `<div class="erow" data-said="${esc(a.id)}">
-      <input class="full" data-sak="name" type="text" value="${esc(a.name)}" aria-label="Nom du compte" placeholder="Nom du compte">
-      <input class="n" data-sak="goal" type="text" inputmode="decimal" value="${fmtIn(a.goal)}" placeholder="Objectif (€)" aria-label="Objectif pour ${esc(a.name)}" style="grid-column:1 / 3">
-      <button class="del" type="button" data-sadel aria-label="Supprimer le compte ${esc(a.name)}">✕</button></div>`).join("") || `<div class="notice">Aucun compte.</div>`;
   $("s-classes").innerHTML = CLASSES.map(c => `<label class="field"><span class="small muted" style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:${c.c}"></span>Classe ${CLASSES.indexOf(c) + 1}</span><input type="text" data-cn="${c.id}" value="${esc(cname(c.id))}"></label>`).join("");
   if (document.activeElement !== $("q-url")) $("q-url").value = S.invest.quotesUrl || "";
   $("appver").textContent = APP_VERSION;
   renderLastImport();
 }
-function updateEnvTotal() { const t = S.budget.envelopes.reduce((s, e) => s + (+e.planned || 0), 0); $("s-envtotal").textContent = "Total prévu " + fmtEUR(t) }
 $("s-payday").addEventListener("change", e => { S.budget.payday = Math.min(31, Math.max(1, Math.round(+e.target.value) || 25)); e.target.value = S.budget.payday; viewCycle = cycleOf(new Date()); commit(false) });
 $("s-income").addEventListener("input", e => { S.budget.income = parseNum(e.target.value); commit(false) });
 $("s-shift").addEventListener("click", e => { S.budget.shiftWeekend = !S.budget.shiftWeekend; viewCycle = cycleOf(new Date()); commit() });
@@ -1949,7 +2265,7 @@ $("s-envs").addEventListener("input", e => {
 });
 $("s-envs").addEventListener("change", e => {
   const sel = e.target.closest("select[data-ek]"); if (!sel) return;
-  const env = envById(sel.closest("[data-eid]").dataset.eid); if (env) { env.kind = sel.value; commit(false) }
+  const env = envById(sel.closest("[data-eid]").dataset.eid); if (env) { env.kind = sel.value; commit() }
 });
 $("s-envs").addEventListener("click", e => {
   const del = e.target.closest("[data-edel]"); if (!del) return;
@@ -1975,22 +2291,10 @@ $("s-incs").addEventListener("click", e => {
   const id = del.closest("[data-icid]").dataset.icid; S.budget.incomeCats = S.budget.incomeCats.filter(x => x.id !== id); commit();
 });
 $("s-incadd").addEventListener("click", () => { S.budget.incomeCats.push({ id: rid(), name: "Nouvelle catégorie", env: "" }); commit(); const rows = document.querySelectorAll("#s-incs [data-ick=name]"); rows[rows.length - 1]?.select() });
-$("s-savs").addEventListener("input", e => {
-  const inp = e.target.closest("[data-sak]"); if (!inp) return;
-  const a = S.budget.savings.find(x => x.id === inp.closest("[data-said]").dataset.said); if (!a) return;
-  a[inp.dataset.sak] = inp.dataset.sak === "goal" ? parseNum(inp.value) : inp.value; commit(false);
-});
-$("s-savs").addEventListener("click", e => {
-  const del = e.target.closest("[data-sadel]"); if (!del) return;
-  if (!del.dataset.confirm) { del.dataset.confirm = "1"; del.textContent = "Suppr. ?"; del.style.color = "var(--down)";
-    setTimeout(() => { if (del.isConnected) { delete del.dataset.confirm; del.textContent = "✕"; del.style.color = "" } }, 3000); return }
-  const id = del.closest("[data-said]").dataset.said; S.budget.savings = S.budget.savings.filter(x => x.id !== id); commit();
-});
-$("s-savadd").addEventListener("click", () => { S.budget.savings.push({ id: rid(), name: "Nouveau compte", balance: 0, goal: 0 }); commit(); const rows = document.querySelectorAll("#s-savs [data-sak=name]"); rows[rows.length - 1]?.select() });
 $("s-classes").addEventListener("input", e => { const inp = e.target.closest("[data-cn]"); if (!inp) return; S.invest.classNames[inp.dataset.cn] = inp.value.trim() || defaultState().invest.classNames[inp.dataset.cn]; commit(false) });
 $("q-copy").addEventListener("click", async () => {
   const tsv = sheetTSV(), msg = $("q-msg");
-  if (!tsv) { msg.textContent = "Indiquez d'abord le symbole de vos lignes dans l'onglet Portefeuille (colonne « Symbole »)."; msg.className = "notice err"; return }
+  if (!tsv) { msg.textContent = "Indiquez d'abord le symbole de vos lignes dans la rubrique Portefeuille (colonne « Symbole »)."; msg.className = "notice err"; return }
   $("q-tsv").value = tsv; $("q-tsvbox").hidden = false;
   try { await navigator.clipboard.writeText(tsv); msg.textContent = `${tsv.split("\n").length - 1} ligne(s) copiée(s). Collez-les en A1 d'un Google Sheets.`; msg.className = "notice" }
   catch { msg.textContent = "Copie automatique refusée : sélectionnez le texte ci-dessus et copiez-le."; msg.className = "notice"; $("q-tsv").select() }
@@ -2003,7 +2307,7 @@ $("q-url").addEventListener("change", e => {
   msg.textContent = "Lecture du tableau…"; msg.className = "notice";
   refreshQuotes().then(() => {
     const n = Object.keys(quotes.map).length;
-    msg.textContent = qErr ? qErr : `Tableau lu : ${n} symbole${n > 1 ? "s" : ""}. Les cours s'affichent dans l'onglet Portefeuille.`;
+    msg.textContent = qErr ? qErr : `Tableau lu : ${n} symbole${n > 1 ? "s" : ""}. Les cours s'affichent dans la rubrique Portefeuille.`;
     msg.className = "notice" + (qErr ? " err" : "");
   });
 });
@@ -2073,9 +2377,9 @@ function fsMsg(e) {
   return "Erreur de synchronisation : " + (c || e?.message || "inconnue");
 }
 const sync = {
-  fb: null, user: null, ref: null, unsub: null, timer: null, status: "off", msg: "", remote: null, remoteAt: 0, serverSeen: false, mode: "",
+  fb: null, user: null, ref: null, unsub: null, timer: null, status: "off", msg: "", remote: null, remoteAt: 0, serverSeen: false, mode: "", lastOk: +ls.get(LS.lastSync) || 0,
   cfg() { try { return JSON.parse(ls.get(LS.fb)) } catch { return null } },
-  set(status, msg = "") { this.status = status; this.msg = msg; renderSync() },
+  set(status, msg = "") { this.status = status; this.msg = msg; if (status === "ok") { this.lastOk = Date.now(); ls.set(LS.lastSync, String(this.lastOk)) } renderSync() },
   async start() {
     const cfg = this.cfg(); if (!cfg) { this.set("off"); return }
     this.set("loading", "Connexion à Firebase…");
@@ -2142,6 +2446,7 @@ const sync = {
 };
 const PILL = { off: ["Local", ""], loading: ["Synchro…", ""], syncing: ["Synchro…", ""], ok: ["Synchronisé", "good"], offline: ["Hors ligne", "warn"], error: ["Erreur synchro", "bad"], signedout: ["Non connecté", "warn"], choice: ["Action requise", "warn"] };
 function renderSync() {
+  updateDrawer();
   const [txt, cls] = PILL[sync.status] || PILL.off;
   document.querySelectorAll("[data-syncpill]").forEach(p => { p.textContent = txt; p.className = "pill " + cls });
   // Bandeau : choix au premier branchement, ou erreur
