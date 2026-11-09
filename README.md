@@ -83,6 +83,8 @@ La configuration Firebase (`apiKey`, etc.) n'est pas un secret : la protection v
 - Couleurs : **vert** pour les revenus, **orange** pour les dépenses, **bleu** pour l'épargne. Une enveloppe de dépense dépassée est hachurée en rouge, avec ⚠.
 
 **Accueil (cycle de paie)**
+- **Disponible à dépenser** = revenus du cycle (salaire + autres entrées) − dépenses − objectif d'épargne du cycle (total des enveloppes de type Épargne, ou ce qui a déjà été viré si c'est plus). C'est ce que vous pouvez encore dépenser jusqu'à la prochaine paie en tenant votre objectif d'épargne ; l'appli indique aussi le montant par jour. Sur un cycle terminé, le chiffre devient « Restant en fin de cycle ».
+- **Sur le compte courant** : solde estimé du compte courant (voir Comptes), avec la part encore à virer vers l'épargne sur ce cycle.
 - Le bouton **+** ajoute une **dépense** ou une **entrée d'argent** (choix en haut de la fenêtre).
 - Une entrée a une **catégorie** (remboursement mutuelle, remboursement d'un proche, vente, prime, cadeau…) pour savoir d'où vient l'argent. Elle peut aussi être **déduite d'une enveloppe** : un remboursement de mutuelle redonne le montant à l'enveloppe Santé, et un ami qui rembourse sa part du resto le redonne à Restaurants. Sans enveloppe, l'argent s'ajoute simplement au reste du cycle (vente, prime…).
 - Les catégories d'entrées et leur enveloppe par défaut se règlent dans **Réglages › Catégories d'entrées**.
@@ -97,8 +99,9 @@ La configuration Firebase (`apiKey`, etc.) n'est pas un secret : la protection v
 - **Coller un budget** : collez le budget mis au point avec Claude, une enveloppe par ligne (`Courses : 230 €`, liste ou tableau). Les enveloppes reconnues sont mises à jour, les autres sont créées (en type Épargne si le nom l'évoque : livret, PEA, placement…). Les lignes « Total » ou « Salaire » sont ignorées. **Annuler** rétablit le budget d'avant.
 
 **Comptes**
+- **Compte courant** : recopiez de temps en temps le solde affiché par votre banque, avec sa date. Entre deux mises à jour, l'appli l'estime : solde enregistré + salaires (au jour de paie) et entrées − dépenses et virements saisis depuis. Une dépense oubliée crée un écart, corrigé à la mise à jour suivante.
 - Solde et objectif (facultatif) de chaque compte d'épargne, avec la progression vers l'objectif.
-- Le patrimoine suivi additionne les comptes d'épargne et le portefeuille.
+- Le patrimoine suivi additionne le compte courant, les comptes d'épargne et le portefeuille.
 
 **Bilan**
 - Choisissez la période : 12 derniers cycles, une année, ou tout l'historique.
@@ -157,13 +160,14 @@ Les cours s'actualisent à l'ouverture de l'appli, puis toutes les 5 minutes tan
 
 **Google Sheets privé (rempli par Claude)**
 
-Un tableau de votre Google Drive, avec trois onglets, que Claude remplit à partir de vos captures (relevé bancaire, ticket, confirmation DEGIRO) :
+Un tableau de votre Google Drive, avec quatre onglets, que Claude remplit à partir de vos captures (relevé bancaire, ticket, confirmation DEGIRO) :
 
 | Onglet | Colonnes | Effet dans l'appli |
 |---|---|---|
 | Mouvements | ID, Date, Type (Dépense / Entrée), Montant, Enveloppe, Catégorie (entrées), Libellé | Ajout des mouvements, sans doublons grâce à l'ID. Une ligne corrigée dans le tableau est corrigée dans l'appli ; une modification faite dans l'appli est gardée. |
 | Budget | Enveloppe, Prévu, Type (Dépense / Épargne) | Montants prévus. La première fois, l'appli demande votre accord ; ensuite, chaque changement du tableau s'applique avec « Annuler ». |
 | Portefeuille | Symbole, Quantité, Montant investi, Classe, ISIN, Nom | Quantités et coût des lignes du même symbole ou ISIN ; une valeur absente est ajoutée dans la classe indiquée. |
+| Soldes | Compte, Solde, Date | « Compte courant » met à jour le solde réel du compte courant ; les autres lignes, les comptes d'épargne du même nom (créés s'ils manquent). |
 
 L'appli lit le tableau avec votre compte Google, en **lecture seule**. Il n'est pas publié et reste visible par vous seul. Les cours, eux, viennent toujours du tableau « Cours en direct ».
 
@@ -189,7 +193,7 @@ Réglages → **Exporter** crée un fichier `.json`. Gardez-en une copie de temp
 
 ## Mettre à jour l'appli
 
-1. Dans GitHub : **Add file** → **Upload files** → déposez les fichiers modifiés (versions 1.2 à 1.5 : `index.html`, et `README.md` si vous voulez le guide à jour ; version 1.1 : `index.html`, `sw.js` et `README.md`) → **Commit changes**. GitHub remplace les anciens fichiers du même nom.
+1. Dans GitHub : **Add file** → **Upload files** → déposez les fichiers modifiés (versions 1.2 à 1.6 : `index.html`, et `README.md` si vous voulez le guide à jour ; version 1.1 : `index.html`, `sw.js` et `README.md`) → **Commit changes**. GitHub remplace les anciens fichiers du même nom.
 2. Attendez une minute, puis dans l'appli : **Réglages** → **Recharger l'appli**. La version affichée en bas des Réglages doit changer.
 3. Si vous changez aussi les icônes ou le manifeste, augmentez le numéro `CACHE` en haut de `sw.js` (`finances-v3`, etc.).
 
@@ -197,6 +201,7 @@ Vos données ne sont pas touchées par une mise à jour.
 
 ## Historique des versions
 
+- **1.6** : « Disponible à dépenser » (objectif d'épargne déduit) à la place de « Reste sur le cycle » ; solde du compte courant (solde réel + mouvements saisis depuis) dans l'Accueil, les Comptes et le patrimoine ; onglet Soldes dans le Google Sheets privé.
 - **1.5** : Google Sheets privé (lecture seule avec votre compte Google) pour les mouvements, le budget et les quantités du portefeuille remplis par Claude.
 - **1.4** : menu latéral (patrimoine, rubriques, heure de synchronisation), rubriques Bilan, Comptes et Budget séparées ; page Budget avec moyennes des derniers cycles et budget à coller ; couleurs par type (revenus, dépenses, épargne), épargne au-dessus de l'objectif en bleu ; Bilan en barres groupées avec bulle des montants exacts au toucher ; plus de zoom au double-tap.
 - **1.3** : vue Bilan (période, revenus, dépenses, épargne, graphique par cycle, totaux par enveloppe et par catégorie d'entrée) ; import d'historique Excel / CSV (feuilles dépenses, revenus et transferts, catégories → enveloppes, salaires → revenu du cycle, doublons ignorés, annulation).

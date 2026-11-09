@@ -313,6 +313,10 @@ details.tbl td.calc { padding: 6px 5px }
 .erow label { display: flex; flex-direction: column; gap: 3px; min-width: 0 }
 .acct .bar { margin-top: 2px }
 .bigline { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap }
+.ccprow { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; border: 1px solid var(--line); border-radius: 12px;
+  background: color-mix(in srgb, var(--fg) 3%, transparent); padding: 10px 12px; text-align: left; color: var(--fg); margin-top: 4px }
+.ccprow b { font-family: var(--mono); font-weight: 600; font-size: 1.05rem; white-space: nowrap }
+.ccprow small { display: block; color: var(--muted); font-size: .78rem }
 </style>
 </head>
 <body>
@@ -352,17 +356,19 @@ details.tbl td.calc { padding: 6px 5px }
   </div>
 
   <div class="panel total">
-    <div class="eyebrow">Reste sur le cycle</div>
+    <div class="eyebrow" id="b-lefttitle">Disponible à dépenser</div>
     <div class="big" id="b-left">0,00 €</div>
     <div class="bar" aria-hidden="true"><i id="b-bar" style="width:0"></i></div>
+    <div class="small" id="b-pace" style="font-weight:600"></div>
+    <div class="small muted" id="b-calc"></div>
+    <button type="button" class="ccprow" id="b-ccp" data-goto="comptes" data-anchor="c-ccp"></button>
     <div class="stats">
-      <label class="stat"><span class="eyebrow">Revenu du cycle</span><input id="b-income" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><span class="small muted" id="b-incnote"></span></label>
+      <label class="stat"><span class="eyebrow"><span class="tdot t-rev"></span>Revenu du cycle</span><input id="b-income" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><span class="small muted" id="b-incnote"></span></label>
       <div class="stat"><span class="eyebrow"><span class="tdot t-rev"></span>Autres entrées</span><span class="v" id="b-extra">0,00 €</span><span class="small muted" id="b-extranote"></span></div>
-      <div class="stat"><span class="eyebrow"><span class="tdot t-exp"></span>Sorties</span><span class="v" id="b-out">0,00 €</span><span class="small muted" id="b-saved"></span></div>
-      <div class="stat"><span class="eyebrow">Prévu</span><span class="v" id="b-planned">0,00 €</span><span class="small muted" id="b-free"></span></div>
+      <div class="stat"><span class="eyebrow"><span class="tdot t-exp"></span>Dépenses</span><span class="v" id="b-out">0,00 €</span><span class="small muted" id="b-outnote"></span></div>
+      <div class="stat"><span class="eyebrow"><span class="tdot t-sav"></span>Épargne</span><span class="v" id="b-saved">0,00 €</span><span class="small muted" id="b-savenote"></span></div>
     </div>
     <div class="notice" id="b-incdetail" hidden></div>
-    <div class="notice" id="b-pace"></div>
   </div>
 
   <div class="panel">
@@ -396,9 +402,21 @@ details.tbl td.calc { padding: 6px 5px }
 
 <!-- ============ COMPTES ============ -->
 <section id="v-comptes" class="wrap" hidden>
+  <div class="panel stack" id="c-ccp">
+    <div class="eyebrow">Compte courant</div>
+    <div class="big" id="c-ccpval">—</div>
+    <div class="small muted" id="c-ccpnote"></div>
+    <div class="stats">
+      <label class="stat"><span class="eyebrow">Solde affiché par la banque</span><input id="c-ccpbal" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+      <label class="stat"><span class="eyebrow">À la date du</span><input id="c-ccpdate" type="date"></label>
+    </div>
+    <div class="actions" style="justify-content:flex-start"><button class="btn primary" type="button" id="c-ccpsave">Enregistrer le solde</button></div>
+    <div class="notice">Recopiez le solde de votre appli bancaire de temps en temps. Entre deux mises à jour, l'appli l'estime : solde enregistré + salaires et entrées − dépenses et virements saisis depuis. Si vous oubliez de noter une dépense, l'écart se corrige à la mise à jour suivante.</div>
+  </div>
   <div class="panel total">
     <div class="eyebrow">Patrimoine suivi</div>
     <div class="big" id="c-all">0,00 €</div>
+    <div class="totrow" style="font-weight:500"><span>Compte courant</span><span class="num" id="c-cur">—</span></div>
     <div class="totrow" style="font-weight:500"><span><span class="tdot t-sav"></span>Comptes d'épargne</span><span class="num" id="c-sav">0,00 €</span></div>
     <div class="totrow" style="font-weight:500"><span>Investissements <button class="linkbtn small" type="button" data-goto="invest">Portefeuille ›</button></span><span class="num" id="c-inv">0,00 €</span></div>
   </div>
@@ -666,7 +684,7 @@ details.tbl td.calc { padding: 6px 5px }
 
 <script>
 "use strict";
-const APP_VERSION = "1.5.0";
+const APP_VERSION = "1.6.0";
 const FB_VERSION = "10.12.2"; // SDK Firebase chargé depuis gstatic uniquement si la synchronisation est configurée
 const LS = { state: "fin.state", fb: "fin.firebase", dev: "fin.device", link: "fin.linked", lastSync: "fin.lastsync" };
 const CLASSES = [{ id: "stocks", c: "#2346d8" }, { id: "bonds", c: "#7a4fd0" }, { id: "gold", c: "#c99a0a" }, { id: "cash", c: "#138a5b" }];
@@ -740,7 +758,7 @@ function defaultState() {
       country: "FRA", method: "trend"   // conjoncture : pays et méthode choisis
     },
     // Google Sheets privé (rempli par Claude) : identifiant client OAuth, lien du tableau, empreintes du dernier budget / portefeuille appliqués
-    gs: { clientId: "", sheet: "", budgetHash: "", portHash: "" }
+    gs: { clientId: "", sheet: "", budgetHash: "", portHash: "", soldHash: "" }
   };
 }
 function normalize(s) {
@@ -755,6 +773,7 @@ function normalize(s) {
   if (b.lastImport === undefined) b.lastImport = null;
   if (!Array.isArray(b.incomeCats) || !b.incomeCats.length) b.incomeCats = d.budget.incomeCats;
   if (!b.cycles || typeof b.cycles !== "object") b.cycles = {};
+  if (!b.ccp || typeof b.ccp !== "object" || !b.ccp.date) b.ccp = null;   // { balance, date: "AAAA-MM-JJ", at } : dernier solde réel du compte courant
   b.payday = Math.min(31, Math.max(1, Math.round(+b.payday) || 25));
   i.classNames = { ...d.invest.classNames, ...(i.classNames || {}) };
   i.portfolio = Object.fromEntries(CLASSES.map(c => [c.id, Array.isArray(i.portfolio?.[c.id]) ? i.portfolio[c.id] : []]));
@@ -844,9 +863,9 @@ function fmtWhen(t) {
   return d.toDateString() === new Date().toDateString() ? "à " + time : `le ${fmtDay(d)} à ${time}`;
 }
 function updateDrawer() {
-  const sv = savTotal(), inv = grandTotal();
-  $("d-total").textContent = fmtEUR(sv + inv);
-  $("d-detail").textContent = `Épargne ${fmtEUR(sv)} · Placements ${fmtEUR(inv)}`;
+  const sv = savTotal(), inv = grandTotal(), cc = ccpEstimate();
+  $("d-total").textContent = fmtEUR(sv + inv + (cc ? cc.value : 0));
+  $("d-detail").textContent = (cc ? `Courant ${fmtEUR(cc.value)} · ` : "") + `Épargne ${fmtEUR(sv)} · Placements ${fmtEUR(inv)}`;
   const st = sync.status, [txt] = PILL[st] || PILL.off;
   $("d-sync").textContent = st === "off" ? "Données sur cet appareil" : txt;
   $("d-synctime").textContent = sync.lastOk ? "Dernière synchronisation " + fmtWhen(sync.lastOk) : (st === "off" ? "Synchronisation non configurée" : "");
@@ -943,31 +962,53 @@ function renderBudget() {
       <span class="num" style="font-weight:600">${o.amount < 0 ? "+" + fmtEUR(-o.amount) : fmtEUR(o.amount)}</span></button>`;
   }).join("") : `<div class="notice">${envFilter ? "Aucun mouvement dans cette enveloppe sur ce cycle." : "Aucun mouvement sur ce cycle. Touchez + pour ajouter une dépense ou une entrée."}</div>`;
 }
+// Solde estimé du compte courant : dernier solde réel + salaires et entrées − dépenses (virements d'épargne compris) saisis depuis
+function ccpEstimate() {
+  const a = S.budget.ccp; if (!a) return null;
+  const t = ymd(new Date()), at = +a.at || 0;
+  const after = x => x.date <= t && (x.date > a.date || (x.date === a.date && (+x.at || 0) > at));
+  let out = 0, inc = 0, sal = 0;
+  S.budget.expenses.forEach(e => { if (after(e)) out += +e.amount || 0 });
+  S.budget.incomes.forEach(i => { if (after(i)) inc += +i.amount || 0 });
+  const t0 = parseYmd(t);
+  for (let c = shiftCycle(cycleOf(parseYmd(a.date)), 1); c.start <= t0; c = shiftCycle(c, 1)) sal += cycleIncome(c);
+  return { value: round2((+a.balance || 0) + inc + sal - out), inc: round2(inc + sal), out: round2(out) };
+}
 function updateSummary() {
-  const c = viewCycle, st = cycleStats(c), salary = cycleIncome(c);
-  const planned = S.budget.envelopes.reduce((s, e) => s + (+e.planned || 0), 0);
-  const plannedSpend = S.budget.envelopes.filter(e => e.kind !== "save").reduce((s, e) => s + (+e.planned || 0), 0);
-  const left = salary + st.extra - st.out, free = salary - planned, entries = st.extra + st.refunds;
+  const c = viewCycle, st = cycleStats(c), salary = cycleIncome(c), cur = isCurrent(c), past = c.end < new Date() && !cur;
+  const envs = S.budget.envelopes, savePlan = envs.filter(e => e.kind === "save").reduce((s, e) => s + (+e.planned || 0), 0);
+  const income = salary + st.extra, spend = round2(st.out - st.saved), saveGoal = past ? st.saved : Math.max(savePlan, st.saved), toSave = Math.max(0, savePlan - st.saved);
+  // Disponible = revenus du cycle − dépenses − objectif d'épargne (ou ce qui a déjà été viré, si c'est plus)
+  const left = round2(income - spend - saveGoal);
+  $("b-lefttitle").textContent = past ? "Restant en fin de cycle" : "Disponible à dépenser";
   $("b-left").textContent = fmtEUR(left); $("b-left").style.color = left < 0 ? "var(--down)" : "";
+  const room = income - saveGoal, pct = room > 0 ? Math.min(100, Math.max(0, spend / room * 100)) : (spend > 0 ? 100 : 0);
+  $("b-bar").style.width = pct + "%"; $("b-bar").className = left < 0 ? "over" : "t-exp";
+  $("b-calc").textContent = income || spend ? `${fmtEUR(income)} de revenus − ${fmtEUR(spend)} de dépenses − ${fmtEUR(saveGoal)} ${past ? "virés vers l'épargne" : "d'objectif d'épargne"}` : "";
+  let pace = "";
+  if (!salary && !S.budget.income) pace = "Indiquez votre revenu habituel dans Budget (ou le revenu de ce cycle ci-dessous).";
+  else if (cur) {
+    const t = new Date(), t0 = new Date(t.getFullYear(), t.getMonth(), t.getDate()), days = Math.round((c.end - t0) / 864e5) + 1;
+    pace = `${days} jour${days > 1 ? "s" : ""} jusqu'à la paie` + (left > 0 ? ` · environ ${fmtEUR(left / days)} par jour` : left < 0 ? " · objectif d'épargne compromis" : "");
+  } else if (past) pace = left >= 0 ? "Cycle terminé." : "Cycle terminé en dépassement.";
+  else pace = "Cycle à venir.";
+  $("b-pace").textContent = pace;
+  // Compte courant (solde réel le plus récent + mouvements depuis)
+  const cc = ccpEstimate();
+  $("b-ccp").innerHTML = cc
+    ? `<span><span class="small muted">Sur le compte courant</span>${toSave > 0 && cur ? `<small>dont ${fmtEUR(toSave)} encore à virer vers l'épargne : ${fmtEUR(cc.value - toSave)} vraiment libres</small>` : `<small>estimé depuis le solde du ${fmtDay(parseYmd(S.budget.ccp.date))}</small>`}</span><b${cc.value < 0 ? ' style="color:var(--down)"' : ""}>${fmtEUR(cc.value)}</b>`
+    : `<span><span class="small muted">Compte courant</span><small>Indiquez le solde de votre banque pour le suivre ici</small></span><b style="font-family:var(--body);font-size:.85rem;color:var(--accent)">Ajouter ›</b>`;
+  const entries = st.extra + st.refunds;
   $("b-extra").textContent = fmtEUR(entries);
   $("b-extranote").textContent = st.refunds ? `dont ${fmtEUR(st.refunds)} déduits des enveloppes` : (entries ? "argent en plus" : "ventes, remboursements…");
-  $("b-out").textContent = fmtEUR(st.out);
-  $("b-saved").textContent = st.saved ? `dont ${fmtEUR(st.saved)} vers l'épargne` : "";
-  $("b-planned").textContent = fmtEUR(planned);
-  $("b-free").textContent = `non affecté : ${fmtEUR(free)}`; $("b-free").style.color = free < 0 ? "var(--down)" : "";
+  $("b-out").textContent = fmtEUR(spend);
+  const plannedSpend = envs.filter(e => e.kind !== "save").reduce((s, e) => s + (+e.planned || 0), 0);
+  $("b-outnote").textContent = plannedSpend ? `sur ${fmtEUR(plannedSpend)} prévus` : "hors virements d'épargne";
+  $("b-saved").textContent = fmtEUR(st.saved);
+  $("b-savenote").innerHTML = savePlan ? (st.saved >= savePlan - 0.005 ? `<span style="color:var(--c-sav)">✓</span> objectif de ${fmtEUR(savePlan)} atteint` : `objectif ${fmtEUR(savePlan)} · reste ${fmtEUR(toSave)}`) : "virements vers l'épargne";
   const cats = Object.entries(st.byCat).sort((a, b) => b[1] - a[1]);
   $("b-incdetail").textContent = cats.length ? "Entrées : " + cats.map(([id, v]) => `${incCat(id)?.name || "Autre"} ${fmtEUR(v)}`).join(" · ") : "";
   $("b-incdetail").hidden = !cats.length;
-  const base = salary + st.extra, pct = base > 0 ? Math.min(100, Math.max(0, st.out / base * 100)) : (st.out > 0 ? 100 : 0);
-  $("b-bar").style.width = pct + "%"; $("b-bar").className = left < 0 ? "over" : "";
-  let pace = "";
-  if (!salary && !S.budget.income) pace = "Indiquez votre revenu habituel dans Budget (ou le revenu de ce cycle ci-dessus).";
-  else if (isCurrent(c)) {
-    const t = new Date(), t0 = new Date(t.getFullYear(), t.getMonth(), t.getDate());
-    const days = Math.round((c.end - t0) / 864e5) + 1, restSpend = Math.max(0, plannedSpend - (st.out - st.saved));
-    pace = `${days} jour${days > 1 ? "s" : ""} restant${days > 1 ? "s" : ""}` + (plannedSpend > 0 ? ` · environ ${fmtEUR(restSpend / days)} par jour pour les dépenses prévues` : "");
-  } else if (c.end < new Date()) pace = left >= 0 ? `Cycle terminé avec ${fmtEUR(left)} de reste.` : `Cycle terminé avec un dépassement de ${fmtEUR(-left)}.`;
-  $("b-pace").textContent = pace;
 }
 $("cprev").addEventListener("click", () => { viewCycle = shiftCycle(viewCycle, -1); renderBudget() });
 $("cnext").addEventListener("click", () => { viewCycle = shiftCycle(viewCycle, 1); renderBudget() });
@@ -1199,6 +1240,9 @@ const goalBar = (b, g) => {
     : `Objectif ${fmtEUR(g)} · reste ${fmtEUR(g - b)} (${pct.toLocaleString("fr-FR", { maximumFractionDigits: 0 })} %)`}</div>`;
 };
 function renderComptes() {
+  const a = S.budget.ccp;
+  if (document.activeElement !== $("c-ccpbal")) $("c-ccpbal").value = a ? fmtIn(a.balance) : "";
+  if (document.activeElement !== $("c-ccpdate")) $("c-ccpdate").value = a ? a.date : ymd(new Date());
   $("c-savs").innerHTML = S.budget.savings.map(a => { const g = +a.goal || 0, b = +a.balance || 0;
     return `<div class="erow acct" data-said="${esc(a.id)}">
       <input class="full" data-sak="name" type="text" value="${esc(a.name)}" aria-label="Nom du compte" placeholder="Nom du compte">
@@ -1209,10 +1253,18 @@ function renderComptes() {
   updateComptesTotals();
 }
 function updateComptesTotals() {
-  const t = savTotal(), inv = grandTotal();
-  $("c-sav").textContent = fmtEUR(t); $("c-inv").textContent = fmtEUR(inv); $("c-all").textContent = fmtEUR(t + inv);
+  const t = savTotal(), inv = grandTotal(), cc = ccpEstimate();
+  $("c-sav").textContent = fmtEUR(t); $("c-inv").textContent = fmtEUR(inv); $("c-all").textContent = fmtEUR(t + inv + (cc ? cc.value : 0));
+  $("c-cur").textContent = cc ? fmtEUR(cc.value) : "—";
+  $("c-ccpval").textContent = cc ? fmtEUR(cc.value) : "—"; $("c-ccpval").style.color = cc && cc.value < 0 ? "var(--down)" : "";
+  $("c-ccpnote").textContent = cc ? `Solde de ${fmtEUR(S.budget.ccp.balance)} le ${fmtDay(parseYmd(S.budget.ccp.date))}${cc.inc || cc.out ? `, puis +${fmtEUR(cc.inc)} d'entrées et salaires, −${fmtEUR(cc.out)} de dépenses et virements` : ", aucun mouvement depuis"}.` : "Pas encore de solde enregistré.";
   updateDrawer();
 }
+$("c-ccpsave").addEventListener("click", () => {
+  const v = toNum($("c-ccpbal").value), d = $("c-ccpdate").value || ymd(new Date());
+  if (!isFinite(v)) { toast("Indiquez le solde du compte courant."); $("c-ccpbal").focus(); return }
+  S.budget.ccp = { balance: round2(v), date: d, at: Date.now() }; commit(); toast("Solde du compte courant enregistré.");
+});
 $("c-savs").addEventListener("input", e => {
   const inp = e.target.closest("[data-sak]"); if (!inp) return;
   const row = inp.closest("[data-said]"), a = S.budget.savings.find(x => x.id === row.dataset.said); if (!a) return;
@@ -2135,8 +2187,8 @@ async function gsFetch(auto) {
     const id = sheetIdOf(S.gs.sheet);
     const meta = await gsGet(id + "?fields=sheets.properties.title");
     const titles = (meta.sheets || []).map(x => x.properties.title), find = re => titles.find(t => re.test(fold(t)));
-    const want = [["mv", find(/^mouvements?/), "A1:H3000"], ["bu", find(/^budget/), "A1:C300"], ["pf", find(/^portefeuille/), "A1:F300"]].filter(x => x[1]);
-    if (!want.length) throw new Error("Aucun onglet « Mouvements », « Budget » ou « Portefeuille » dans ce tableau.");
+    const want = [["mv", find(/^mouvements?/), "A1:H3000"], ["bu", find(/^budget/), "A1:C300"], ["pf", find(/^portefeuille/), "A1:F300"], ["so", find(/^soldes?/), "A1:C100"]].filter(x => x[1]);
+    if (!want.length) throw new Error("Aucun onglet « Mouvements », « Budget », « Portefeuille » ou « Soldes » dans ce tableau.");
     const q = want.map(([, t, r]) => "ranges=" + encodeURIComponent(`'${t.replace(/'/g, "''")}'!${r}`)).join("&");
     const data = await gsGet(id + "/values:batchGet?" + q + "&valueRenderOption=UNFORMATTED_VALUE&dateTimeRenderOption=FORMATTED_STRING");
     const vals = {}; want.forEach(([k], i) => { vals[k] = data.valueRanges?.[i]?.values || [] });
@@ -2146,6 +2198,7 @@ async function gsFetch(auto) {
     if (res.add || res.upd) parts.push(`${res.add} mouvement${res.add > 1 ? "s" : ""} ajouté${res.add > 1 ? "s" : ""}${res.upd ? `, ${res.upd} modifié${res.upd > 1 ? "s" : ""}` : ""}`);
     if (res.budget) parts.push("budget mis à jour");
     if (res.port) parts.push(`${res.port} ligne${res.port > 1 ? "s" : ""} du portefeuille à jour`);
+    if (res.sold) parts.push(`${res.sold} solde${res.sold > 1 ? "s" : ""} de compte à jour`);
     if (res.envNew.length) parts.push(`enveloppe${res.envNew.length > 1 ? "s" : ""} créée${res.envNew.length > 1 ? "s" : ""} : ${res.envNew.join(", ")}`);
     const when = new Date(gsLast).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
     gsMsg(`Récupéré à ${when} : ${parts.length ? parts.join(" · ") : "rien de nouveau"}.${res.bad ? ` ${res.bad} ligne${res.bad > 1 ? "s" : ""} ignorée${res.bad > 1 ? "s" : ""} (date ou montant illisible).` : ""}${gsPending ? " Un budget attend votre accord (page Budget)." : ""}`);
@@ -2230,8 +2283,23 @@ function applyPortRows(rows) {
     if (r.cost > 0) { a.cost = round2(r.cost); if (!a.costDate) a.costDate = new Date().toISOString(); if (!(+a.amount > 0) && a.units) a.amount = round2(r.cost) }
   });
 }
+// Onglet Soldes : Compte, Solde, Date. « Compte courant » met à jour le solde réel du compte courant ; les autres lignes, les comptes d'épargne du même nom.
+function gsSoldRows(rows) {
+  if (!rows.length) return [];
+  const { idx, body } = gsCols(rows, { name: [/compte|^nom|libelle/, 0], bal: [/solde|montant/, 1], date: [/^date/, 2] });
+  return body.map(r => ({ name: cell(r, idx.name), balance: round2(toNum(r[idx.bal])), date: gsDate(r[idx.date]) || ymd(new Date()) })).filter(r => r.name && isFinite(r.balance));
+}
+function applySoldRows(rows) {
+  rows.forEach(r => {
+    const f = fold(r.name);
+    if (/courant|\bccp\b|cheque|principal/.test(f)) { const cur = S.budget.ccp; if (!cur || r.date >= cur.date) S.budget.ccp = { balance: r.balance, date: r.date, at: Date.now() }; return }
+    let a = S.budget.savings.find(x => fold(x.name) === f) || S.budget.savings.find(x => { const g = fold(x.name); return g.length >= 3 && f.length >= 3 && (g.includes(f) || f.includes(g)) });
+    if (!a) { a = { id: rid(), name: r.name, balance: 0, goal: 0 }; S.budget.savings.push(a) }
+    a.balance = r.balance;
+  });
+}
 function gsApply(v) {
-  const res = { add: 0, upd: 0, bad: 0, budget: false, port: 0, envNew: [] };
+  const res = { add: 0, upd: 0, bad: 0, budget: false, port: 0, sold: 0, envNew: [] };
   const snap = () => JSON.stringify([S.budget, S.invest.portfolio, S.gs]), before = snap();
   gsMovements(v.mv || [], res);
   const bRows = gsBudgetRows(v.bu || []), bh = bRows.length ? hashStr(JSON.stringify(bRows.map(r => [fold(r.name), r.amount, r.kind]))) : "";
@@ -2243,6 +2311,8 @@ function gsApply(v) {
   }
   const pRows = gsPortRows(v.pf || []), ph = pRows.length ? hashStr(JSON.stringify(pRows)) : "";
   if (pRows.length && ph !== S.gs.portHash) { applyPortRows(pRows); S.gs.portHash = ph; res.port = pRows.length }
+  const sRows = gsSoldRows(v.so || []), sh = sRows.length ? hashStr(JSON.stringify(sRows)) : "";
+  if (sRows.length && sh !== S.gs.soldHash) { applySoldRows(sRows); S.gs.soldHash = sh; res.sold = sRows.length }
   if (snap() !== before) commit();
   return res;
 }
