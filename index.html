@@ -241,6 +241,7 @@ input[type=range] { width: 100%; accent-color: var(--accent) }
 .tip b { font-family: var(--mono); font-weight: 500 }
 .vh { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; pointer-events: none }
 label.btn { cursor: pointer }
+a.btn { color: inherit; text-decoration: none }
 label.btn:focus-within { outline: 2px solid var(--accent); outline-offset: 2px }
 .xprev { display: flex; flex-direction: column; gap: 12px; border-top: 1px solid var(--line); padding-top: 12px }
 .xrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; align-items: center }
@@ -370,7 +371,7 @@ details.tbl td.calc { padding: 6px 5px }
   </div>
 
   <div class="panel">
-    <div class="clshead"><h2>Mouvements <span class="small muted" id="expcount"></span></h2><button class="linkbtn" type="button" id="expclear" hidden>Tout afficher</button></div>
+    <div class="clshead"><h2>Mouvements <span class="small muted" id="expcount"></span></h2><span style="display:flex;gap:14px"><button class="linkbtn" type="button" id="expclear" hidden>Tout afficher</button><button class="linkbtn" type="button" id="gs-quick" data-gsfetch hidden>↻ Google Sheets</button></span></div>
     <div id="explist"></div>
   </div>
 </section>
@@ -411,6 +412,7 @@ details.tbl td.calc { padding: 6px 5px }
 
 <!-- ============ BUDGET PRÉVU ============ -->
 <section id="v-plan" class="wrap" hidden>
+  <div id="p-gs" class="stack" hidden></div>
   <div class="panel total">
     <div class="eyebrow">Budget de chaque cycle</div>
     <div class="bigline"><div class="big" id="p-total">0,00 €</div><span class="small muted" id="p-of"></span></div>
@@ -544,6 +546,26 @@ details.tbl td.calc { padding: 6px 5px }
     <div class="notice" id="syncmsg" aria-live="polite"></div>
   </div>
 
+  <div class="panel stack" id="set-gs">
+    <h2>Google Sheets privé</h2>
+    <div class="notice">Un tableau de votre Google Drive que Claude remplit à partir de vos captures : mouvements, budget prévu, quantités du portefeuille. L'appli le lit avec votre compte Google, en lecture seule ; il n'est pas publié. Une seule récupération suffit : les autres appareils reçoivent les données par la synchronisation.</div>
+    <label class="field"><span class="small muted">Identifiant client Google (OAuth)</span><input id="gs-client" type="text" autocomplete="off" spellcheck="false" autocapitalize="off" placeholder="123456789-abc….apps.googleusercontent.com"></label>
+    <label class="field"><span class="small muted">Lien du tableau</span><input id="gs-sheet" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://docs.google.com/spreadsheets/d/…/edit"></label>
+    <div class="actions" style="justify-content:flex-start"><button class="btn primary" type="button" id="gs-fetch" data-gsfetch>Se connecter et récupérer</button><a class="btn" id="gs-open" target="_blank" rel="noopener" hidden>Ouvrir le tableau</a></div>
+    <div class="notice" id="gs-msg" aria-live="polite"></div>
+    <div id="gs-pending" class="stack" hidden></div>
+    <details class="tbl"><summary>Créer l'identifiant client Google (une seule fois)</summary>
+      <ol class="steps notice" style="margin-top:8px">
+        <li>Sur <code>console.cloud.google.com</code>, choisissez le projet de votre Firebase (en haut de la page).</li>
+        <li>« API et services » › « Bibliothèque » › <b>Google Sheets API</b> › Activer.</li>
+        <li>« Google Auth Platform » (ou « Écran de consentement OAuth ») : nom de l'appli, votre e-mail, public <b>Externe</b>. Dans « Audience », ajoutez votre adresse Gmail comme <b>utilisateur test</b>.</li>
+        <li>« Clients » › Créer un client › <b>Application Web</b> › Origines JavaScript autorisées : l'adresse de l'appli sans le chemin (ex. <code>https://votre-nom.github.io</code>) › Créer.</li>
+        <li>Copiez l'<b>ID client</b> (se termine par <code>.apps.googleusercontent.com</code>) et collez-le ci-dessus.</li>
+      </ol>
+      <div class="notice">À la première connexion, Google affiche « Google n'a pas validé cette application » : c'est normal pour une appli personnelle. Touchez « Continuer ».</div>
+    </details>
+  </div>
+
   <div class="panel stack">
     <h2>Cycle de paie</h2>
     <div class="row2">
@@ -644,7 +666,7 @@ details.tbl td.calc { padding: 6px 5px }
 
 <script>
 "use strict";
-const APP_VERSION = "1.4.0";
+const APP_VERSION = "1.5.0";
 const FB_VERSION = "10.12.2"; // SDK Firebase chargé depuis gstatic uniquement si la synchronisation est configurée
 const LS = { state: "fin.state", fb: "fin.firebase", dev: "fin.device", link: "fin.linked", lastSync: "fin.lastsync" };
 const CLASSES = [{ id: "stocks", c: "#2346d8" }, { id: "bonds", c: "#7a4fd0" }, { id: "gold", c: "#c99a0a" }, { id: "cash", c: "#138a5b" }];
@@ -716,7 +738,9 @@ function defaultState() {
       band: 5, importAt: null, history: [],
       quotesUrl: "",                    // lien CSV du Google Sheets publié (cours GOOGLEFINANCE)
       country: "FRA", method: "trend"   // conjoncture : pays et méthode choisis
-    }
+    },
+    // Google Sheets privé (rempli par Claude) : identifiant client OAuth, lien du tableau, empreintes du dernier budget / portefeuille appliqués
+    gs: { clientId: "", sheet: "", budgetHash: "", portHash: "" }
   };
 }
 function normalize(s) {
@@ -737,7 +761,8 @@ function normalize(s) {
   if (!Array.isArray(i.history)) i.history = [];
   if (typeof i.quotesUrl !== "string") i.quotesUrl = "";
   if (!["trend", "absolute"].includes(i.method)) i.method = "trend";
-  return { v: 1, updatedAt: +s.updatedAt || 0, budget: b, invest: i };
+  const g = { ...d.gs, ...(s.gs && typeof s.gs === "object" ? s.gs : {}) };
+  return { v: 1, updatedAt: +s.updatedAt || 0, budget: b, invest: i, gs: g };
 }
 let S = (() => { try { const j = JSON.parse(ls.get(LS.state)); if (j && j.v) return normalize(j) } catch {} return defaultState() })();
 
@@ -903,7 +928,7 @@ function renderBudget() {
   const incs = st.inc.filter(i => !envFilter || refundEnv(i) === envFilter).map(i => ({ k: "inc", o: i }));
   const list = [...exps, ...incs].sort((a, b) => b.o.date.localeCompare(a.o.date) || (b.o.at || 0) - (a.o.at || 0));
   $("expcount").textContent = list.length ? `· ${list.length}` : "";
-  $("expclear").hidden = !envFilter;
+  $("expclear").hidden = !envFilter; $("gs-quick").hidden = !gsReady();
   $("explist").innerHTML = list.length ? list.map(({ k, o }) => {
     const d = parseYmd(o.date), day = `<span class="d">${pad(d.getDate())}/${pad(d.getMonth() + 1)}</span>`;
     if (k === "inc") {
@@ -1229,7 +1254,7 @@ function renderPlan() {
       <button class="del" type="button" data-edel aria-label="Supprimer l'enveloppe ${esc(e.name)}" style="align-self:end">✕</button>
       <div class="full prow2"><span><span class="tdot ${save ? "t-sav" : "t-exp"}"></span>${A.n ? `Moyenne : ${fmtEUR(avg)} / cycle` : "Pas encore de cycle terminé"}</span>${A.n && avg > 0 && r !== (+e.planned || 0) ? `<button class="linkbtn" type="button" data-euse="${r}">Mettre ${fmtEUR(r).replace(",00", "")}</button>` : ""}</div></div>`; }).join("") || `<div class="notice">Aucune enveloppe.</div>`;
   $("p-fill").hidden = !A.n;
-  updatePlanTotals();
+  updatePlanTotals(); renderGsPending();
 }
 function updatePlanTotals() {
   const envs = S.budget.envelopes, inc = +S.budget.income || 0;
@@ -1303,7 +1328,7 @@ $("p-apply").addEventListener("click", () => {
 document.addEventListener("click", e => {
   if (!e.target.closest("[data-planundo]") || !planUndo) return;
   S.budget.envelopes = JSON.parse(planUndo); planUndo = null; commit();
-  $("p-msg").textContent = ""; $("p-fillmsg").textContent = ""; toast("Budget précédent rétabli.");
+  $("p-msg").textContent = ""; $("p-fillmsg").textContent = ""; gsBudgetNote = ""; renderGsPending(); toast("Budget précédent rétabli.");
 });
 
 /* ---------- Import d'historique (Excel / CSV) ---------- */
@@ -2047,6 +2072,213 @@ $("impprev").addEventListener("click", e => {
   $("impnote").textContent = `${n} position${n > 1 ? "s" : ""} importée${n > 1 ? "s" : ""} depuis DEGIRO. Les prochains imports reconnaîtront automatiquement ces lignes.`;
 });
 
+/* ---------- Google Sheets privé (rempli par Claude) ---------- */
+// L'appli lit le tableau avec le compte Google de l'utilisateur (Google Identity Services, lecture seule).
+// Onglets reconnus : Mouvements (ID, Date, Type, Montant, Enveloppe, Catégorie, Libellé), Budget (Enveloppe, Prévu, Type),
+// Portefeuille (Symbole, Quantité, Montant investi, Classe, ISIN, Nom). Rien n'est écrit dans le tableau.
+const GS_SCOPE = "https://www.googleapis.com/auth/spreadsheets.readonly", LS_GSAT = "fin.gsat";
+let gsToken = null, gsTokenExp = 0, gsClient = null, gsClientId = "", gsBusy = false, gsLoad = null, gsPending = null, gsBudgetNote = "", gsLast = +ls.get(LS_GSAT) || 0;
+const sheetIdOf = v => { const t = String(v || "").trim(), m = t.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]{20,})/); return m ? m[1] : (/^[a-zA-Z0-9_-]{25,}$/.test(t) ? t : "") };
+const gsReady = () => !!(S.gs.clientId && sheetIdOf(S.gs.sheet));
+const gsTokenOk = () => !!gsToken && Date.now() < gsTokenExp - 60e3;
+function hashStr(str) { let h = 0x811c9dc5; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 0x01000193) } return (h >>> 0).toString(36) }
+function gsMsg(t, err) { const m = $("gs-msg"); m.textContent = t; m.className = "notice" + (err ? " err" : "") }
+function loadGis() {
+  if (window.google?.accounts?.oauth2) return Promise.resolve();
+  return gsLoad ||= new Promise((res, rej) => {
+    const sc = document.createElement("script"); sc.src = "https://accounts.google.com/gsi/client"; sc.async = true;
+    sc.onload = () => res(); sc.onerror = () => { gsLoad = null; sc.remove(); rej(new Error("gis")) }; document.head.appendChild(sc);
+  });
+}
+// Appelé depuis un toucher : la fenêtre de connexion Google ne s'ouvre que sur une action de l'utilisateur.
+function gsConnectAndFetch() {
+  if (!gsReady()) { go("reglages", "set-gs"); setTimeout(() => gsMsg("Indiquez l'identifiant client Google et le lien du tableau.", true), 50); return }
+  if (gsTokenOk()) { gsFetch(false); return }
+  if (!window.google?.accounts?.oauth2) {
+    gsMsg("Chargement de la connexion Google…");
+    loadGis().then(() => { gsMsg("Prêt : touchez à nouveau « Se connecter et récupérer »."); toast("Connexion Google prête : touchez à nouveau.") }, () => gsMsg("Impossible de charger la connexion Google : vérifiez le réseau.", true));
+    return;
+  }
+  const id = S.gs.clientId.trim();
+  try {
+    if (!gsClient || gsClientId !== id) {
+      gsClient = google.accounts.oauth2.initTokenClient({ client_id: id, scope: GS_SCOPE, callback: gsOnToken, error_callback: gsOnTokenErr });
+      gsClientId = id;
+    }
+    gsMsg("Connexion à Google…");
+    gsClient.requestAccessToken({ prompt: "" });
+  } catch (e) { gsMsg("Identifiant client Google invalide.", true) }
+}
+function gsOnToken(r) {
+  if (r.error) { gsMsg(r.error === "access_denied" ? "Accès refusé dans la fenêtre Google." : "Connexion Google impossible (" + r.error + "). Vérifiez l'identifiant client et que votre adresse est « utilisateur test ».", true); return }
+  if (!google.accounts.oauth2.hasGrantedAllScopes(r, GS_SCOPE)) { gsMsg("La lecture des tableaux n'a pas été autorisée : reconnectez-vous et cochez l'accès à Google Sheets.", true); return }
+  gsToken = r.access_token; gsTokenExp = Date.now() + (+r.expires_in || 3600) * 1000;
+  gsFetch(false);
+}
+function gsOnTokenErr(e) {
+  gsMsg(e?.type === "popup_failed_to_open" ? "La fenêtre de connexion Google n'a pas pu s'ouvrir. Autorisez les fenêtres pop-up, ou récupérez depuis le PC : le téléphone recevra les données par la synchronisation."
+    : e?.type === "popup_closed" ? "Connexion Google annulée." : "Connexion Google impossible.", true);
+}
+async function gsGet(path) {
+  const r = await fetch("https://sheets.googleapis.com/v4/spreadsheets/" + path, { headers: { Authorization: "Bearer " + gsToken } });
+  if (r.ok) return r.json();
+  if (r.status === 401) { gsToken = null; throw new Error("Connexion Google expirée : touchez « Récupérer » pour vous reconnecter.") }
+  if (r.status === 403) throw new Error("Accès refusé : vérifiez que l'API Google Sheets est activée et que ce tableau est dans le Drive du compte connecté.");
+  if (r.status === 404) throw new Error("Tableau introuvable : vérifiez le lien dans Réglages.");
+  throw new Error("Lecture du tableau impossible (erreur " + r.status + ").");
+}
+async function gsFetch(auto) {
+  if (gsBusy || !gsTokenOk() || !gsReady()) return;
+  gsBusy = true; if (!auto) gsMsg("Lecture du tableau…");
+  document.querySelectorAll("[data-gsfetch]").forEach(b => b.disabled = true);
+  try {
+    const id = sheetIdOf(S.gs.sheet);
+    const meta = await gsGet(id + "?fields=sheets.properties.title");
+    const titles = (meta.sheets || []).map(x => x.properties.title), find = re => titles.find(t => re.test(fold(t)));
+    const want = [["mv", find(/^mouvements?/), "A1:H3000"], ["bu", find(/^budget/), "A1:C300"], ["pf", find(/^portefeuille/), "A1:F300"]].filter(x => x[1]);
+    if (!want.length) throw new Error("Aucun onglet « Mouvements », « Budget » ou « Portefeuille » dans ce tableau.");
+    const q = want.map(([, t, r]) => "ranges=" + encodeURIComponent(`'${t.replace(/'/g, "''")}'!${r}`)).join("&");
+    const data = await gsGet(id + "/values:batchGet?" + q + "&valueRenderOption=UNFORMATTED_VALUE&dateTimeRenderOption=FORMATTED_STRING");
+    const vals = {}; want.forEach(([k], i) => { vals[k] = data.valueRanges?.[i]?.values || [] });
+    const res = gsApply(vals);
+    gsLast = Date.now(); ls.set(LS_GSAT, String(gsLast));
+    const parts = [];
+    if (res.add || res.upd) parts.push(`${res.add} mouvement${res.add > 1 ? "s" : ""} ajouté${res.add > 1 ? "s" : ""}${res.upd ? `, ${res.upd} modifié${res.upd > 1 ? "s" : ""}` : ""}`);
+    if (res.budget) parts.push("budget mis à jour");
+    if (res.port) parts.push(`${res.port} ligne${res.port > 1 ? "s" : ""} du portefeuille à jour`);
+    if (res.envNew.length) parts.push(`enveloppe${res.envNew.length > 1 ? "s" : ""} créée${res.envNew.length > 1 ? "s" : ""} : ${res.envNew.join(", ")}`);
+    const when = new Date(gsLast).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+    gsMsg(`Récupéré à ${when} : ${parts.length ? parts.join(" · ") : "rien de nouveau"}.${res.bad ? ` ${res.bad} ligne${res.bad > 1 ? "s" : ""} ignorée${res.bad > 1 ? "s" : ""} (date ou montant illisible).` : ""}${gsPending ? " Un budget attend votre accord (page Budget)." : ""}`);
+    if (parts.length || !auto) toast(parts.length ? "Google Sheets : " + parts.join(" · ") + "." : "Google Sheets : rien de nouveau.");
+    if (gsPending && !auto) toast("Budget reçu de Google Sheets : validez-le dans la page Budget.");
+  } catch (e) { gsMsg(e.message || "Lecture du tableau impossible.", true); if (!auto) toast(e.message || "Lecture du tableau impossible.") }
+  finally { gsBusy = false; document.querySelectorAll("[data-gsfetch]").forEach(b => b.disabled = false); renderGsPending() }
+}
+// Colonnes repérées par leur titre (première ligne), sinon dans l'ordre par défaut
+function gsCols(rows, spec) {
+  const head = (rows[0] || []).map(fold), idx = {}; let found = 0;
+  Object.entries(spec).forEach(([k, [re, def]]) => { const i = head.findIndex(h => re.test(h)); if (i >= 0) found++; idx[k] = i >= 0 ? i : def });
+  return { idx, body: found >= 2 ? rows.slice(1) : rows };
+}
+const cell = (r, i) => String(r?.[i] ?? "").trim();
+function gsDate(v) {
+  if (typeof v === "number" && v > 20000 && v < 80000) { const d = new Date(Date.UTC(1899, 11, 30) + v * 864e5); return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}` }
+  const t = String(v ?? "").trim(); let m;
+  if ((m = t.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/))) return `${m[1]}-${pad(+m[2])}-${pad(+m[3])}`;
+  if ((m = t.match(/^(\d{1,2})[/.](\d{1,2})[/.](\d{2,4})/))) { const y = m[3].length === 2 ? 2000 + +m[3] : +m[3]; if (+m[2] >= 1 && +m[2] <= 12 && +m[1] >= 1 && +m[1] <= 31) return `${y}-${pad(+m[2])}-${pad(+m[1])}` }
+  return "";
+}
+const looksSave = name => /epargn|livret|placement|invest|\bpea\b|assurance.?vie|bourse|reserve|ldds|\bpel\b/.test(fold(name));
+function gsEnv(name, res) {
+  if (!name) return "";
+  let e = matchEnv(name);
+  if (!e) { e = { id: rid(), name, planned: 0, kind: looksSave(name) ? "save" : "spend" }; S.budget.envelopes.push(e); res.envNew.push(name) }
+  return e.id;
+}
+function gsCat(name) {
+  const cats = S.budget.incomeCats, f = fold(name);
+  if (!f) return (cats.find(c => c.id === "autre") || cats[0]).id;
+  let c = cats.find(x => fold(x.name) === f) || cats.find(x => { const g = fold(x.name); return g.length >= 3 && f.length >= 3 && (g.includes(f) || f.includes(g)) });
+  if (!c) { c = { id: rid(), name, env: "" }; cats.push(c) }
+  return c.id;
+}
+function gsMovements(rows, res) {
+  if (!rows.length) return;
+  const { idx, body } = gsCols(rows, { id: [/^id$|identifiant/, 0], date: [/^date/, 1], type: [/^type|^sens/, 2], amount: [/montant|somme/, 3], env: [/enveloppe/, 4], cat: [/categ|origine/, 5], label: [/libelle|description|detail|note/, 6] });
+  const seen = {};
+  for (const r of body) {
+    const date = gsDate(r[idx.date]), amount = round2(toNum(r[idx.amount]));
+    if (!date || !isFinite(amount) || !amount) { if (r.some(c => String(c ?? "").trim())) res.bad++; continue }
+    const inc = /^(entree|revenu|credit|recette|rembours|vente|\+)/.test(fold(r[idx.type])), envName = cell(r, idx.env), catName = cell(r, idx.cat), label = cell(r, idx.label);
+    const h = hashStr([date, inc ? "i" : "e", amount, fold(envName), fold(catName), label].join("|"));
+    let gid = cell(r, idx.id); if (!gid) { seen[h] = (seen[h] || 0) + 1; gid = "h" + h + "-" + seen[h] }
+    const B = S.budget, ex = B.expenses.find(x => x.gs === gid), ic = B.incomes.find(x => x.gs === gid), cur = ex || ic;
+    if (cur && cur.gsh === h) continue;                     // déjà importé et inchangé dans le tableau (une modification faite dans l'appli est gardée)
+    if (ex) B.expenses = B.expenses.filter(x => x !== ex); if (ic) B.incomes = B.incomes.filter(x => x !== ic);
+    const base = { id: cur?.id || rid(), date, label, at: cur?.at || Date.now(), gs: gid, gsh: h };
+    if (inc) B.incomes.push({ ...base, amount: Math.abs(amount), cat: gsCat(catName), env: envName ? (matchEnv(envName)?.id || "") : "" });
+    else B.expenses.push({ ...base, amount, env: gsEnv(envName, res) });
+    cur ? res.upd++ : res.add++;
+  }
+}
+function gsBudgetRows(rows) {
+  if (!rows.length) return [];
+  const { idx, body } = gsCols(rows, { name: [/enveloppe|^nom|poste/, 0], amount: [/prevu|montant|budget/, 1], type: [/^type/, 2] });
+  return body.map(r => ({ name: cell(r, idx.name), amount: round2(toNum(r[idx.amount])), kind: /epargn/.test(fold(r[idx.type])) ? "save" : /depens/.test(fold(r[idx.type])) ? "spend" : null }))
+    .filter(r => r.name && isFinite(r.amount) && !/^(total|salaire|revenu|reste|non affect)/.test(fold(r.name)));
+}
+const budgetDiffers = rows => rows.some(r => { const e = matchEnv(r.name); return !e || Math.abs((+e.planned || 0) - r.amount) > 0.004 || (r.kind && e.kind !== r.kind) });
+function applyBudgetRows(rows, res) {
+  rows.forEach(r => { let e = matchEnv(r.name); if (!e) { e = { id: rid(), name: r.name, planned: 0, kind: r.kind || (looksSave(r.name) ? "save" : "spend") }; S.budget.envelopes.push(e); res?.envNew.push(r.name) } e.planned = Math.max(0, r.amount); if (r.kind) e.kind = r.kind });
+}
+function gsPortRows(rows) {
+  if (!rows.length) return [];
+  const { idx, body } = gsCols(rows, { sym: [/symbole|ticker/, 0], units: [/quantit|nombre|parts/, 1], cost: [/investi|cout|prix de revient/, 2], cls: [/classe/, 3], isin: [/isin/, 4], name: [/^nom|libelle|valeur/, 5] });
+  return body.map(r => ({ sym: normSym(r[idx.sym]), units: toNum(r[idx.units]), cost: toNum(r[idx.cost]), cls: cell(r, idx.cls), isin: cell(r, idx.isin).toUpperCase(), name: cell(r, idx.name) }))
+    .filter(r => (r.sym || r.isin) && isFinite(r.units));
+}
+function applyPortRows(rows) {
+  rows.forEach(r => {
+    let a = allAssets().find(x => (r.isin && x.isin === r.isin) || (r.sym && normSym(x.sym) === r.sym));
+    if (!a) {
+      const f = fold(r.cls), c = CLASSES.find(k => f && (fold(cname(k.id)) === f || k.id === f)) || CLASSES.find(k => f.length >= 3 && fold(cname(k.id)).includes(f)) || CLASSES[0];
+      a = newAsset(r.name || r.sym || r.isin); P()[c.id].push(a);
+    }
+    if (r.sym) a.sym = r.sym; if (r.isin && !a.isin) a.isin = r.isin;
+    if (r.name && (!a.name || a.name === "Nouvel actif")) a.name = r.name;
+    a.units = Math.max(0, r.units); if (!a.units) a.amount = 0;
+    if (r.cost > 0) { a.cost = round2(r.cost); if (!a.costDate) a.costDate = new Date().toISOString(); if (!(+a.amount > 0) && a.units) a.amount = round2(r.cost) }
+  });
+}
+function gsApply(v) {
+  const res = { add: 0, upd: 0, bad: 0, budget: false, port: 0, envNew: [] };
+  const snap = () => JSON.stringify([S.budget, S.invest.portfolio, S.gs]), before = snap();
+  gsMovements(v.mv || [], res);
+  const bRows = gsBudgetRows(v.bu || []), bh = bRows.length ? hashStr(JSON.stringify(bRows.map(r => [fold(r.name), r.amount, r.kind]))) : "";
+  gsPending = null;
+  if (bRows.length && bh !== S.gs.budgetHash) {
+    if (!budgetDiffers(bRows)) S.gs.budgetHash = bh;
+    else if (!S.gs.budgetHash) gsPending = { rows: bRows, hash: bh };                       // première fois : on demande avant de remplacer le budget
+    else { planUndo = JSON.stringify(S.budget.envelopes); applyBudgetRows(bRows, res); S.gs.budgetHash = bh; res.budget = true; gsBudgetNote = "Budget mis à jour depuis Google Sheets." }
+  }
+  const pRows = gsPortRows(v.pf || []), ph = pRows.length ? hashStr(JSON.stringify(pRows)) : "";
+  if (pRows.length && ph !== S.gs.portHash) { applyPortRows(pRows); S.gs.portHash = ph; res.port = pRows.length }
+  if (snap() !== before) commit();
+  return res;
+}
+function renderGsPending() {
+  let html = "";
+  if (gsPending) {
+    const rows = gsPending.rows, tot = rows.reduce((t, r) => t + r.amount, 0), sav = rows.filter(r => (r.kind || matchEnv(r.name)?.kind || (looksSave(r.name) ? "save" : "spend")) === "save").reduce((t, r) => t + r.amount, 0);
+    html = `<div class="panel stack" style="border-color:var(--accent)"><div><b>Budget reçu de Google Sheets</b></div><div class="small">${rows.length} enveloppe${rows.length > 1 ? "s" : ""}, total ${fmtEUR(tot)}${sav ? ` dont ${fmtEUR(sav)} d'épargne` : ""}. Remplacer les montants prévus dans l'appli ? Les changements suivants du tableau s'appliqueront ensuite automatiquement (avec « Annuler »).</div>
+      <div class="actions" style="justify-content:flex-start"><button class="btn primary" type="button" data-gsb="apply">Appliquer</button><button class="btn" type="button" data-gsb="ignore">Garder le budget actuel</button></div></div>`;
+  } else if (gsBudgetNote) html = `<div class="notice">${esc(gsBudgetNote)} ${planUndo ? undoBtn : ""}</div>`;
+  ["p-gs", "gs-pending"].forEach(id => { $(id).innerHTML = html; $(id).hidden = !html });
+}
+document.addEventListener("click", e => {
+  const f = e.target.closest("[data-gsfetch]"); if (f) { gsConnectAndFetch(); return }
+  const b = e.target.closest("[data-gsb]"); if (!b || !gsPending) return;
+  if (b.dataset.gsb === "apply") { planUndo = JSON.stringify(S.budget.envelopes); applyBudgetRows(gsPending.rows); gsBudgetNote = "Budget de Google Sheets appliqué." }
+  else gsBudgetNote = "";
+  S.gs.budgetHash = gsPending.hash; gsPending = null; commit(); renderGsPending();
+  if (b.dataset.gsb === "apply") toast("Budget de Google Sheets appliqué.");
+});
+$("gs-client").addEventListener("change", e => { S.gs.clientId = e.target.value.trim(); gsClient = null; commit(false); renderGsSettings(); if (S.gs.clientId) loadGis().catch(() => {}) });
+$("gs-sheet").addEventListener("change", e => {
+  const v = e.target.value.trim(); S.gs.sheet = v; commit(false); renderGsSettings();
+  if (v && !sheetIdOf(v)) gsMsg("Ce lien ne ressemble pas à un lien Google Sheets (…/spreadsheets/d/…).", true); else gsMsg("");
+});
+function renderGsSettings() {
+  if (document.activeElement !== $("gs-client")) $("gs-client").value = S.gs.clientId || "";
+  if (document.activeElement !== $("gs-sheet")) $("gs-sheet").value = S.gs.sheet || "";
+  const id = sheetIdOf(S.gs.sheet); $("gs-open").hidden = !id; if (id) $("gs-open").href = `https://docs.google.com/spreadsheets/d/${id}/edit`;
+  $("gs-fetch").textContent = gsTokenOk() ? "Récupérer maintenant" : "Se connecter et récupérer";
+  if (!$("gs-msg").textContent && gsLast) gsMsg("Dernière récupération " + fmtWhen(gsLast) + ".");
+  renderGsPending();
+}
+setInterval(() => { if (document.visibilityState === "visible" && gsTokenOk()) gsFetch(true) }, 5 * 60e3);
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && gsTokenOk() && Date.now() - gsLast > 60e3) gsFetch(true) });
+
 /* ---------- Cours en direct (Google Sheets publié + taux BCE) ---------- */
 // Le tableau contient au minimum les colonnes « Symbole » et « Cours » (=GOOGLEFINANCE(A2)) ; « Devise » et « ISIN » sont facultatives.
 const EXCH_CUR = { NASDAQ: "USD", NYSE: "USD", NYSEARCA: "USD", NYSEAMERICAN: "USD", BATS: "USD", OTCMKTS: "USD",
@@ -2252,6 +2484,7 @@ function renderSettings() {
   $("s-classes").innerHTML = CLASSES.map(c => `<label class="field"><span class="small muted" style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:${c.c}"></span>Classe ${CLASSES.indexOf(c) + 1}</span><input type="text" data-cn="${c.id}" value="${esc(cname(c.id))}"></label>`).join("");
   if (document.activeElement !== $("q-url")) $("q-url").value = S.invest.quotesUrl || "";
   $("appver").textContent = APP_VERSION;
+  renderGsSettings();
   renderLastImport();
 }
 $("s-payday").addEventListener("change", e => { S.budget.payday = Math.min(31, Math.max(1, Math.round(+e.target.value) || 25)); e.target.value = S.budget.payday; viewCycle = cycleOf(new Date()); commit(false) });
@@ -2507,6 +2740,7 @@ $("syncbox").addEventListener("keydown", e => { if (e.key === "Enter" && e.targe
 
 /* ---------- Démarrage ---------- */
 show(location.hash.slice(1) || "budget");
+if (gsReady()) loadGis().catch(() => {});
 sync.start();
 refreshQuotes();
 if (Date.now() - macro.at > 12 * 36e5) refreshMacro();

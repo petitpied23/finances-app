@@ -155,6 +155,30 @@ Les cours s'actualisent à l'ouverture de l'appli, puis toutes les 5 minutes tan
 - Le pays choisi sert aussi au rééquilibrage (classes historiquement favorisées) et au calcul « après inflation » du portefeuille. C'est un repère, pas un conseil en investissement.
 - Les données publiées ont souvent 1 à 3 mois de décalage avec l'actualité.
 
+**Google Sheets privé (rempli par Claude)**
+
+Un tableau de votre Google Drive, avec trois onglets, que Claude remplit à partir de vos captures (relevé bancaire, ticket, confirmation DEGIRO) :
+
+| Onglet | Colonnes | Effet dans l'appli |
+|---|---|---|
+| Mouvements | ID, Date, Type (Dépense / Entrée), Montant, Enveloppe, Catégorie (entrées), Libellé | Ajout des mouvements, sans doublons grâce à l'ID. Une ligne corrigée dans le tableau est corrigée dans l'appli ; une modification faite dans l'appli est gardée. |
+| Budget | Enveloppe, Prévu, Type (Dépense / Épargne) | Montants prévus. La première fois, l'appli demande votre accord ; ensuite, chaque changement du tableau s'applique avec « Annuler ». |
+| Portefeuille | Symbole, Quantité, Montant investi, Classe, ISIN, Nom | Quantités et coût des lignes du même symbole ou ISIN ; une valeur absente est ajoutée dans la classe indiquée. |
+
+L'appli lit le tableau avec votre compte Google, en **lecture seule**. Il n'est pas publié et reste visible par vous seul. Les cours, eux, viennent toujours du tableau « Cours en direct ».
+
+*Mise en place (une seule fois)*
+1. Sur <https://console.cloud.google.com>, choisissez le projet de votre Firebase (menu en haut de la page).
+2. **API et services** → **Bibliothèque** → **Google Sheets API** → **Activer**.
+3. **Google Auth Platform** (ou **Écran de consentement OAuth**) → **Commencer** : nom de l'appli, votre e-mail, public **Externe** → Créer. Puis **Audience** → **Utilisateurs test** → ajoutez votre adresse Gmail.
+4. **Clients** → **Créer un client** → type **Application Web** → **Origines JavaScript autorisées** : l'adresse de l'appli sans le chemin (par exemple `https://votre-nom.github.io`) → **Créer**. Copiez l'**ID client**.
+5. Dans l'appli : **Réglages** → **Google Sheets privé** → collez l'ID client et le lien du tableau → **Se connecter et récupérer**. Choisissez le compte Google qui possède le tableau. Google affiche « Google n'a pas validé cette application » : c'est normal pour une appli personnelle, touchez **Continuer**.
+
+*Au quotidien*
+- Le bouton **↻ Google Sheets** (Accueil, en face de « Mouvements ») récupère les nouveautés. La connexion dure environ une heure ; pendant ce temps, l'appli vérifie aussi toute seule toutes les 5 minutes.
+- Une récupération sur un seul appareil suffit : les autres reçoivent les données par la synchronisation Firebase. Si la fenêtre de connexion Google ne s'ouvre pas sur le téléphone, faites-le depuis le PC.
+- Rien n'est jamais écrit dans le tableau par l'appli.
+
 **Sauvegarde**
 Réglages → **Exporter** crée un fichier `.json`. Gardez-en une copie de temps en temps, même avec la synchronisation.
 
@@ -165,7 +189,7 @@ Réglages → **Exporter** crée un fichier `.json`. Gardez-en une copie de temp
 
 ## Mettre à jour l'appli
 
-1. Dans GitHub : **Add file** → **Upload files** → déposez les fichiers modifiés (versions 1.2 à 1.4 : `index.html`, et `README.md` si vous voulez le guide à jour ; version 1.1 : `index.html`, `sw.js` et `README.md`) → **Commit changes**. GitHub remplace les anciens fichiers du même nom.
+1. Dans GitHub : **Add file** → **Upload files** → déposez les fichiers modifiés (versions 1.2 à 1.5 : `index.html`, et `README.md` si vous voulez le guide à jour ; version 1.1 : `index.html`, `sw.js` et `README.md`) → **Commit changes**. GitHub remplace les anciens fichiers du même nom.
 2. Attendez une minute, puis dans l'appli : **Réglages** → **Recharger l'appli**. La version affichée en bas des Réglages doit changer.
 3. Si vous changez aussi les icônes ou le manifeste, augmentez le numéro `CACHE` en haut de `sw.js` (`finances-v3`, etc.).
 
@@ -173,6 +197,7 @@ Vos données ne sont pas touchées par une mise à jour.
 
 ## Historique des versions
 
+- **1.5** : Google Sheets privé (lecture seule avec votre compte Google) pour les mouvements, le budget et les quantités du portefeuille remplis par Claude.
 - **1.4** : menu latéral (patrimoine, rubriques, heure de synchronisation), rubriques Bilan, Comptes et Budget séparées ; page Budget avec moyennes des derniers cycles et budget à coller ; couleurs par type (revenus, dépenses, épargne), épargne au-dessus de l'objectif en bleu ; Bilan en barres groupées avec bulle des montants exacts au toucher ; plus de zoom au double-tap.
 - **1.3** : vue Bilan (période, revenus, dépenses, épargne, graphique par cycle, totaux par enveloppe et par catégorie d'entrée) ; import d'historique Excel / CSV (feuilles dépenses, revenus et transferts, catégories → enveloppes, salaires → revenu du cycle, doublons ignorés, annulation).
 - **1.2** : entrées d'argent avec catégories (remboursements, ventes, primes…), déductibles d'une enveloppe ; liste « Mouvements » ; détail des entrées dans le résumé du cycle.
