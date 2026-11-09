@@ -142,6 +142,8 @@ label.field { display: flex; flex-direction: column; gap: 6px; min-width: 0 }
 .erow:last-of-type { border-bottom: 0 }
 .erow .full { grid-column: 1 / -1 }
 .erow input, .erow select { width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface) }
+.chk { display: flex; align-items: center; gap: 10px; font-size: .92rem }
+.field .chk input { width: 18px; height: 18px; padding: 0; flex: none; accent-color: var(--accent) }
 .hint { padding: 10px 12px; border-radius: 10px; background: var(--bg); line-height: 1.5 }
 .kv { display: flex; justify-content: space-between; gap: 12px; align-items: center; font-size: .88rem }
 .kv code { font-family: var(--mono); font-size: .78rem; overflow-wrap: anywhere }
@@ -251,6 +253,8 @@ td.live { color: var(--fg) }
     <div><div class="eyebrow">Budget</div><h1>Cycle de paie</h1></div>
     <button class="pill" type="button" data-syncpill data-goto="reglages">Local</button>
   </div>
+  <div class="seg" id="bmode" role="group" aria-label="Affichage du budget"><button type="button" data-bm="cycle" aria-pressed="true">Cycle</button><button type="button" data-bm="bilan" aria-pressed="false">Bilan</button></div>
+  <div id="b-cycle" class="stack" style="gap:16px">
   <div class="panel cyclenav">
     <button class="arrow" type="button" id="cprev" aria-label="Cycle précédent">‹</button>
     <div><b id="clabel"></b><div class="small muted"><span id="csub"></span> <button class="linkbtn small" type="button" id="cnow" hidden>Revenir au cycle en cours</button></div></div>
@@ -263,10 +267,11 @@ td.live { color: var(--fg) }
     <div class="bar" aria-hidden="true"><i id="b-bar" style="width:0"></i></div>
     <div class="stats">
       <label class="stat"><span class="eyebrow">Revenu du cycle</span><input id="b-income" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><span class="small muted" id="b-incnote"></span></label>
+      <div class="stat"><span class="eyebrow">Autres entrées</span><span class="v" id="b-extra" style="color:var(--up)">0,00 €</span><span class="small muted" id="b-extranote"></span></div>
       <div class="stat"><span class="eyebrow">Sorties</span><span class="v" id="b-out">0,00 €</span><span class="small muted" id="b-saved"></span></div>
-      <div class="stat"><span class="eyebrow">Prévu</span><span class="v" id="b-planned">0,00 €</span></div>
-      <div class="stat"><span class="eyebrow">Non affecté</span><span class="v" id="b-free">0,00 €</span></div>
+      <div class="stat"><span class="eyebrow">Prévu</span><span class="v" id="b-planned">0,00 €</span><span class="small muted" id="b-free"></span></div>
     </div>
+    <div class="notice" id="b-incdetail" hidden></div>
     <div class="notice" id="b-pace"></div>
   </div>
 
@@ -276,7 +281,7 @@ td.live { color: var(--fg) }
   </div>
 
   <div class="panel">
-    <div class="clshead"><h2>Dépenses <span class="small muted" id="expcount"></span></h2><button class="linkbtn" type="button" id="expclear" hidden>Tout afficher</button></div>
+    <div class="clshead"><h2>Mouvements <span class="small muted" id="expcount"></span></h2><button class="linkbtn" type="button" id="expclear" hidden>Tout afficher</button></div>
     <div id="explist"></div>
   </div>
 
@@ -286,6 +291,22 @@ td.live { color: var(--fg) }
     <div class="totrow"><span>Total épargne</span><span class="num" id="sav-total">0,00 €</span></div>
     <div class="totrow muted" style="font-weight:500"><span>Investissements</span><span class="num" id="sav-inv">0,00 €</span></div>
     <div class="totrow"><span>Patrimoine suivi</span><span class="num" id="sav-all">0,00 €</span></div>
+  </div>
+  </div>
+
+  <div id="b-bilan" class="stack" style="gap:16px" hidden>
+    <div class="panel stack">
+      <label class="field"><span class="eyebrow">Période</span><select id="bl-period"></select></label>
+      <div class="stats" id="bl-stats"></div>
+    </div>
+    <div class="panel total">
+      <div class="clshead"><h2>Par cycle</h2></div>
+      <div class="chart" id="bl-chart"></div>
+      <div class="notice" id="bl-chartnote"></div>
+    </div>
+    <div class="panel"><div class="clshead"><h2>Par enveloppe</h2></div><div id="bl-env"></div></div>
+    <div class="panel"><div class="clshead"><h2>Entrées</h2></div><div id="bl-inc"></div></div>
+    <div class="notice">Un cycle va d'une paie à la suivante. Pour importer vos anciennes dépenses : Réglages › Importer un historique.</div>
   </div>
 </section>
 
@@ -417,6 +438,13 @@ td.live { color: var(--fg) }
     <div><button class="btn" type="button" id="s-envadd">+ Ajouter une enveloppe</button></div>
   </div>
 
+  <div class="panel stack" id="set-inc">
+    <h2>Catégories d'entrées</h2>
+    <div class="notice">Pour savoir d'où vient l'argent qui rentre en plus du salaire. « Déduire par défaut » préremplit l'enveloppe à créditer (ex. mutuelle → Santé).</div>
+    <div id="s-incs"></div>
+    <div><button class="btn" type="button" id="s-incadd">+ Ajouter une catégorie</button></div>
+  </div>
+
   <div class="panel stack" id="set-sav">
     <h2>Comptes d'épargne</h2>
     <div class="notice">Nom et objectif (facultatif). Le solde se met à jour dans l'onglet Budget.</div>
@@ -443,6 +471,15 @@ td.live { color: var(--fg) }
     <h2>Investissements</h2>
     <div class="notice">Nom des quatre classes du rééquilibrage.</div>
     <div class="row2" id="s-classes"></div>
+  </div>
+
+  <div class="panel stack" id="set-hist">
+    <h2>Importer un historique</h2>
+    <div class="notice">Fichier Excel (.xlsx, .xls), LibreOffice (.ods) ou CSV : export d'une autre appli de budget, tableau de dépenses ou relevé bancaire. Les mouvements sont ajoutés à ceux de l'appli sans rien écraser ; vous vérifiez tout avant de valider, et l'import peut être annulé.</div>
+    <div><label class="btn" for="hx-file">Choisir le fichier<input type="file" id="hx-file" class="vh" accept=".xlsx,.xls,.ods,.csv,text/csv"></label></div>
+    <div id="hx-box" class="stack" hidden></div>
+    <div class="notice" id="hx-msg" aria-live="polite"></div>
+    <div id="hx-last" class="stack" hidden></div>
   </div>
 
   <div class="panel stack">
@@ -478,9 +515,15 @@ td.live { color: var(--fg) }
 <div id="sheet" class="sheet" hidden>
   <div class="sheetbg" data-close></div>
   <form class="sheetcard" id="expform" novalidate>
+    <div class="seg" id="f-kind" role="group" aria-label="Type de mouvement"><button type="button" data-k="exp" aria-pressed="true">Dépense</button><button type="button" data-k="inc" aria-pressed="false">Entrée d'argent</button></div>
     <h2 id="sheettitle">Nouvelle dépense</h2>
-    <label class="field"><span class="small muted">Montant (€) — négatif pour un remboursement</span><input id="f-amount" class="n" type="text" inputmode="decimal" autocomplete="off" placeholder="0,00" style="text-align:left;font-size:1.4rem"></label>
-    <label class="field"><span class="small muted">Enveloppe</span><select id="f-env"></select></label>
+    <label class="field"><span class="small muted">Montant (€)</span><input id="f-amount" class="n" type="text" inputmode="decimal" autocomplete="off" placeholder="0,00" style="text-align:left;font-size:1.4rem"></label>
+    <div id="f-expbox"><label class="field"><span class="small muted">Enveloppe</span><select id="f-env"></select></label></div>
+    <div id="f-incbox" class="stack" hidden>
+      <label class="field"><span class="small muted">D'où vient cet argent ?</span><select id="f-cat"></select></label>
+      <label class="field"><span class="small muted">Effet sur le budget</span><select id="f-renv"></select></label>
+      <div class="notice">« Déduire » sert aux remboursements d'une dépense (mutuelle, ami qui rembourse un resto…) : l'enveloppe concernée retrouve ce montant. Sinon, l'argent s'ajoute au reste du cycle.</div>
+    </div>
     <label class="field"><span class="small muted">Libellé (facultatif)</span><input id="f-label" type="text" autocomplete="off" placeholder="Ex. Courses Saran"></label>
     <label class="field"><span class="small muted">Date</span><input id="f-date" type="date"></label>
     <div class="notice err" id="f-err"></div>
@@ -496,7 +539,7 @@ td.live { color: var(--fg) }
 
 <script>
 "use strict";
-const APP_VERSION = "1.1.0";
+const APP_VERSION = "1.3.0";
 const FB_VERSION = "10.12.2"; // SDK Firebase chargé depuis gstatic uniquement si la synchronisation est configurée
 const LS = { state: "fin.state", fb: "fin.firebase", dev: "fin.device", link: "fin.linked" };
 const CLASSES = [{ id: "stocks", c: "#2346d8" }, { id: "bonds", c: "#7a4fd0" }, { id: "gold", c: "#c99a0a" }, { id: "cash", c: "#138a5b" }];
@@ -550,7 +593,17 @@ function defaultState() {
         env("epargne", "Épargne", "save"), env("invest", "Investissements", "save")],
       cycles: {},      // "AAAA-MM" -> { income } quand le revenu du cycle diffère du revenu habituel
       expenses: [],    // { id, date: "AAAA-MM-JJ", amount, env, label, at }
-      savings: [{ id: "reserve", name: "Réserve de sécurité", balance: 0, goal: 0 }, { id: "livreta", name: "Livret A", balance: 0, goal: 0 }]
+      savings: [{ id: "reserve", name: "Réserve de sécurité", balance: 0, goal: 0 }, { id: "livreta", name: "Livret A", balance: 0, goal: 0 }],
+      incomes: [],     // { id, date, amount, cat, env, label, at } : remboursements, ventes, primes…
+      incomeCats: [
+        { id: "mutuelle", name: "Remboursement mutuelle / santé", env: "sante" },
+        { id: "proche", name: "Remboursement d'un proche", env: "" },
+        { id: "rembachat", name: "Remboursement d'un achat", env: "" },
+        { id: "vente", name: "Vente", env: "" },
+        { id: "prime", name: "Prime / bonus", env: "" },
+        { id: "cadeau", name: "Cadeau", env: "" },
+        { id: "autre", name: "Autre entrée", env: "" }
+      ]
     },
     invest: {
       classNames: { stocks: "Actions", bonds: "Obligations", gold: "Or & matières premières", cash: "Énergie" },
@@ -568,6 +621,10 @@ function normalize(s) {
   if (!Array.isArray(b.envelopes)) b.envelopes = d.budget.envelopes;
   if (!Array.isArray(b.expenses)) b.expenses = [];
   if (!Array.isArray(b.savings)) b.savings = [];
+  if (!Array.isArray(b.incomes)) b.incomes = [];
+  if (!b.catMap || typeof b.catMap !== "object") b.catMap = {};
+  if (b.lastImport === undefined) b.lastImport = null;
+  if (!Array.isArray(b.incomeCats) || !b.incomeCats.length) b.incomeCats = d.budget.incomeCats;
   if (!b.cycles || typeof b.cycles !== "object") b.cycles = {};
   b.payday = Math.min(31, Math.max(1, Math.round(+b.payday) || 25));
   i.classNames = { ...d.invest.classNames, ...(i.classNames || {}) };
@@ -633,13 +690,34 @@ function cycleOf(date) {
   return { key: `${y}-${pad(m + 1)}`, y, m, start, end };
 }
 function shiftCycle(c, delta) { let y = c.y, m = c.m + delta; while (m < 0) { m += 12; y-- } while (m > 11) { m -= 12; y++ } return cycleOf(payDate(y, m)) }
-let viewCycle = cycleOf(new Date()), envFilter = null, lastEnv = null;
+let viewCycle = cycleOf(new Date()), envFilter = null, lastEnv = null, lastCat = null;
 const envById = id => S.budget.envelopes.find(e => e.id === id);
-const cycleExpenses = c => { const a = ymd(c.start), b = ymd(c.end); return S.budget.expenses.filter(e => e.date >= a && e.date <= b) };
+const incCat = id => S.budget.incomeCats.find(x => x.id === id);
+const inRange = (list, c) => { const a = ymd(c.start), b = ymd(c.end); return list.filter(e => e.date >= a && e.date <= b) };
+const cycleExpenses = c => inRange(S.budget.expenses, c);
+const cycleIncomes = c => inRange(S.budget.incomes, c);
 const cycleIncome = c => { const x = S.budget.cycles[c.key]?.income; return typeof x === "number" && isFinite(x) ? x : (+S.budget.income || 0) };
 const isCurrent = c => cycleOf(new Date()).key === c.key;
+// Une entrée rattachée à une enveloppe existante vient en déduction de cette enveloppe (ex. remboursement mutuelle -> Santé) ;
+// sinon c'est de l'argent en plus (vente, prime, cadeau…).
+const refundEnv = i => (i.env && envById(i.env)) ? i.env : "";
+function cycleStats(c) {
+  const ex = cycleExpenses(c), inc = cycleIncomes(c), kind = id => envById(id)?.kind || "spend";
+  const spentBy = {}, refundBy = {}, byCat = {};
+  let gross = 0, savedGross = 0, extra = 0, refunds = 0, savedRefunds = 0;
+  ex.forEach(e => { const a = +e.amount || 0; spentBy[e.env] = (spentBy[e.env] || 0) + a; gross += a; if (kind(e.env) === "save") savedGross += a });
+  inc.forEach(i => {
+    const a = +i.amount || 0, env = refundEnv(i);
+    byCat[i.cat] = (byCat[i.cat] || 0) + a;
+    if (env) { refundBy[env] = (refundBy[env] || 0) + a; refunds += a; if (kind(env) === "save") savedRefunds += a } else extra += a;
+  });
+  return { ex, inc, spentBy, refundBy, byCat, extra, refunds, out: gross - refunds, saved: savedGross - savedRefunds };
+}
 
 function renderBudget() {
+  document.querySelectorAll("#bmode button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.bm === bMode)));
+  $("b-cycle").hidden = bMode !== "cycle"; $("b-bilan").hidden = bMode !== "bilan";
+  if (bMode === "bilan") { renderBilan(); return }
   const c = viewCycle, cur = isCurrent(c), now = new Date();
   $("clabel").textContent = `${fmtDay(c.start)} → ${fmtDay(c.end)} ${c.end.getFullYear()}`;
   $("csub").textContent = cur ? "Cycle en cours" : (c.start > now ? "Cycle à venir" : "Cycle terminé");
@@ -650,54 +728,65 @@ function renderBudget() {
   $("b-incnote").textContent = typeof custom === "number" ? "propre à ce cycle" : "revenu habituel";
   updateSummary();
 
-  const ex = cycleExpenses(c), spentBy = {};
-  ex.forEach(e => { spentBy[e.env] = (spentBy[e.env] || 0) + (+e.amount || 0) });
-  const envs = S.budget.envelopes;
-  const orphan = Object.keys(spentBy).filter(id => !envById(id)).reduce((s, id) => s + spentBy[id], 0);
-  const envRow = (id, name, sp, pl, kind) => {
-    const pct = pl > 0 ? Math.min(100, sp / pl * 100) : (sp > 0 ? 100 : 0), over = pl > 0 ? sp > pl + 0.005 : sp > 0;
-    const rest = pl - sp;
+  const st = cycleStats(c), envs = S.budget.envelopes;
+  const orphan = Object.keys(st.spentBy).filter(id => !envById(id)).reduce((s, id) => s + st.spentBy[id], 0);
+  const envRow = (id, name, sp, refund, pl, kind) => {
+    const net = sp - refund, pct = pl > 0 ? Math.min(100, Math.max(0, net / pl * 100)) : (net > 0 ? 100 : 0), over = pl > 0 ? net > pl + 0.005 : net > 0;
+    const rest = pl - net;
     return `<button type="button" class="env${envFilter === id ? " on" : ""}" data-env="${esc(id)}">
-      <span><b>${esc(name)}</b>${kind === "save" ? '<span class="tag">épargne</span>' : ""}<br><span class="small muted num">${fmtEUR(sp)} / ${fmtEUR(pl)}</span></span>
-      <span class="num small" style="font-weight:600;color:${over ? "var(--down)" : "var(--fg)"}">${pl > 0 || sp > 0 ? (rest >= 0 ? "reste " + fmtEUR(rest) : "dépassé de " + fmtEUR(-rest)) : "—"}</span>
+      <span><b>${esc(name)}</b>${kind === "save" ? '<span class="tag">épargne</span>' : ""}<br><span class="small muted num">${fmtEUR(net)} / ${fmtEUR(pl)}${refund ? ` · dont ${fmtEUR(refund)} remboursés` : ""}</span></span>
+      <span class="num small" style="font-weight:600;color:${over ? "var(--down)" : "var(--fg)"}">${pl > 0 || net ? (rest >= 0 ? "reste " + fmtEUR(rest) : "dépassé de " + fmtEUR(-rest)) : "—"}</span>
       <span class="bar"><i class="${over ? "over" : ""}" style="width:${pct}%${kind === "save" && !over ? ";background:var(--up)" : ""}"></i></span></button>`;
   };
-  $("envlist").innerHTML = (envs.length ? envs.map(e => envRow(e.id, e.name, spentBy[e.id] || 0, +e.planned || 0, e.kind)).join("") : `<div class="notice">Aucune enveloppe : ajoutez-en dans Réglages.</div>`)
-    + (orphan ? envRow("__none", "Sans enveloppe", orphan, 0, "spend") : "");
+  const shown = envs.filter(e => +e.planned || st.spentBy[e.id] || st.refundBy[e.id] || envFilter === e.id), hidden = envs.length - shown.length;
+  $("envlist").innerHTML = (envs.length ? shown.map(e => envRow(e.id, e.name, st.spentBy[e.id] || 0, st.refundBy[e.id] || 0, +e.planned || 0, e.kind)).join("") : `<div class="notice">Aucune enveloppe : ajoutez-en dans Réglages.</div>`)
+    + (orphan ? envRow("__none", "Sans enveloppe", orphan, 0, 0, "spend") : "")
+    + (hidden ? `<div class="notice" style="padding-top:8px">${hidden} enveloppe${hidden > 1 ? "s" : ""} sans budget ni mouvement sur ce cycle ${hidden > 1 ? "sont masquées" : "est masquée"}.</div>` : "");
 
-  const list = ex.filter(e => !envFilter || (envFilter === "__none" ? !envById(e.env) : e.env === envFilter))
-    .sort((a, b) => b.date.localeCompare(a.date) || (b.at || 0) - (a.at || 0));
+  // Mouvements du cycle : dépenses et entrées mélangées, du plus récent au plus ancien
+  const exps = st.ex.filter(e => !envFilter || (envFilter === "__none" ? !envById(e.env) : e.env === envFilter)).map(e => ({ k: "exp", o: e }));
+  const incs = st.inc.filter(i => !envFilter || refundEnv(i) === envFilter).map(i => ({ k: "inc", o: i }));
+  const list = [...exps, ...incs].sort((a, b) => b.o.date.localeCompare(a.o.date) || (b.o.at || 0) - (a.o.at || 0));
   $("expcount").textContent = list.length ? `· ${list.length}` : "";
   $("expclear").hidden = !envFilter;
-  $("explist").innerHTML = list.length ? list.map(e => {
-    const d = parseYmd(e.date), en = envById(e.env);
-    return `<button type="button" class="exp" data-exp="${esc(e.id)}"><span class="d">${pad(d.getDate())}/${pad(d.getMonth() + 1)}</span>
-      <span class="l"><b>${esc(e.label || en?.name || "Dépense")}</b><small>${esc(en?.name || "Sans enveloppe")}</small></span>
-      <span class="num" style="font-weight:600;color:${e.amount < 0 ? "var(--up)" : "var(--fg)"}">${e.amount < 0 ? "+" + fmtEUR(-e.amount) : fmtEUR(e.amount)}</span></button>`;
-  }).join("") : `<div class="notice">${envFilter ? "Aucune dépense dans cette enveloppe sur ce cycle." : "Aucune dépense sur ce cycle. Touchez + pour en ajouter une."}</div>`;
+  $("explist").innerHTML = list.length ? list.map(({ k, o }) => {
+    const d = parseYmd(o.date), day = `<span class="d">${pad(d.getDate())}/${pad(d.getMonth() + 1)}</span>`;
+    if (k === "inc") {
+      const cat = incCat(o.cat), env = envById(refundEnv(o));
+      return `<button type="button" class="exp" data-inc="${esc(o.id)}">${day}
+        <span class="l"><b>${esc(o.label || cat?.name || "Entrée")}</b><small>${esc(cat?.name || "Entrée")}${env ? " · déduit de " + esc(env.name) : ""}</small></span>
+        <span class="num" style="font-weight:600;color:var(--up)">+${fmtEUR(o.amount)}</span></button>`;
+    }
+    const en = envById(o.env);
+    return `<button type="button" class="exp" data-exp="${esc(o.id)}">${day}
+      <span class="l"><b>${esc(o.label || en?.name || "Dépense")}</b><small>${esc(en?.name || "Sans enveloppe")}</small></span>
+      <span class="num" style="font-weight:600;color:${o.amount < 0 ? "var(--up)" : "var(--fg)"}">${o.amount < 0 ? "+" + fmtEUR(-o.amount) : fmtEUR(o.amount)}</span></button>`;
+  }).join("") : `<div class="notice">${envFilter ? "Aucun mouvement dans cette enveloppe sur ce cycle." : "Aucun mouvement sur ce cycle. Touchez + pour ajouter une dépense ou une entrée."}</div>`;
 
   renderSavings();
 }
 function updateSummary() {
-  const c = viewCycle, ex = cycleExpenses(c), inc = cycleIncome(c);
-  const kind = id => envById(id)?.kind || "spend";
-  const out = ex.reduce((s, e) => s + (+e.amount || 0), 0);
-  const saved = ex.filter(e => kind(e.env) === "save").reduce((s, e) => s + (+e.amount || 0), 0);
+  const c = viewCycle, st = cycleStats(c), salary = cycleIncome(c);
   const planned = S.budget.envelopes.reduce((s, e) => s + (+e.planned || 0), 0);
   const plannedSpend = S.budget.envelopes.filter(e => e.kind !== "save").reduce((s, e) => s + (+e.planned || 0), 0);
-  const left = inc - out, free = inc - planned;
+  const left = salary + st.extra - st.out, free = salary - planned, entries = st.extra + st.refunds;
   $("b-left").textContent = fmtEUR(left); $("b-left").style.color = left < 0 ? "var(--down)" : "";
-  $("b-out").textContent = fmtEUR(out);
-  $("b-saved").textContent = saved ? `dont ${fmtEUR(saved)} vers l'épargne` : "";
+  $("b-extra").textContent = fmtEUR(entries);
+  $("b-extranote").textContent = st.refunds ? `dont ${fmtEUR(st.refunds)} déduits des enveloppes` : (entries ? "argent en plus" : "ventes, remboursements…");
+  $("b-out").textContent = fmtEUR(st.out);
+  $("b-saved").textContent = st.saved ? `dont ${fmtEUR(st.saved)} vers l'épargne` : "";
   $("b-planned").textContent = fmtEUR(planned);
-  $("b-free").textContent = fmtEUR(free); $("b-free").style.color = free < 0 ? "var(--down)" : "";
-  const pct = inc > 0 ? Math.min(100, out / inc * 100) : (out > 0 ? 100 : 0);
+  $("b-free").textContent = `non affecté : ${fmtEUR(free)}`; $("b-free").style.color = free < 0 ? "var(--down)" : "";
+  const cats = Object.entries(st.byCat).sort((a, b) => b[1] - a[1]);
+  $("b-incdetail").textContent = cats.length ? "Entrées : " + cats.map(([id, v]) => `${incCat(id)?.name || "Autre"} ${fmtEUR(v)}`).join(" · ") : "";
+  $("b-incdetail").hidden = !cats.length;
+  const base = salary + st.extra, pct = base > 0 ? Math.min(100, Math.max(0, st.out / base * 100)) : (st.out > 0 ? 100 : 0);
   $("b-bar").style.width = pct + "%"; $("b-bar").className = left < 0 ? "over" : "";
   let pace = "";
-  if (!inc && !S.budget.income) pace = "Indiquez votre revenu habituel dans Réglages (ou le revenu de ce cycle ci-dessus).";
+  if (!salary && !S.budget.income) pace = "Indiquez votre revenu habituel dans Réglages (ou le revenu de ce cycle ci-dessus).";
   else if (isCurrent(c)) {
     const t = new Date(), t0 = new Date(t.getFullYear(), t.getMonth(), t.getDate());
-    const days = Math.round((c.end - t0) / 864e5) + 1, restSpend = Math.max(0, plannedSpend - (out - saved));
+    const days = Math.round((c.end - t0) / 864e5) + 1, restSpend = Math.max(0, plannedSpend - (st.out - st.saved));
     pace = `${days} jour${days > 1 ? "s" : ""} restant${days > 1 ? "s" : ""}` + (plannedSpend > 0 ? ` · environ ${fmtEUR(restSpend / days)} par jour pour les dépenses prévues` : "");
   } else if (c.end < new Date()) pace = left >= 0 ? `Cycle terminé avec ${fmtEUR(left)} de reste.` : `Cycle terminé avec un dépassement de ${fmtEUR(-left)}.`;
   $("b-pace").textContent = pace;
@@ -727,7 +816,10 @@ $("b-income").addEventListener("input", e => {
 });
 $("envlist").addEventListener("click", e => { const b = e.target.closest("[data-env]"); if (!b) return; envFilter = envFilter === b.dataset.env ? null : b.dataset.env; renderBudget() });
 $("expclear").addEventListener("click", () => { envFilter = null; renderBudget() });
-$("explist").addEventListener("click", e => { const b = e.target.closest("[data-exp]"); if (b) openSheet(S.budget.expenses.find(x => x.id === b.dataset.exp)) });
+$("explist").addEventListener("click", e => {
+  const x = e.target.closest("[data-exp]"); if (x) { openSheet("exp", S.budget.expenses.find(o => o.id === x.dataset.exp)); return }
+  const i = e.target.closest("[data-inc]"); if (i) openSheet("inc", S.budget.incomes.find(o => o.id === i.dataset.inc));
+});
 $("savlist").addEventListener("input", e => {
   const inp = e.target.closest("[data-sk]"); if (!inp) return;
   const a = S.budget.savings.find(x => x.id === inp.closest("[data-sid]").dataset.sid); if (!a) return;
@@ -735,52 +827,472 @@ $("savlist").addEventListener("input", e => {
 });
 $("savlist").addEventListener("change", () => renderSavings());
 
-/* ---------- Feuille de saisie ---------- */
-let editing = null;
+/* ---------- Feuille de saisie (dépense ou entrée) ---------- */
+let editing = null, sheetKind = "exp";
 function defaultDate() {
   const c = viewCycle, t = new Date();
   if (isCurrent(c)) return ymd(t);
   return ymd(c.end < t ? c.end : c.start);
 }
-function openSheet(exp) {
-  editing = exp ? exp.id : null;
-  $("sheettitle").textContent = exp ? "Modifier la dépense" : "Nouvelle dépense";
-  const envs = S.budget.envelopes;
+function setSheetKind(k) {
+  sheetKind = k;
+  document.querySelectorAll("#f-kind button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.k === k)));
+  $("f-expbox").hidden = k !== "exp"; $("f-incbox").hidden = k !== "inc";
+  $("sheettitle").textContent = editing ? (k === "inc" ? "Modifier l'entrée" : "Modifier la dépense") : (k === "inc" ? "Nouvelle entrée d'argent" : "Nouvelle dépense");
+  $("f-label").placeholder = k === "inc" ? "Ex. Vente casque sur Leboncoin" : "Ex. Courses Saran";
+}
+function fillRefundEnv(catId, value) {
+  const cat = incCat(catId), v = value !== undefined ? value : (cat?.env && envById(cat.env) ? cat.env : "");
+  $("f-renv").innerHTML = `<option value="">Aucune : argent en plus</option>` + S.budget.envelopes.map(e => `<option value="${esc(e.id)}">Déduire de « ${esc(e.name)} »</option>`).join("");
+  $("f-renv").value = envById(v) ? v : "";
+}
+function openSheet(kind, item) {
+  editing = item ? item.id : null;
+  const envs = S.budget.envelopes, cats = S.budget.incomeCats;
   $("f-env").innerHTML = envs.map(e => `<option value="${esc(e.id)}">${esc(e.name)}</option>`).join("")
-    + (exp && !envById(exp.env) ? `<option value="${esc(exp.env)}">Sans enveloppe</option>` : "");
-  $("f-amount").value = exp ? fmtIn(exp.amount) : "";
-  $("f-env").value = exp?.env || (envFilter && envById(envFilter) ? envFilter : null) || (lastEnv && envById(lastEnv) ? lastEnv : envs[0]?.id || "");
-  $("f-label").value = exp?.label || "";
-  $("f-date").value = exp?.date || defaultDate();
+    + (kind === "exp" && item && !envById(item.env) ? `<option value="${esc(item.env)}">Sans enveloppe</option>` : "");
+  $("f-env").value = (kind === "exp" && item?.env) || (envFilter && envById(envFilter) ? envFilter : null) || (lastEnv && envById(lastEnv) ? lastEnv : envs[0]?.id || "");
+  $("f-cat").innerHTML = cats.map(c => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join("")
+    + (kind === "inc" && item && !incCat(item.cat) ? `<option value="${esc(item.cat)}">Autre</option>` : "");
+  const catId = (kind === "inc" && item?.cat) || (lastCat && incCat(lastCat) ? lastCat : cats[0]?.id || "");
+  $("f-cat").value = catId;
+  fillRefundEnv(catId, kind === "inc" && item ? (item.env || "") : undefined);
+  $("f-amount").value = item ? fmtIn(Math.abs(item.amount)) : "";
+  if (kind === "exp" && item && item.amount < 0) $("f-amount").value = "-" + fmtIn(-item.amount);
+  $("f-label").value = item?.label || "";
+  $("f-date").value = item?.date || defaultDate();
   $("f-err").textContent = "";
-  const del = $("f-del"); del.hidden = !exp; delete del.dataset.confirm; del.textContent = "Supprimer";
+  $("f-kind").hidden = !!item;
+  setSheetKind(kind);
+  const del = $("f-del"); del.hidden = !item; delete del.dataset.confirm; del.textContent = "Supprimer";
   $("sheet").hidden = false;
   setTimeout(() => $("f-amount").focus(), 60);
 }
 function closeSheet() { $("sheet").hidden = true; editing = null; if (renderLater) { renderLater = false; renderView() } }
-$("fab").addEventListener("click", () => openSheet(null));
+$("fab").addEventListener("click", () => openSheet("exp", null));
+$("f-kind").addEventListener("click", e => { const b = e.target.closest("[data-k]"); if (b) setSheetKind(b.dataset.k) });
+$("f-cat").addEventListener("change", e => fillRefundEnv(e.target.value));
 $("sheet").addEventListener("click", e => { if (e.target.closest("[data-close]")) closeSheet() });
 document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("sheet").hidden) closeSheet() });
 $("expform").addEventListener("submit", e => {
   e.preventDefault();
-  const amount = round2(parseNum($("f-amount").value));
+  let amount = round2(parseNum($("f-amount").value));
   if (!amount) { $("f-err").textContent = "Indiquez un montant."; $("f-amount").focus(); return }
   const date = /^\d{4}-\d{2}-\d{2}$/.test($("f-date").value) ? $("f-date").value : ymd(new Date());
-  const env = $("f-env").value, label = $("f-label").value.trim();
-  const ex = editing && S.budget.expenses.find(x => x.id === editing);
-  if (ex) Object.assign(ex, { amount, date, env, label });
-  else S.budget.expenses.push({ id: rid(), amount, date, env, label, at: Date.now() });
-  lastEnv = env; const wasEdit = !!ex;
+  const label = $("f-label").value.trim();
+  let wasEdit = false, msg;
+  if (sheetKind === "inc") {
+    amount = Math.abs(amount);
+    const cat = $("f-cat").value, env = $("f-renv").value, it = editing && S.budget.incomes.find(x => x.id === editing);
+    if (it) { Object.assign(it, { amount, date, cat, env, label }); wasEdit = true }
+    else S.budget.incomes.push({ id: rid(), amount, date, cat, env, label, at: Date.now() });
+    lastCat = cat;
+    msg = wasEdit ? "Entrée modifiée." : `+${fmtEUR(amount)} enregistrés (${incCat(cat)?.name || "entrée"})${envById(env) ? ", déduits de " + envById(env).name : ""}.`;
+  } else {
+    const env = $("f-env").value, ex = editing && S.budget.expenses.find(x => x.id === editing);
+    if (ex) { Object.assign(ex, { amount, date, env, label }); wasEdit = true }
+    else S.budget.expenses.push({ id: rid(), amount, date, env, label, at: Date.now() });
+    lastEnv = env;
+    msg = wasEdit ? "Dépense modifiée." : `${fmtEUR(amount)} ajoutés à ${envById(env)?.name || "la dépense"}.`;
+  }
   closeSheet();
   viewCycle = cycleOf(parseYmd(date));
   commit();
-  toast(wasEdit ? "Dépense modifiée." : `${fmtEUR(amount)} ajoutés à ${envById(env)?.name || "la dépense"}.`);
+  toast(msg);
 });
 $("f-del").addEventListener("click", e => {
   const b = e.currentTarget;
   if (!b.dataset.confirm) { b.dataset.confirm = "1"; b.textContent = "Confirmer la suppression"; return }
-  S.budget.expenses = S.budget.expenses.filter(x => x.id !== editing);
-  closeSheet(); commit(); toast("Dépense supprimée.");
+  if (sheetKind === "inc") S.budget.incomes = S.budget.incomes.filter(x => x.id !== editing);
+  else S.budget.expenses = S.budget.expenses.filter(x => x.id !== editing);
+  const what = sheetKind === "inc" ? "Entrée supprimée." : "Dépense supprimée.";
+  closeSheet(); commit(); toast(what);
+});
+
+/* ---------- Bilan (plusieurs cycles) ---------- */
+let bMode = "cycle", bPeriod = "12";
+function allCycles() {
+  // Du premier mouvement enregistré jusqu'au cycle en cours
+  let first = null;
+  for (const e of S.budget.expenses) if (!first || e.date < first) first = e.date;
+  for (const e of S.budget.incomes) if (!first || e.date < first) first = e.date;
+  const cur = cycleOf(new Date()), list = [];
+  let c = first ? cycleOf(parseYmd(first)) : cur;
+  while (c.key <= cur.key && list.length < 600) { list.push(c); c = shiftCycle(c, 1) }
+  return list;
+}
+const fmtCycle = c => c.start.toLocaleDateString("fr-FR", { month: "short", year: "2-digit" });
+function renderBilan() {
+  const all = allCycles(), years = [...new Set(all.map(c => c.key.slice(0, 4)))].reverse();
+  if (bPeriod !== "12" && bPeriod !== "all" && !years.includes(bPeriod)) bPeriod = "12";
+  $("bl-period").innerHTML = `<option value="12">12 derniers cycles</option>` + years.map(y => `<option value="${y}">Cycles commencés en ${y}</option>`).join("") + `<option value="all">Tout l'historique (${all.length} cycles)</option>`;
+  $("bl-period").value = bPeriod;
+  const cycles = bPeriod === "12" ? all.slice(-12) : bPeriod === "all" ? all : all.filter(c => c.key.startsWith(bPeriod));
+  // Dépenses = sorties hors virements vers l'épargne et les placements ; épargne = revenus − dépenses
+  const per = cycles.map(c => { const st = cycleStats(c), sal = cycleIncome(c); return { c, st, sal, rev: sal + st.extra, spend: st.out - st.saved, placed: st.saved } });
+  const n = per.length || 1, rev = per.reduce((s, p) => s + p.rev, 0), spend = per.reduce((s, p) => s + p.spend, 0), placed = per.reduce((s, p) => s + p.placed, 0), saved = rev - spend;
+  const stat = (label, v, sub, color) => `<div class="stat"><span class="eyebrow">${label}</span><span class="v"${color ? ` style="color:${color}"` : ""}>${v}</span>${sub ? `<span class="small muted">${sub}</span>` : ""}</div>`;
+  $("bl-stats").innerHTML = stat("Revenus", fmtEUR(rev), "salaires + autres entrées")
+    + stat("Dépenses", fmtEUR(spend), `moyenne ${fmtEUR(spend / n)} par cycle`)
+    + stat("Épargne", fmtEUR(saved), (rev > 0 ? `${(saved / rev * 100).toLocaleString("fr-FR", { maximumFractionDigits: 0 })} % des revenus · ` : "") + `dont ${fmtEUR(placed)} virés vers l'épargne et les placements`, saved < 0 ? "var(--down)" : "var(--up)")
+    + stat("Cycles", String(per.length), per.length ? `${fmtDay(per[0].c.start)} ${per[0].c.start.getFullYear()} → ${fmtDay(per.at(-1).c.end)} ${per.at(-1).c.end.getFullYear()}` : "");
+  // Graphique : dépenses par cycle (barres) et revenus (traits)
+  const el = $("bl-chart");
+  if (!per.length || (!spend && !rev)) { el.innerHTML = ""; $("bl-chartnote").textContent = "Pas encore de mouvements sur cette période." }
+  else {
+    $("bl-chartnote").textContent = "Barres : dépenses du cycle (hors épargne) · traits verts : revenus. Touchez une barre pour ouvrir le cycle.";
+    const W = Math.max(280, el.clientWidth || 600), H = 190, pl = 60, pr = 8, pt = 10, pb = 26;
+    const top = Math.max(1, ...per.map(p => Math.max(p.spend, p.rev))), max = top * 1.08, bw = (W - pl - pr) / per.length;
+    const y = v => pt + (1 - Math.max(0, v) / max) * (H - pt - pb), step = Math.max(1, Math.ceil(per.length / Math.max(1, Math.floor((W - pl) / 64))));
+    const fmtK = v => v >= 10000 ? (v / 1000).toLocaleString("fr-FR", { maximumFractionDigits: 0 }) + " k€" : v.toLocaleString("fr-FR", { maximumFractionDigits: 0 }) + " €";
+    el.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Dépenses et revenus par cycle">
+      ${[0, .5, 1].map(f => f * top).map(v => `<line x1="${pl}" x2="${W - pr}" y1="${y(v)}" y2="${y(v)}" class="grid"/><text x="${pl - 6}" y="${y(v) + 4}" text-anchor="end" class="ax">${fmtK(v)}</text>`).join("")}
+      ${per.map((p, i) => { const x = pl + i * bw, w = Math.max(2, bw * .64), over = p.spend > p.rev && p.rev > 0;
+        return `<g data-ck="${p.c.key}" style="cursor:pointer"><rect x="${x}" y="${pt}" width="${bw}" height="${H - pt - pb}" fill="transparent"/>
+          <rect x="${x + (bw - w) / 2}" y="${y(p.spend)}" width="${w}" height="${Math.max(0, H - pb - y(p.spend))}" rx="2" fill="${over ? "var(--down)" : "var(--accent)"}" opacity=".85"><title>${fmtCycle(p.c)} : dépenses ${fmtEUR(p.spend)}, revenus ${fmtEUR(p.rev)}</title></rect>
+          ${p.rev ? `<line x1="${x + bw * .1}" x2="${x + bw * .9}" y1="${y(p.rev)}" y2="${y(p.rev)}" stroke="var(--up)" stroke-width="2.5" stroke-linecap="round"/>` : ""}
+          ${i % step === 0 ? `<text x="${x + bw / 2}" y="${H - 8}" text-anchor="middle" class="ax">${fmtCycle(p.c)}</text>` : ""}</g>`; }).join("")}
+    </svg>`;
+  }
+  // Par enveloppe : total net, moyenne par cycle comparée au prévu
+  const tot = {}; let orphan = 0;
+  per.forEach(p => {
+    Object.entries(p.st.spentBy).forEach(([id, v]) => { if (envById(id)) tot[id] = (tot[id] || 0) + v; else orphan += v });
+    Object.entries(p.st.refundBy).forEach(([id, v]) => { tot[id] = (tot[id] || 0) - v });
+  });
+  const rows = S.budget.envelopes.map(e => ({ name: e.name, v: tot[e.id] || 0, pl: +e.planned || 0, kind: e.kind })).concat(orphan ? [{ name: "Sans enveloppe", v: orphan, pl: 0 }] : [])
+    .filter(r => Math.abs(r.v) > 0.004).sort((a, b) => (a.kind === "save") - (b.kind === "save") || b.v - a.v);
+  const maxv = Math.max(1, ...rows.map(r => r.v));
+  $("bl-env").innerHTML = rows.length ? rows.map(r => { const avg = r.v / n, over = r.pl > 0 && avg > r.pl;
+    return `<div class="env" style="cursor:default"><span><b>${esc(r.name)}</b>${r.kind === "save" ? '<span class="tag">épargne</span>' : ""}<br><span class="small muted num">moyenne ${fmtEUR(avg)} / cycle${r.pl ? ` · prévu ${fmtEUR(r.pl)}` : ""}</span></span>
+      <span class="num small" style="font-weight:600;color:${over ? "var(--down)" : "var(--fg)"};text-align:right">${fmtEUR(r.v)}<br><span class="muted" style="font-weight:500">${spend && r.kind !== "save" ? (r.v / spend * 100).toLocaleString("fr-FR", { maximumFractionDigits: 0 }) + " % des dépenses" : ""}</span></span>
+      <span class="bar"><i class="${over ? "over" : ""}" style="width:${Math.max(0, r.v / maxv * 100)}%${r.kind === "save" ? ";background:var(--up)" : ""}"></i></span></div>`; }).join("")
+    : `<div class="notice">Aucune dépense sur cette période.</div>`;
+  // Entrées par catégorie (+ salaires)
+  const byCat = {}; per.forEach(p => Object.entries(p.st.byCat).forEach(([id, v]) => { byCat[id] = (byCat[id] || 0) + v }));
+  const sal = per.reduce((s, p) => s + p.sal, 0), custom = per.filter(p => typeof S.budget.cycles[p.c.key]?.income === "number").length;
+  const incRows = [{ name: "Salaires (revenu des cycles)", v: sal, sub: custom < per.length ? `${per.length - custom} cycle${per.length - custom > 1 ? "s" : ""} au revenu habituel` : "montants propres à chaque cycle" }]
+    .concat(Object.entries(byCat).map(([id, v]) => ({ name: incCat(id)?.name || "Autre entrée", v })).sort((a, b) => b.v - a.v));
+  $("bl-inc").innerHTML = incRows.filter(r => r.v).map(r => `<div class="totrow" style="font-weight:500"><span>${esc(r.name)}${r.sub ? `<br><span class="small muted">${esc(r.sub)}</span>` : ""}</span><span class="num" style="color:var(--up)">${fmtEUR(r.v)}</span></div>`).join("")
+    || `<div class="notice">Aucune entrée sur cette période.</div>`;
+}
+$("bl-period").addEventListener("change", e => { bPeriod = e.target.value; renderBilan() });
+$("bl-chart").addEventListener("click", e => { const g = e.target.closest("[data-ck]"); if (!g) return; const [y, m] = g.dataset.ck.split("-").map(Number); viewCycle = cycleOf(payDate(y, m - 1)); bMode = "cycle"; renderBudget(); window.scrollTo(0, 0) });
+$("bmode").addEventListener("click", e => { const b = e.target.closest("[data-bm]"); if (!b) return; bMode = b.dataset.bm; renderBudget() });
+
+/* ---------- Import d'historique (Excel / CSV) ---------- */
+// Lit un tableau de dépenses, l'export d'une appli de budget ou un relevé bancaire ; propose une correspondance
+// colonnes -> champs et catégories -> enveloppes, puis ajoute les mouvements sans rien écraser.
+// Les doublons déjà présents sont ignorés et l'import peut être annulé.
+const fold = s => String(s ?? "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s+/g, " ").trim();
+const HX_RE = {
+  date: /date|jour/, amount: /montant|prix|somme|valeur|total|cout|€|euros?$/, debit: /debit|sortie|depense/,
+  credit: /credit|entree|recette|rentree|encaissement/, label: /libelle|description|designation|intitule|objet|detail|commentaire|nom|magasin|marchand|tiers|operation|quoi/,
+  cat: /categorie|poste|type|enveloppe|rubrique|famille|nature|classement/, account: /^compte$|^account$|^compte bancaire$/,
+  from: /^(?!.*(montant|devise|amount|currency)).*(sortant|depuis|origine|source|^de$|^from$|compte debite)/, to: /^(?!.*(montant|devise|amount|currency)).*(entrant|^vers$|destination|^a$|^to$|compte credite|beneficiaire)/
+};
+const HX_ENV = [
+  ["courses", /courses|supermarch|alimentation|nourriture|leclerc|carrefour|auchan|intermarch|lidl|aldi|monoprix|casino|super u|hyper u|franprix|picard|grand frais|boulang/],
+  ["restos", /resto|restaurant|\bcafe\b|mcdo|mcdonald|burger|kfc|pizza|sushi|kebab|uber ?eats|deliveroo|brasserie|fast ?food/],
+  ["carburant", /carburant|essence|gasoil|gazole|diesel|station|totalenergies|\besso\b|shell|\bavia\b|plein/],
+  ["sante", /sante|pharmacie|medecin|docteur|dentiste|kine|osteo|opticien|hopital|laboratoire|medical/],
+  ["voiture", /voiture|\bauto\b|transport|garage|entretien|peage|parking|controle technique|pneu|norauto|feu vert|assurance auto|\bmoto\b|\bvtc\b|taxi|\bsncf\b|train/],
+  ["abos", /abonnement|netflix|spotify|disney|canal|prime video|deezer|youtube|\bfree\b|orange|sfr|bouygues|sosh|forfait|fitness|salle de sport|on air|basic fit|telephone|internet/],
+  ["loisirs", /loisir|cinema|steam|playstation|xbox|jeux?\b|jeux video|concert|sortie|vacances|voyage|deplacement|fnac|livre|sport|musculation|decathlon|cadeau/],
+  ["epargne", /epargne|livret|\bpel\b|\bldds\b/],
+  ["invest", /invest|\bbourse\b|degiro|trade republic|\bpea\b|crypto|\betf\b/],
+  ["imprevus", /imprevu|divers|reparation|^autre/]
+];
+const HX_INC = [["salary", /salaire|\bpaie\b|\bpaye\b|remuneration|employeur/], ["mutuelle", /mutuelle|\buneo\b|cnmss|cpam|ameli|securite sociale|remboursement sante|harmonie|mgen/],
+  ["vente", /vente|leboncoin|vinted|ebay|backmarket/], ["prime", /prime|bonus|interessement|participation/], ["cadeau", /cadeau|anniversaire|noel/], ["proche", /rembours/]];
+const HX_INVEST_ACCT = /degiro|trade ?republic|\bpea\b|\bbourse\b|crypto|binance|coinbase|vantage|\bxtb\b|etoro|ibkr|interactive|compte titre|\bcto\b/;
+const HX_CASH_ACCT = /espece|cash|liquide|portefeuille/;
+function hxGuess(name, kind) {
+  const n = fold(name);
+  if (kind === "exp") {
+    const direct = S.budget.envelopes.find(e => { const en = fold(e.name); return en && n && (n === en || (en.length > 3 && n.includes(en)) || (n.length > 3 && en.includes(n))) });
+    if (direct) return "env:" + direct.id;
+    const k = HX_ENV.find(([id, re]) => re.test(n) && envById(id)); if (k) return "env:" + k[0];
+    return "new";
+  }
+  const direct = S.budget.incomeCats.find(c => { const cn = fold(c.name); return cn && n && (n === cn || (cn.length > 3 && n.includes(cn)) || (n.length > 3 && cn.includes(n))) });
+  if (direct) return "inc:" + direct.id;
+  const k = HX_INC.find(([id, re]) => re.test(n) && (id === "salary" || incCat(id))); if (k) return k[0] === "salary" ? "salary" : "inc:" + k[0];
+  return "newinc";
+}
+function cellDate(v) {
+  let y, m, d;
+  if (v instanceof Date && !isNaN(v)) {
+    // Date seule lue comme minuit UTC : on prend la date UTC ; sinon la date locale
+    const utcMidnight = v.getUTCHours() === 0 && v.getUTCMinutes() === 0 && v.getUTCSeconds() === 0;
+    y = utcMidnight ? v.getUTCFullYear() : v.getFullYear(); m = (utcMidnight ? v.getUTCMonth() : v.getMonth()) + 1; d = utcMidnight ? v.getUTCDate() : v.getDate();
+  }
+  else if (typeof v === "number" && v > 20000 && v < 80000) { const t = new Date(Math.round((v - 25569) * 864e5)); y = t.getUTCFullYear(); m = t.getUTCMonth() + 1; d = t.getUTCDate() }
+  else {
+    const s = String(v ?? "").trim(); let r;
+    if ((r = s.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/))) { y = +r[1]; m = +r[2]; d = +r[3] }
+    else if ((r = s.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{2,4})\b/))) { d = +r[1]; m = +r[2]; y = r[3].length === 2 ? 2000 + +r[3] : +r[3] }
+    else return null;
+  }
+  if (!(y > 1990 && y < 2100 && m >= 1 && m <= 12 && d >= 1 && d <= 31)) return null;
+  return `${y}-${pad(m)}-${pad(d)}`;
+}
+// Feuille nommée « Janvier 2024 », « 01-2024 »… : sert de date aux lignes sans date
+function sheetMonth(name) {
+  const n = fold(name), y = (n.match(/(20\d{2})/) || [])[1]; if (!y) return null;
+  let m = ["janv", "fev", "mars", "avr", "mai", "juin", "juil", "aout", "sept", "oct", "nov", "dec"].findIndex(p => new RegExp("\\b" + p).test(n));
+  if (m < 0) { const r = n.match(/\b(0?[1-9]|1[0-2])[-/. _]20\d{2}|20\d{2}[-/. _](0?[1-9]|1[0-2])\b/); if (r) m = +(r[1] || r[2]) - 1 }
+  return m >= 0 ? `${y}-${pad(m + 1)}-01` : null;
+}
+// Feuille « Revenus », « Dépenses », « Transferts » : nature des lignes connue d'avance
+const hxSheetKind = name => { const n = fold(name); return /transfert|virement|transfer/.test(n) ? "tr" : /revenu|recette|entree|income|gain/.test(n) ? "inc" : /depense|expense|sortie|achat/.test(n) ? "exp" : null };
+function hxFindHeader(rows) {
+  for (let i = 0; i < Math.min(rows.length, 25); i++) {
+    const h = rows[i].map(fold);
+    if (["date", "amount", "debit", "credit", "label", "cat", "from", "to"].filter(k => h.some(c => c && c.length < 45 && HX_RE[k].test(c))).length >= 2) return i;
+  }
+  return -1;
+}
+let hx = null;
+$("hx-file").addEventListener("change", async e => {
+  const f = e.target.files?.[0]; e.target.value = ""; if (!f) return;
+  $("hx-msg").textContent = "Lecture du fichier…"; $("hx-msg").className = "notice";
+  try {
+    let sheets;
+    if (/\.(csv|txt)$/i.test(f.name)) sheets = [{ name: f.name.replace(/\.\w+$/, ""), rows: parseCSV(await f.text()) }];
+    else {
+      await loadXLSX();
+      const wb = XLSX.read(await f.arrayBuffer(), { type: "array", cellDates: true });
+      sheets = wb.SheetNames.map(n => ({ name: n, rows: XLSX.utils.sheet_to_json(wb.Sheets[n], { header: 1, raw: true, defval: "" }) }));
+    }
+    sheets = sheets.map(s => { const hi = hxFindHeader(s.rows); return { ...s, hi, kind: hxSheetKind(s.name), H: hi >= 0 ? s.rows[hi].map(fold) : [], raw: hi >= 0 ? s.rows[hi].map(c => String(c ?? "").trim()) : [] } }).filter(s => s.hi >= 0);
+    // Une feuille de transferts doit avoir une colonne origine et une colonne destination
+    sheets.forEach(s => { if (s.kind === "tr" && !(s.H.some(h => HX_RE.from.test(h)) && s.H.some(h => HX_RE.to.test(h)))) s.kind = null });
+    if (!sheets.length) throw new Error("format");
+    // Colonnes : celles de la feuille de mouvements la plus fournie
+    const main = sheets.filter(s => s.kind !== "tr"), ref = (main.length ? main : sheets).slice().sort((a, b) => (b.rows.length - b.hi) - (a.rows.length - a.hi))[0];
+    const cols = ref.raw.map((r, i) => ({ key: ref.H[i], name: r })).filter(c => c.key);
+    const pick = (re, not) => cols.find(c => re.test(c.key) && !(not && not.test(c.key)))?.key || "";
+    const map = { date: pick(/^date|date op|date$/) || pick(HX_RE.date), label: pick(HX_RE.label, HX_RE.date), cat: pick(HX_RE.cat), amount: pick(HX_RE.amount, /date/), debit: pick(HX_RE.debit), credit: pick(HX_RE.credit) };
+    const mode = map.debit && map.credit && !sheets.some(s => s.kind === "exp" || s.kind === "inc") ? "dc" : "one";
+    if (mode === "one" && !map.amount) map.amount = map.debit || map.credit;
+    // Compte courant : le plus fréquent dans la colonne « Compte », sinon dans les transferts
+    const acc = {}, bumpA = a => { const k = String(a ?? "").trim(); if (k) acc[k] = (acc[k] || 0) + 1 };
+    main.forEach(s => { const i = s.H.findIndex(h => HX_RE.account.test(h)); if (i >= 0) s.rows.slice(s.hi + 1).forEach(r => bumpA(r[i])) });
+    if (!Object.keys(acc).length) sheets.filter(s => s.kind === "tr").forEach(s => { const i = s.H.findIndex(h => HX_RE.from.test(h)), j = s.H.findIndex(h => HX_RE.to.test(h)); s.rows.slice(s.hi + 1).forEach(r => { bumpA(r[i]); bumpA(r[j]) }) });
+    const accounts = Object.entries(acc).sort((a, b) => b[1] - a[1]).map(([k]) => k);
+    hx = { file: f.name, sheets, cols, map, mode, sign: "pos", selected: new Set(sheets.map(s => s.name)), targets: {}, mainAcct: accounts[0] || "", accounts, cutoff: "" };
+    sheets.filter(s => s.kind === "tr").forEach(s => { const i = s.H.findIndex(h => HX_RE.from.test(h)), j = s.H.findIndex(h => HX_RE.to.test(h)); s.rows.slice(s.hi + 1).forEach(r => [r[i], r[j]].forEach(v => { const a = String(v ?? "").trim(); if (a && !hx.accounts.includes(a)) hx.accounts.push(a) })) });
+    // Sens des montants (feuilles sans nature connue) : majorité de négatifs = relevé bancaire
+    if (mode === "one" && map.amount && !ref.kind) {
+      let neg = 0, pos = 0; ref.rows.slice(ref.hi + 1).forEach(r => { const v = toNum(r[ref.H.indexOf(map.amount)]); if (isFinite(v) && v) v < 0 ? neg++ : pos++ });
+      hx.sign = neg > pos ? "neg" : "pos";
+    }
+    // Pour ne pas doubler ce qui a déjà été saisi dans l'appli : import limité aux dates antérieures au premier mouvement de l'appli
+    let first = null; S.budget.expenses.concat(S.budget.incomes).forEach(x => { if (!x.imp && (!first || x.date < first)) first = x.date });
+    hx.cutoff = first || "";
+    $("hx-msg").textContent = "";
+    renderHx();
+  } catch (err) {
+    hx = null; $("hx-box").hidden = true;
+    $("hx-msg").textContent = err?.message === "format" ? "Je ne trouve pas de ligne d'en-tête (Date, Montant, Libellé…) dans ce fichier. Envoyez-le à Claude pour adapter l'import." : "Le fichier n'a pas pu être lu (une connexion internet est nécessaire pour les fichiers Excel).";
+    $("hx-msg").className = "notice err";
+  }
+});
+function hxRows() {
+  const out = []; let bad = 0, internal = 0, later = 0;
+  const push = r => { if (hx.cutoff && r.date >= hx.cutoff) { later++; return } out.push(r) };
+  hx.sheets.filter(s => hx.selected.has(s.name)).forEach(sh => {
+    const rows = sh.rows.slice(sh.hi + 1), col = re => sh.H.findIndex(h => re.test(h));
+    if (sh.kind === "tr") {
+      // Transfert depuis le compte courant = virement vers l'épargne ou un placement ; vers le compte courant = retrait
+      const iD = col(/^date|date/), iF = col(HX_RE.from), iT = col(HX_RE.to), iA = col(/montant|amount|somme/), iC = col(/commentaire|libelle|description/);
+      for (const r of rows) {
+        if (!r.some(c => String(c ?? "").trim())) continue;
+        const date = cellDate(r[iD]), amt = Math.abs(toNum(r[iA])), from = String(r[iF] ?? "").trim(), to = String(r[iT] ?? "").trim();
+        if (!date || !(amt > 0)) { bad++; continue }
+        const out_ = from === hx.mainAcct, in_ = to === hx.mainAcct;
+        if (out_ === in_) { internal++; continue }
+        const other = out_ ? to : from, fo = fold(other);
+        const def = HX_INVEST_ACCT.test(fo) ? (envById("invest") ? "env:invest" : "new") : HX_CASH_ACCT.test(fo) ? "new" : (envById("epargne") ? "env:epargne" : "new");
+        const comment = iC >= 0 ? String(r[iC] ?? "").trim() : "";
+        push({ date, amount: round2(out_ ? amt : -amt), kind: "exp", tr: true, label: (out_ ? "Virement vers " : "Retrait depuis ") + other + (comment ? " · " + comment : ""),
+          ckey: (out_ ? "tr:to:" : "tr:from:") + fo, cname: (out_ ? "Virement vers " : "Retrait depuis ") + other, newName: HX_CASH_ACCT.test(fo) ? "Espèces" : other, def });
+      }
+      return;
+    }
+    const ix = k => hx.map[k] ? sh.H.indexOf(hx.map[k]) : -1;
+    const iD = ix("date"), iA = ix("amount"), iDb = ix("debit"), iCr = ix("credit"), iL = ix("label"), iC = ix("cat"), fb = sheetMonth(sh.name);
+    for (const r of rows) {
+      if (!r.some(c => String(c ?? "").trim())) continue;
+      const date = (iD >= 0 ? cellDate(r[iD]) : null) || (iD < 0 ? fb : null);
+      let amt = NaN, kind = "exp";
+      if (hx.mode === "dc") {
+        const d = iDb >= 0 ? toNum(r[iDb]) : NaN, c = iCr >= 0 ? toNum(r[iCr]) : NaN;
+        if (isFinite(d) && d) { amt = Math.abs(d); kind = d < 0 ? "inc" : "exp" } else if (isFinite(c) && c) { amt = Math.abs(c); kind = "inc" }
+      } else {
+        const a = iA >= 0 ? toNum(r[iA]) : NaN;
+        if (isFinite(a) && a) {
+          amt = Math.abs(a);
+          if (sh.kind) kind = a < 0 ? (sh.kind === "inc" ? "exp" : "inc") : sh.kind;
+          else kind = (hx.sign === "neg" ? a < 0 : a > 0) ? "exp" : "inc";
+        }
+      }
+      if (!date || !(amt > 0)) { bad++; continue }
+      const label = iL >= 0 ? String(r[iL] ?? "").trim() : "", catRaw = iC >= 0 ? String(r[iC] ?? "").trim() : "";
+      let ckey, cname, def;
+      if (catRaw && kind === "inc" && /rembours/.test(fold(catRaw))) {
+        // Remboursements : triés d'après le commentaire (mutuelle, achat, proche)
+        const l = fold(label), sub = HX_INC[1][1].test(l) ? "mutuelle" : /amazon|achat|commande|retour|\bsav\b|assurance|cdiscount|fnac|darty|boulanger/.test(l) ? "rembachat" : "proche";
+        ckey = "inc:" + fold(catRaw) + ":" + sub; cname = catRaw + " — " + { mutuelle: "mutuelle / santé", rembachat: "achat, assurance", proche: "proches et autres" }[sub];
+        def = incCat(sub) ? "inc:" + sub : undefined;
+      } else if (catRaw) { ckey = kind + ":" + fold(catRaw); cname = catRaw }
+      else {
+        const t = hxGuess(label, kind), tid = t.split(":")[1];
+        ckey = kind + ":auto:" + t; cname = (t === "salary" ? "Salaire" : t.startsWith("env:") ? envById(tid)?.name : t.startsWith("inc:") ? incCat(tid)?.name : "Non classé") + " (d'après le libellé)";
+        def = t === "new" ? (envById("imprevus") ? "env:imprevus" : "skip") : t === "newinc" ? (incCat("autre") ? "inc:autre" : "skip") : t;
+      }
+      push({ date, amount: round2(amt), kind, label: label || catRaw, ckey, cname, newName: catRaw || cname, def });
+    }
+  });
+  return { rows: out, bad, internal, later };
+}
+const HX_OK = t => t && (t === "skip" || t === "salary" || t === "new" || t === "newinc" || (t.startsWith("env:") && envById(t.slice(4))) || (t.startsWith("inc:") && incCat(t.slice(4))));
+function hxTarget(g) {
+  if (hx.targets[g.ckey]) return hx.targets[g.ckey];
+  const saved = S.budget.catMap?.[g.ckey];
+  return hx.targets[g.ckey] = HX_OK(saved) ? saved : (HX_OK(g.def) ? g.def : hxGuess(g.cname, g.kind));
+}
+const hxKey = (kind, date, amount, label) => `${kind}|${date}|${round2(amount).toFixed(2)}|${fold(label).slice(0, 40)}`;
+function hxPlan() {
+  const res = hxRows(), groups = new Map();
+  res.rows.forEach(r => { const g = groups.get(r.ckey) || { ckey: r.ckey, cname: r.cname, newName: r.newName, kind: r.kind, tr: r.tr, def: r.def, n: 0, total: 0 }; g.n++; g.total += r.amount; groups.set(r.ckey, g) });
+  // Doublons : chaque mouvement déjà présent dans l'appli « absorbe » une ligne identique du fichier
+  const have = new Map(), bump = k => have.set(k, (have.get(k) || 0) + 1);
+  S.budget.expenses.forEach(e => bump(hxKey("exp", e.date, e.amount, e.label || "")));
+  S.budget.incomes.forEach(i => bump(hxKey("inc", i.date, i.amount, i.label || "")));
+  let dup = 0; const keep = [];
+  res.rows.forEach(r => {
+    if (r.kind === "inc" && hxTarget(groups.get(r.ckey)) === "salary") { if (typeof S.budget.cycles[salaryCycle(r.date).key]?.income === "number") dup++; else keep.push(r); return }
+    const k = hxKey(r.kind, r.date, r.amount, r.label); if (have.get(k) > 0) { have.set(k, have.get(k) - 1); dup++ } else keep.push(r);
+  });
+  const order = g => g.kind === "inc" ? 2 : g.tr ? 1 : 0;
+  return { ...res, keep, dup, groups: [...groups.values()].sort((a, b) => order(a) - order(b) || Math.abs(b.total) - Math.abs(a.total)) };
+}
+function renderHx() {
+  const box = $("hx-box"); box.hidden = false;
+  const colOpts = sel => `<option value="">—</option>` + hx.cols.map(c => `<option value="${esc(c.key)}"${sel === c.key ? " selected" : ""}>${esc(c.name)}</option>`).join("");
+  const plan = hxPlan(), dates = plan.rows.map(r => r.date).sort();
+  const tOpts = g => {
+    const t = hxTarget(g), o = (v, l) => `<option value="${esc(v)}"${t === v ? " selected" : ""}>${esc(l)}</option>`;
+    return g.kind === "exp"
+      ? S.budget.envelopes.map(e => o("env:" + e.id, e.name + (e.kind === "save" ? " (épargne)" : ""))).join("") + (g.ckey.includes(":auto:") ? "" : o("new", `+ Créer l'enveloppe « ${g.newName} »`)) + o("skip", "Ne pas importer")
+      : o("salary", "Salaire → revenu du cycle") + S.budget.incomeCats.map(c => o("inc:" + c.id, c.name + (envById(c.env) ? ` (déduit de ${envById(c.env).name})` : ""))).join("") + (g.ckey.includes(":auto:") ? "" : o("newinc", `+ Créer la catégorie « ${g.newName} »`)) + o("skip", "Ne pas importer");
+  };
+  const groupRow = g => `<div class="xrow"><div><b>${esc(g.cname)}</b> <span class="tk">${g.n} ligne${g.n > 1 ? "s" : ""}</span></div><span class="num"${g.kind === "inc" || g.total < 0 ? ' style="color:var(--up)"' : ""}>${g.total < 0 ? "+" + fmtEUR(-g.total) : fmtEUR(g.total)}</span><select data-hxg="${esc(g.ckey)}">${tOpts(g)}</select></div>`;
+  const sect = (title, list, note) => list.length ? `<div class="field"><span style="font-weight:600">${title}</span>${note ? `<span class="small muted">${note}</span>` : ""}<div class="stack" style="gap:10px">${list.map(groupRow).join("")}</div></div>` : "";
+  const isSal = r => r.kind === "inc" && hxTarget({ ckey: r.ckey, cname: r.cname, kind: r.kind, def: r.def }) === "salary";
+  const nExp = plan.keep.filter(r => r.kind === "exp" && !r.tr).length, nTr = plan.keep.filter(r => r.tr).length, nSal = plan.keep.filter(isSal).length, nInc = plan.keep.filter(r => r.kind === "inc").length - nSal;
+  const hasTr = hx.sheets.some(s => s.kind === "tr" && hx.selected.has(s.name)), needSign = hx.mode === "one" && hx.sheets.some(s => !s.kind && hx.selected.has(s.name));
+  box.innerHTML = `<div class="hint small"><b>${esc(hx.file)}</b> · ${plan.rows.length} mouvement${plan.rows.length > 1 ? "s" : ""}${dates.length ? ` du ${new Date(dates[0]).toLocaleDateString("fr-FR")} au ${new Date(dates.at(-1)).toLocaleDateString("fr-FR")}` : ""}${plan.bad ? ` · ${plan.bad} ligne${plan.bad > 1 ? "s" : ""} sans date ou sans montant ignorée${plan.bad > 1 ? "s" : ""}` : ""}${plan.internal ? ` · ${plan.internal} transfert${plan.internal > 1 ? "s" : ""} entre comptes d'épargne ignoré${plan.internal > 1 ? "s" : ""}` : ""}</div>
+    ${hx.sheets.length > 1 ? `<div class="field"><span class="small muted">Feuilles à importer</span><div class="stack" style="gap:6px">${hx.sheets.map(s => `<label class="chk"><input type="checkbox" data-hxs="${esc(s.name)}"${hx.selected.has(s.name) ? " checked" : ""}><span>${esc(s.name)} <span class="small muted">(${s.rows.length - s.hi - 1} lignes${s.kind ? " · " + { exp: "dépenses", inc: "entrées", tr: "transferts" }[s.kind] : ""})</span></span></label>`).join("")}</div></div>` : ""}
+    <div class="row2">
+      <label class="field"><span class="small muted">Colonne date</span><select data-hxm="date">${colOpts(hx.map.date)}</select></label>
+      <label class="field"><span class="small muted">Colonne libellé</span><select data-hxm="label">${colOpts(hx.map.label)}</select></label>
+      <label class="field"><span class="small muted">Colonne catégorie</span><select data-hxm="cat">${colOpts(hx.map.cat)}</select></label>
+      <label class="field"><span class="small muted">Montants</span><select id="hx-mode"><option value="one"${hx.mode === "one" ? " selected" : ""}>Une colonne montant</option><option value="dc"${hx.mode === "dc" ? " selected" : ""}>Deux colonnes : débit / crédit</option></select></label>
+      ${hx.mode === "one" ? `<label class="field"><span class="small muted">Colonne montant</span><select data-hxm="amount">${colOpts(hx.map.amount)}</select></label>
+      ${needSign ? `<label class="field"><span class="small muted">Sens</span><select id="hx-sign"><option value="pos"${hx.sign === "pos" ? " selected" : ""}>Positif = dépense</option><option value="neg"${hx.sign === "neg" ? " selected" : ""}>Négatif = dépense (relevé)</option></select></label>` : ""}`
+      : `<label class="field"><span class="small muted">Colonne débit (dépenses)</span><select data-hxm="debit">${colOpts(hx.map.debit)}</select></label>
+      <label class="field"><span class="small muted">Colonne crédit (entrées)</span><select data-hxm="credit">${colOpts(hx.map.credit)}</select></label>`}
+      ${hasTr ? `<label class="field"><span class="small muted">Compte courant (transferts)</span><select id="hx-acct">${hx.accounts.map(a => `<option${a === hx.mainAcct ? " selected" : ""}>${esc(a)}</option>`).join("")}</select></label>` : ""}
+      <label class="field"><span class="small muted">Importer jusqu'au (exclu)</span><input type="date" id="hx-cutoff" value="${esc(hx.cutoff)}"></label>
+    </div>
+    ${hx.cutoff ? `<div class="notice">Les mouvements à partir du ${new Date(hx.cutoff).toLocaleDateString("fr-FR")} ne sont pas importés${plan.later ? ` (${plan.later})` : ""} : c'est la date de votre premier mouvement saisi dans l'appli. Videz la case pour tout importer.</div>` : ""}
+    ${sect("Dépenses : dans quelle enveloppe ?", plan.groups.filter(g => g.kind === "exp" && !g.tr), "Choisissez une enveloppe existante, ou gardez la catégorie du fichier en créant une enveloppe.")}
+    ${sect("Transferts entre vos comptes", plan.groups.filter(g => g.tr), "Virements depuis le compte courant = épargne ou placements ; retraits = en déduction.")}
+    ${sect("Entrées : de quelle nature ?", plan.groups.filter(g => g.kind === "inc"), "Les salaires deviennent le revenu de leur cycle (même versés quelques jours en avance).")}
+    <div class="notice" style="color:var(--fg)">${nExp} dépense${nExp > 1 ? "s" : ""}, ${nTr} transfert${nTr > 1 ? "s" : ""}, ${nInc} entrée${nInc > 1 ? "s" : ""} et ${nSal} salaire${nSal > 1 ? "s" : ""} à ajouter${plan.dup ? ` · ${plan.dup} déjà présent${plan.dup > 1 ? "s" : ""} dans l'appli (ignoré${plan.dup > 1 ? "s" : ""})` : ""}.</div>
+    <div class="actions"><button class="btn" type="button" id="hx-cancel">Annuler</button><button class="btn primary" type="button" id="hx-apply"${plan.keep.length ? "" : " disabled"}>Importer</button></div>`;
+}
+$("hx-box").addEventListener("change", e => {
+  const t = e.target;
+  if (t.dataset.hxg !== undefined) { hx.targets[t.dataset.hxg] = t.value; return }
+  if (t.dataset.hxm !== undefined) hx.map[t.dataset.hxm] = t.value;
+  else if (t.id === "hx-mode") hx.mode = t.value;
+  else if (t.id === "hx-sign") hx.sign = t.value;
+  else if (t.id === "hx-acct") hx.mainAcct = t.value;
+  else if (t.id === "hx-cutoff") hx.cutoff = /^\d{4}-\d{2}-\d{2}$/.test(t.value) ? t.value : "";
+  else if (t.dataset.hxs !== undefined) { t.checked ? hx.selected.add(t.dataset.hxs) : hx.selected.delete(t.dataset.hxs) }
+  else return;
+  renderHx();
+});
+// Cycle financé par une paie : celui dont le début est le plus proche de la date de versement
+function salaryCycle(date) {
+  const d = parseYmd(date), c = cycleOf(d), n = shiftCycle(c, 1);
+  return (n.start - d) < (d - c.start) ? n : c;
+}
+$("hx-box").addEventListener("click", e => {
+  if (e.target.closest("#hx-cancel")) { hx = null; $("hx-box").hidden = true; $("hx-box").innerHTML = ""; $("hx-msg").textContent = "Import annulé."; return }
+  if (!e.target.closest("#hx-apply")) return;
+  const plan = hxPlan(), impId = rid(), now = Date.now(), created = { env: {}, cat: {} }, prevCycles = {}, salByCycle = {}, newEnvs = [], newCats = [];
+  let nE = 0, nI = 0;
+  S.budget.catMap ||= {};
+  const resolve = r => {
+    let t = hxTarget({ ckey: r.ckey, cname: r.cname, kind: r.kind, def: r.def });
+    if (t === "new") {
+      const name = r.newName || r.cname, k = fold(name);
+      if (!created.env[k]) { const ex = S.budget.envelopes.find(x => fold(x.name) === k); if (ex) created.env[k] = ex.id; else { const id = rid(); S.budget.envelopes.push({ id, name, planned: 0, kind: r.tr ? "save" : "spend" }); created.env[k] = id; newEnvs.push(id) } }
+      t = "env:" + created.env[k];
+    }
+    if (t === "newinc") {
+      const name = r.newName || r.cname, k = fold(name);
+      if (!created.cat[k]) { const ex = S.budget.incomeCats.find(x => fold(x.name) === k); if (ex) created.cat[k] = ex.id; else { const id = rid(); S.budget.incomeCats.push({ id, name, env: "" }); created.cat[k] = id; newCats.push(id) } }
+      t = "inc:" + created.cat[k];
+    }
+    S.budget.catMap[r.ckey] = t;
+    return t;
+  };
+  plan.keep.forEach(r => {
+    const t = resolve(r);
+    if (t === "skip") return;
+    if (t === "salary") { const k = salaryCycle(r.date).key; salByCycle[k] = (salByCycle[k] || 0) + r.amount; return }
+    if (t.startsWith("env:")) { S.budget.expenses.push({ id: rid(), date: r.date, amount: r.amount, env: t.slice(4), label: r.label, imp: impId }); nE++ }
+    else if (t.startsWith("inc:")) { const cat = t.slice(4), ce = incCat(cat)?.env; S.budget.incomes.push({ id: rid(), date: r.date, amount: r.amount, cat, env: ce && envById(ce) ? ce : "", label: r.label, imp: impId }); nI++ }
+  });
+  const setCycle = (k, v) => { if (!(k in prevCycles)) prevCycles[k] = S.budget.cycles[k] ?? null; S.budget.cycles[k] = { income: round2(v) } };
+  Object.entries(salByCycle).forEach(([k, v]) => setCycle(k, v));
+  // Cycles importés avant la première paie du fichier (début d'historique) : pas de salaire supposé
+  const salKeys = Object.keys(salByCycle).sort();
+  if (salKeys.length) {
+    const firstDate = plan.keep.map(r => r.date).sort()[0];
+    for (let c = cycleOf(parseYmd(firstDate)); c.key < salKeys[0]; c = shiftCycle(c, 1)) if (!(c.key in S.budget.cycles)) setCycle(c.key, 0);
+  }
+  const nS = salKeys.length;
+  S.budget.lastImport = { id: impId, at: now, file: hx.file, exp: nE, inc: nI, sal: nS, prevCycles, newEnvs, newCats };
+  hx = null; $("hx-box").hidden = true; $("hx-box").innerHTML = "";
+  commit();
+  const size = JSON.stringify(S).length;
+  $("hx-msg").textContent = `Import terminé : ${nE} dépenses et transferts, ${nI} entrées${nS ? `, salaire renseigné sur ${nS} cycle${nS > 1 ? "s" : ""}` : ""}. Consultez Budget › Bilan.` + (size > 850000 ? " Attention : les données approchent la limite de la synchronisation (1 Mo)." : "");
+  $("hx-msg").className = "notice";
+});
+function renderLastImport() {
+  const li = S.budget.lastImport, el = $("hx-last");
+  if (!li) { el.hidden = true; el.innerHTML = ""; return }
+  el.hidden = false;
+  el.innerHTML = `<div class="small">Dernier import : <b>${esc(li.file)}</b>, le ${new Date(li.at).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" })} (${li.exp} dépenses et transferts, ${li.inc} entrées${li.sal ? `, ${li.sal} salaires` : ""}).</div><div><button class="btn danger" type="button" id="hx-undo">Annuler cet import</button></div>`;
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("#hx-undo"); if (!b) return;
+  if (!b.dataset.confirm) { b.dataset.confirm = "1"; b.textContent = "Confirmer : retirer ces mouvements"; return }
+  const li = S.budget.lastImport; if (!li) return;
+  S.budget.expenses = S.budget.expenses.filter(x => x.imp !== li.id);
+  S.budget.incomes = S.budget.incomes.filter(x => x.imp !== li.id);
+  Object.entries(li.prevCycles || {}).forEach(([k, v]) => { if (v === null) delete S.budget.cycles[k]; else S.budget.cycles[k] = v });
+  S.budget.envelopes = S.budget.envelopes.filter(x => !(li.newEnvs || []).includes(x.id) || S.budget.expenses.some(e => e.env === x.id));
+  S.budget.incomeCats = S.budget.incomeCats.filter(x => !(li.newCats || []).includes(x.id) || S.budget.incomes.some(i => i.cat === x.id));
+  S.budget.lastImport = null; commit();
+  $("hx-msg").textContent = "Import annulé : les mouvements ajoutés ont été retirés."; $("hx-msg").className = "notice";
 });
 
 /* ---------- Investissements ---------- */
@@ -1411,6 +1923,11 @@ function renderSettings() {
       <select data-ek="kind" aria-label="Type"><option value="spend"${e.kind !== "save" ? " selected" : ""}>Dépense</option><option value="save"${e.kind === "save" ? " selected" : ""}>Épargne</option></select>
       <button class="del" type="button" data-edel aria-label="Supprimer l'enveloppe ${esc(e.name)}">✕</button></div>`).join("") || `<div class="notice">Aucune enveloppe.</div>`;
   updateEnvTotal();
+  const envOpts = sel => `<option value="">Aucune (argent en plus)</option>` + b.envelopes.map(e => `<option value="${esc(e.id)}"${sel === e.id ? " selected" : ""}>Déduire de « ${esc(e.name)} »</option>`).join("");
+  $("s-incs").innerHTML = b.incomeCats.map(c => `<div class="erow" data-icid="${esc(c.id)}">
+      <input class="full" data-ick="name" type="text" value="${esc(c.name)}" aria-label="Nom de la catégorie" placeholder="Nom">
+      <select data-ick="env" aria-label="Enveloppe par défaut" style="grid-column:1 / 3">${envOpts(c.env)}</select>
+      <button class="del" type="button" data-icdel aria-label="Supprimer la catégorie ${esc(c.name)}">✕</button></div>`).join("") || `<div class="notice">Aucune catégorie.</div>`;
   $("s-savs").innerHTML = b.savings.map(a => `<div class="erow" data-said="${esc(a.id)}">
       <input class="full" data-sak="name" type="text" value="${esc(a.name)}" aria-label="Nom du compte" placeholder="Nom du compte">
       <input class="n" data-sak="goal" type="text" inputmode="decimal" value="${fmtIn(a.goal)}" placeholder="Objectif (€)" aria-label="Objectif pour ${esc(a.name)}" style="grid-column:1 / 3">
@@ -1418,6 +1935,7 @@ function renderSettings() {
   $("s-classes").innerHTML = CLASSES.map(c => `<label class="field"><span class="small muted" style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:${c.c}"></span>Classe ${CLASSES.indexOf(c) + 1}</span><input type="text" data-cn="${c.id}" value="${esc(cname(c.id))}"></label>`).join("");
   if (document.activeElement !== $("q-url")) $("q-url").value = S.invest.quotesUrl || "";
   $("appver").textContent = APP_VERSION;
+  renderLastImport();
 }
 function updateEnvTotal() { const t = S.budget.envelopes.reduce((s, e) => s + (+e.planned || 0), 0); $("s-envtotal").textContent = "Total prévu " + fmtEUR(t) }
 $("s-payday").addEventListener("change", e => { S.budget.payday = Math.min(31, Math.max(1, Math.round(+e.target.value) || 25)); e.target.value = S.budget.payday; viewCycle = cycleOf(new Date()); commit(false) });
@@ -1441,6 +1959,22 @@ $("s-envs").addEventListener("click", e => {
   S.budget.envelopes = S.budget.envelopes.filter(x => x.id !== id); if (envFilter === id) envFilter = null; commit();
 });
 $("s-envadd").addEventListener("click", () => { S.budget.envelopes.push({ id: rid(), name: "Nouvelle enveloppe", planned: 0, kind: "spend" }); commit(); const rows = document.querySelectorAll("#s-envs [data-ek=name]"); rows[rows.length - 1]?.select() });
+$("s-incs").addEventListener("input", e => {
+  const inp = e.target.closest("input[data-ick]"); if (!inp) return;
+  const c = incCat(inp.closest("[data-icid]").dataset.icid); if (c) { c.name = inp.value; commit(false) }
+});
+$("s-incs").addEventListener("change", e => {
+  const sel = e.target.closest("select[data-ick]"); if (!sel) return;
+  const c = incCat(sel.closest("[data-icid]").dataset.icid); if (c) { c.env = sel.value; commit(false) }
+});
+$("s-incs").addEventListener("click", e => {
+  const del = e.target.closest("[data-icdel]"); if (!del) return;
+  if (S.budget.incomeCats.length <= 1) { toast("Gardez au moins une catégorie."); return }
+  if (!del.dataset.confirm) { del.dataset.confirm = "1"; del.textContent = "Suppr. ?"; del.style.color = "var(--down)";
+    setTimeout(() => { if (del.isConnected) { delete del.dataset.confirm; del.textContent = "✕"; del.style.color = "" } }, 3000); return }
+  const id = del.closest("[data-icid]").dataset.icid; S.budget.incomeCats = S.budget.incomeCats.filter(x => x.id !== id); commit();
+});
+$("s-incadd").addEventListener("click", () => { S.budget.incomeCats.push({ id: rid(), name: "Nouvelle catégorie", env: "" }); commit(); const rows = document.querySelectorAll("#s-incs [data-ick=name]"); rows[rows.length - 1]?.select() });
 $("s-savs").addEventListener("input", e => {
   const inp = e.target.closest("[data-sak]"); if (!inp) return;
   const a = S.budget.savings.find(x => x.id === inp.closest("[data-said]").dataset.said); if (!a) return;
@@ -1586,8 +2120,9 @@ const sync = {
   cancelPush() { clearTimeout(this.timer); this.timer = null },
   pushNow() {
     if (!this.ref) return; this.cancelPush();
-    const { F } = this.fb;
-    F.setDoc(this.ref, { json: JSON.stringify(S), updatedAt: S.updatedAt || Date.now(), device: DEVICE, app: APP_VERSION })
+    const { F } = this.fb, json = JSON.stringify(S);
+    if (json.length > 1000000) { this.set("error", "Données trop volumineuses pour la synchronisation (plus de 1 Mo) : annulez le dernier import ou importez moins d'années."); return }
+    F.setDoc(this.ref, { json, updatedAt: S.updatedAt || Date.now(), device: DEVICE, app: APP_VERSION })
       .catch(e => this.set("error", fsMsg(e)));
   },
   chooseRemote() { if (!this.remote) return; const r = this.remote; this.remote = null; this.link(); applyRemote(r); this.set("ok"); toast("Données en ligne chargées sur cet appareil.") },

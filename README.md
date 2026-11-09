@@ -2,7 +2,9 @@
 
 Appli web installable pour gérer un budget par cycle de paie et suivre ses investissements, avec les mêmes données sur le téléphone et le PC.
 
-- **Budget** : cycle de paie (jour de paie réglable, avancé au vendredi si le jour tombe un week-end), enveloppes, dépenses, reste par jour, comptes d'épargne et patrimoine.
+- **Budget** : cycle de paie (jour de paie réglable, avancé au vendredi si le jour tombe un week-end), enveloppes, dépenses et entrées d'argent, reste par jour, comptes d'épargne et patrimoine.
+- **Bilan** : revenus, dépenses et épargne sur 12 cycles, une année ou tout l'historique, avec le détail par enveloppe.
+- **Import d'historique** : vos anciennes dépenses depuis Excel ou CSV (export d'une autre appli de budget, tableau personnel, relevé bancaire).
 - **Investissements** : import des exports DEGIRO, montant investi et plus-values, rééquilibrage à 25 % par classe, apport, historique.
 - **Cours en direct** : la valeur de chaque ligne suit le marché (Google Finance via un Google Sheets à vous, différé d'environ 20 minutes), convertie en euros au taux de la BCE.
 - **Conjoncture** : régime économique (boom ou récession, inflationniste ou déflationniste) par pays, à partir des derniers chiffres de l'OCDE (PIB et inflation), relié au rééquilibrage.
@@ -75,11 +77,29 @@ La configuration Firebase (`apiKey`, etc.) n'est pas un secret : la protection v
 ## Utilisation
 
 **Budget**
-- Le bouton **+** ajoute une dépense. Un montant négatif correspond à un remboursement.
-- Touchez une dépense pour la modifier ou la supprimer, et une enveloppe pour filtrer la liste.
+- Le bouton **+** ajoute une **dépense** ou une **entrée d'argent** (onglet en haut de la fenêtre).
+- Une entrée a une **catégorie** (remboursement mutuelle, remboursement d'un proche, vente, prime, cadeau…) pour savoir d'où vient l'argent. Elle peut aussi être **déduite d'une enveloppe** : un remboursement de mutuelle redonne le montant à l'enveloppe Santé, et un ami qui rembourse sa part du resto le redonne à Restaurants. Sans enveloppe, l'argent s'ajoute simplement au reste du cycle (vente, prime…).
+- Les catégories d'entrées et leur enveloppe par défaut se règlent dans **Réglages › Catégories d'entrées**.
+- Touchez un mouvement pour le modifier ou le supprimer, et une enveloppe pour filtrer la liste (ses dépenses et ses remboursements).
 - Le **revenu du cycle** reprend le revenu habituel défini dans les Réglages. Modifiez-le sur un cycle pour une prime, un salaire différent, etc.
 - Les enveloppes de type **Épargne** (virements vers l'épargne ou les placements) comptent dans les sorties, mais pas dans le « reste par jour ».
 - Les soldes des comptes d'épargne se mettent à jour dans l'onglet Budget. Le nom et l'objectif se règlent dans les Réglages.
+
+**Bilan**
+- En haut de l'onglet Budget, basculez de **Cycle** à **Bilan**.
+- Choisissez la période : 12 derniers cycles, une année, ou tout l'historique.
+- **Dépenses** = sorties hors virements vers l'épargne et les placements. **Épargne** = revenus − dépenses (dont la part virée sur vos livrets et placements).
+- Le graphique montre les dépenses de chaque cycle (barre rouge si elles dépassent les revenus) ; touchez une barre pour ouvrir ce cycle.
+
+**Importer un historique (Excel / CSV)**
+1. **Réglages** → **Importer un historique** → **Choisir le fichier**.
+2. L'appli reconnaît les colonnes (date, catégorie, montant, commentaire) et les feuilles **Dépenses**, **Revenus** et **Transferts**. Tout reste modifiable.
+3. Pour chaque catégorie du fichier, choisissez une enveloppe existante, créez-en une du même nom, ou « Ne pas importer ». Les transferts depuis le compte courant deviennent des virements vers l'épargne ou les placements ; les retraits viennent en déduction. Les salaires deviennent le revenu de leur cycle.
+4. **Importer**. Les mouvements sont ajoutés sans rien écraser ; ceux déjà présents sont ignorés (importer deux fois le même fichier ne crée pas de doublons).
+5. Par défaut, seuls les mouvements **antérieurs** à votre premier mouvement saisi dans l'appli sont importés, pour éviter les doubles saisies. Videz la case « Importer jusqu'au » pour tout importer.
+6. En cas d'erreur : **Annuler cet import** retire tout ce que le dernier import a ajouté.
+
+Vos choix de catégories sont mémorisés pour les imports suivants. Les enveloppes sans budget ni mouvement sur un cycle sont masquées dans la vue Cycle.
 
 **Investissements (DEGIRO)**
 1. Sur le site DEGIRO : **Portefeuille** → **Exporter** → **CSV**.
@@ -129,7 +149,7 @@ Réglages → **Exporter** crée un fichier `.json`. Gardez-en une copie de temp
 
 ## Mettre à jour l'appli
 
-1. Dans GitHub : **Add file** → **Upload files** → déposez les fichiers modifiés (pour la version 1.1 : `index.html`, `sw.js` et `README.md`) → **Commit changes**. GitHub remplace les anciens fichiers du même nom.
+1. Dans GitHub : **Add file** → **Upload files** → déposez les fichiers modifiés (versions 1.2 et 1.3 : `index.html`, et `README.md` si vous voulez le guide à jour ; version 1.1 : `index.html`, `sw.js` et `README.md`) → **Commit changes**. GitHub remplace les anciens fichiers du même nom.
 2. Attendez une minute, puis dans l'appli : **Réglages** → **Recharger l'appli**. La version affichée en bas des Réglages doit changer.
 3. Si vous changez aussi les icônes ou le manifeste, augmentez le numéro `CACHE` en haut de `sw.js` (`finances-v3`, etc.).
 
@@ -137,6 +157,8 @@ Vos données ne sont pas touchées par une mise à jour.
 
 ## Historique des versions
 
+- **1.3** : vue Bilan (période, revenus, dépenses, épargne, graphique par cycle, totaux par enveloppe et par catégorie d'entrée) ; import d'historique Excel / CSV (feuilles dépenses, revenus et transferts, catégories → enveloppes, salaires → revenu du cycle, doublons ignorés, annulation).
+- **1.2** : entrées d'argent avec catégories (remboursements, ventes, primes…), déductibles d'une enveloppe ; liste « Mouvements » ; détail des entrées dans le résumé du cycle.
 - **1.1** : cours en direct (Google Sheets), colonnes Quantité / Symbole / Cours, onglet Conjoncture (OCDE), classes favorisées dans le rééquilibrage, inflation réelle du pays dans le calcul « après inflation ».
 - **1.0** : budget par cycle de paie, portefeuille et import DEGIRO, synchronisation Firebase, mode hors ligne.
 
