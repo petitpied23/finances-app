@@ -15,6 +15,7 @@
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script>try{var t=localStorage.getItem("fin.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
 <style>
 /* Appli mobile : barre du haut + menu latéral (fixe à gauche sur grand écran), colonne centrée */
 :root {
@@ -24,17 +25,27 @@
   --boomdef: #138a5b; --boominf: #c97a0a; --recinf: #c4342d; --dep: #2b6cb0;
   /* Couleurs des types de mouvement : revenus, dépenses, épargne */
   --c-rev: #1baf7a; --c-exp: #eb6834; --c-sav: #2a78d6;
+  /* Natures de comptes (ordre fixe de la palette validée) */
+  --n1: #2a78d6; --n2: #eb6834; --n3: #1baf7a; --n4: #eda100; --n5: #e87ba4; --n6: #008300;
   --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --body: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
   color-scheme: light;
 }
-@media (prefers-color-scheme: dark) { :root {
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #0e1419; --surface: #172029; --fg: #e6ecf1; --muted: #93a1ae; --line: #26323d;
   --accent: #7d97ff; --accent-fg: #0e1419; --warn: #f0a63a;
   --up: #3cc28b; --down: #f06a5f; color-scheme: dark;
   --boomdef: #3cc28b; --boominf: #f0a63a; --recinf: #f06a5f; --dep: #6aa7ea;
-  --c-rev: #199e70; --c-exp: #d95926; --c-sav: #3987e5 } }
+  --c-rev: #199e70; --c-exp: #d95926; --c-sav: #3987e5;
+  --n1: #3987e5; --n2: #d95926; --n3: #199e70; --n4: #c98500; --n5: #d55181; --n6: #008300 } }
+:root[data-theme="dark"] {
+  --bg: #0e1419; --surface: #172029; --fg: #e6ecf1; --muted: #93a1ae; --line: #26323d;
+  --accent: #7d97ff; --accent-fg: #0e1419; --warn: #f0a63a;
+  --up: #3cc28b; --down: #f06a5f; color-scheme: dark;
+  --boomdef: #3cc28b; --boominf: #f0a63a; --recinf: #f06a5f; --dep: #6aa7ea;
+  --c-rev: #199e70; --c-exp: #d95926; --c-sav: #3987e5;
+  --n1: #3987e5; --n2: #d95926; --n3: #199e70; --n4: #c98500; --n5: #d55181; --n6: #008300 }
 
 * { box-sizing: border-box }
 [hidden] { display: none !important }
@@ -281,6 +292,46 @@ td.live { color: var(--fg) }
 .trend.up { color: var(--up) } .trend.down { color: var(--down) }
 .sources a { color: var(--accent) }
 
+/* Logos (enveloppes, catégories, comptes) et grilles de choix */
+.ico { width: 22px; height: 22px; display: block }
+.gic { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none;
+  background: color-mix(in srgb, var(--c, var(--c-exp)) 16%, transparent); color: var(--c, var(--c-exp)) }
+.gic.solid { background: var(--c); color: var(--cf, #fff); box-shadow: 0 0 0 1px color-mix(in srgb, var(--fg) 14%, transparent) }
+.igrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(74px, 1fr)); gap: 8px; max-height: 236px; overflow-y: auto; padding: 2px; overscroll-behavior: contain }
+.gi { border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 8px 4px 6px; display: flex; flex-direction: column; align-items: center; gap: 5px;
+  font-size: .74rem; font-weight: 500; color: var(--fg); min-height: 76px; min-width: 0 }
+.gi[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1.5px var(--accent); background: color-mix(in srgb, var(--accent) 7%, var(--surface)) }
+.gil { line-height: 1.15; text-align: center; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; hyphens: auto; -webkit-hyphens: auto; overflow-wrap: break-word; max-width: 100% }
+.igrid.small { grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); max-height: 172px }
+.igrid.small .gi { min-height: 0; padding: 6px 0 }
+.icopick { border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 3px; flex: none }
+.icopick .gic { width: 36px; height: 36px }
+.swatches { display: flex; flex-wrap: wrap; gap: 8px }
+.swatches button { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--surface); box-shadow: 0 0 0 1px var(--line) }
+.swatches button[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--accent) }
+#f-kind { grid-template-columns: repeat(3, 1fr) }
+.trarrow { display: flex; justify-content: center; color: var(--muted); margin: -4px 0 }
+.warnbox { border-left: 3px solid var(--warn); padding: 6px 0 6px 10px; font-size: .84rem }
+
+/* Comptes : groupes par nature et camembert */
+.acct { display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 0; border: 0; border-bottom: 1px solid var(--line); background: transparent; text-align: left; color: var(--fg) }
+.acct:last-child { border-bottom: 0 }
+.acct .an { flex: 1; min-width: 0 }
+.acct .an b { display: block; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.acct .an small { display: block; color: var(--muted); font-size: .78rem }
+.acct .av { font-family: var(--mono); font-weight: 600; white-space: nowrap }
+.grphead { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 4px }
+.grphead h2 { display: flex; align-items: center; gap: 8px }
+.donutwrap { display: grid; grid-template-columns: 1fr; justify-items: center; gap: 14px; align-items: center }
+@media (min-width: 560px) { .donutwrap { grid-template-columns: 160px 1fr; justify-items: stretch } }
+.donut svg { display: block; width: 150px; height: 150px }
+.dlegend { display: flex; flex-direction: column; gap: 6px; font-size: .84rem; min-width: 0; width: 100% }
+.dlegend div { display: grid; grid-template-columns: 12px 1fr auto; gap: 8px; align-items: center }
+.dlegend .sw { width: 10px; height: 10px; border-radius: 3px }
+.dlegend .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.dlegend .vl { font-family: var(--mono); font-size: .8rem; text-align: right; white-space: nowrap }
+.dlegend .vl small { color: var(--muted); margin-left: 6px }
+
 /* Bilan : barres groupées revenus / dépenses / épargne */
 .vlegend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .84rem; color: var(--muted) }
 .vlegend span { display: inline-flex; align-items: center }
@@ -361,7 +412,8 @@ details.tbl td.calc { padding: 6px 5px }
     <div class="bar" aria-hidden="true"><i id="b-bar" style="width:0"></i></div>
     <div class="small" id="b-pace" style="font-weight:600"></div>
     <div class="small muted" id="b-calc"></div>
-    <button type="button" class="ccprow" id="b-ccp" data-goto="comptes" data-anchor="c-ccp"></button>
+    <div class="warnbox" id="b-alert" hidden></div>
+    <button type="button" class="ccprow" id="b-ccp"></button>
     <div class="stats">
       <label class="stat"><span class="eyebrow"><span class="tdot t-rev"></span>Revenu du cycle</span><input id="b-income" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><span class="small muted" id="b-incnote"></span></label>
       <div class="stat"><span class="eyebrow"><span class="tdot t-rev"></span>Autres entrées</span><span class="v" id="b-extra">0,00 €</span><span class="small muted" id="b-extranote"></span></div>
@@ -402,30 +454,15 @@ details.tbl td.calc { padding: 6px 5px }
 
 <!-- ============ COMPTES ============ -->
 <section id="v-comptes" class="wrap" hidden>
-  <div class="panel stack" id="c-ccp">
-    <div class="eyebrow">Compte courant</div>
-    <div class="big" id="c-ccpval">—</div>
-    <div class="small muted" id="c-ccpnote"></div>
-    <div class="stats">
-      <label class="stat"><span class="eyebrow">Solde affiché par la banque</span><input id="c-ccpbal" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></label>
-      <label class="stat"><span class="eyebrow">À la date du</span><input id="c-ccpdate" type="date"></label>
-    </div>
-    <div class="actions" style="justify-content:flex-start"><button class="btn primary" type="button" id="c-ccpsave">Enregistrer le solde</button></div>
-    <div class="notice">Recopiez le solde de votre appli bancaire de temps en temps. Entre deux mises à jour, l'appli l'estime : solde enregistré + salaires et entrées − dépenses et virements saisis depuis. Si vous oubliez de noter une dépense, l'écart se corrige à la mise à jour suivante.</div>
+  <div class="panel total stack">
+    <div><div class="eyebrow">Patrimoine suivi</div><div class="big" id="c-all">0,00 €</div></div>
+    <div class="seg" id="c-mode" role="group" aria-label="Répartition du patrimoine"><button type="button" data-cm="nature" aria-pressed="true">Par nature</button><button type="button" data-cm="acct" aria-pressed="false">Par compte</button></div>
+    <div class="donutwrap"><div class="donut" id="c-donut"></div><div class="dlegend" id="c-legend"></div></div>
+    <div class="small muted" id="c-donutnote"></div>
   </div>
-  <div class="panel total">
-    <div class="eyebrow">Patrimoine suivi</div>
-    <div class="big" id="c-all">0,00 €</div>
-    <div class="totrow" style="font-weight:500"><span>Compte courant</span><span class="num" id="c-cur">—</span></div>
-    <div class="totrow" style="font-weight:500"><span><span class="tdot t-sav"></span>Comptes d'épargne</span><span class="num" id="c-sav">0,00 €</span></div>
-    <div class="totrow" style="font-weight:500"><span>Investissements <button class="linkbtn small" type="button" data-goto="invest">Portefeuille ›</button></span><span class="num" id="c-inv">0,00 €</span></div>
-  </div>
-  <div class="panel stack">
-    <div class="clshead"><h2>Comptes d'épargne</h2></div>
-    <div class="notice">Mettez à jour le solde quand vous consultez votre banque. L'objectif est facultatif.</div>
-    <div id="c-savs"></div>
-    <div><button class="btn" type="button" id="c-savadd">+ Ajouter un compte</button></div>
-  </div>
+  <div id="c-groups" class="stack" style="gap:16px"></div>
+  <div><button class="btn" type="button" id="c-add">+ Ajouter un compte</button></div>
+  <div class="notice">Touchez un compte pour modifier son solde, sa nature, sa couleur ou son logo. Le compte courant est estimé entre deux mises à jour : dernier solde réel + salaires et entrées − dépenses et virements saisis depuis.</div>
 </section>
 
 <!-- ============ BUDGET PRÉVU ============ -->
@@ -473,6 +510,12 @@ details.tbl td.calc { padding: 6px 5px }
     <div class="alloc" id="alloc"></div>
     <div class="legend" id="legend"></div>
   </div>
+  <div class="panel stack" id="fc-panel">
+    <div class="bigline"><div><div class="eyebrow">Marge libre DEGIRO</div><div class="small muted">Argent sur DEGIRO pas encore investi</div></div>
+      <input id="fc-amount" class="n" type="text" inputmode="decimal" autocomplete="off" placeholder="0" aria-label="Marge libre DEGIRO en euros" style="max-width:9em"></div>
+    <div class="totrow" style="font-weight:500"><span>Total avec la marge libre</span><span class="num" id="fc-total">0,00 €</span></div>
+    <div class="small muted" id="fc-note">Comptée dans le patrimoine, pas dans la performance. Mise à jour par l'import DEGIRO, le tableau privé ou ici.</div>
+  </div>
   <div class="panel total">
     <div class="clshead">
       <div><div class="eyebrow">Historique</div><h2>Valeur totale</h2></div>
@@ -500,6 +543,7 @@ details.tbl td.calc { padding: 6px 5px }
         <span class="small muted">Montant que vous allez investir : il est réparti pour vous rapprocher des 25 %, sans rien vendre.</span>
         <input id="apport" class="n" type="text" inputmode="decimal" placeholder="Ex. 500" autocomplete="off" style="text-align:left">
       </label>
+      <div><button class="linkbtn small" type="button" id="ap-fc" hidden></button></div>
       <div id="aprows" class="stack" style="gap:8px"></div>
     </div>
   </div>
@@ -562,6 +606,12 @@ details.tbl td.calc { padding: 6px 5px }
     <div class="clshead"><h2>Synchronisation</h2></div>
     <div id="syncbox" class="stack"></div>
     <div class="notice" id="syncmsg" aria-live="polite"></div>
+  </div>
+
+  <div class="panel stack" id="set-theme">
+    <h2>Apparence</h2>
+    <div class="seg" id="t-theme" role="group" aria-label="Thème" style="grid-template-columns:repeat(3,1fr)"><button type="button" data-th="auto">Automatique</button><button type="button" data-th="light">Clair</button><button type="button" data-th="dark">Sombre</button></div>
+    <div class="small muted">« Automatique » suit le réglage clair / sombre de l'appareil. Ce choix est propre à chaque appareil.</div>
   </div>
 
   <div class="panel stack" id="set-gs">
@@ -656,18 +706,58 @@ details.tbl td.calc { padding: 6px 5px }
 </button>
 
 
+<!-- Fiche d'un compte -->
+<div id="acsheet" class="sheet" hidden>
+  <div class="sheetbg" data-acclose></div>
+  <form class="sheetcard" id="acform" novalidate>
+    <h2 id="actitle">Compte</h2>
+    <label class="field" id="a-namebox"><span class="small muted">Nom</span><input id="a-name" type="text" autocomplete="off" placeholder="Ex. Livret A"></label>
+    <div class="stats">
+      <label class="stat"><span class="eyebrow" id="a-ballabel">Solde (€)</span><input id="a-bal" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+      <label class="stat"><span class="eyebrow">À la date du</span><input id="a-date" type="date"></label>
+    </div>
+    <label class="field" id="a-goalbox"><span class="small muted">Objectif (€, facultatif)</span><input id="a-goal" type="text" inputmode="decimal" autocomplete="off" placeholder="Ex. 5 000"></label>
+    <label class="field" id="a-kindbox"><span class="small muted">Nature</span><select id="a-kind"></select></label>
+    <div class="field"><span class="small muted">Couleur</span><div class="swatches" id="a-colors" role="group" aria-label="Couleur"></div></div>
+    <div class="field"><span class="small muted">Logo</span><div class="igrid small" id="a-icons" role="group" aria-label="Logo"></div></div>
+    <div class="notice" id="a-note"></div>
+    <div class="notice err" id="a-err"></div>
+    <div class="actions">
+      <button type="button" class="btn danger" id="a-del" hidden>Supprimer</button>
+      <button type="button" class="btn" data-acclose>Annuler</button>
+      <button type="submit" class="btn primary">Enregistrer</button>
+    </div>
+  </form>
+</div>
+
+<!-- Choix d'un logo (enveloppes, catégories) -->
+<div id="icsheet" class="sheet" hidden>
+  <div class="sheetbg" data-icclose></div>
+  <div class="sheetcard">
+    <h2 id="ictitle">Choisir un logo</h2>
+    <div class="igrid" id="ic-grid" role="group" aria-label="Logos" style="max-height:none"></div>
+    <div class="actions"><button type="button" class="btn" data-icclose>Fermer</button></div>
+  </div>
+</div>
+
 <!-- Feuille d'ajout / modification d'une dépense -->
 <div id="sheet" class="sheet" hidden>
   <div class="sheetbg" data-close></div>
   <form class="sheetcard" id="expform" novalidate>
-    <div class="seg" id="f-kind" role="group" aria-label="Type de mouvement"><button type="button" data-k="exp" aria-pressed="true">Dépense</button><button type="button" data-k="inc" aria-pressed="false">Entrée d'argent</button></div>
+    <div class="seg" id="f-kind" role="group" aria-label="Type de mouvement"><button type="button" data-k="exp" aria-pressed="true">Dépense</button><button type="button" data-k="inc" aria-pressed="false">Entrée</button><button type="button" data-k="tr" aria-pressed="false">Virement</button></div>
     <h2 id="sheettitle">Nouvelle dépense</h2>
     <label class="field"><span class="small muted">Montant (€)</span><input id="f-amount" class="n" type="text" inputmode="decimal" autocomplete="off" placeholder="0,00" style="text-align:left;font-size:1.4rem"></label>
-    <div id="f-expbox"><label class="field"><span class="small muted">Enveloppe</span><select id="f-env"></select></label></div>
+    <div id="f-expbox" class="field"><span class="small muted">Enveloppe</span><div class="igrid" id="g-env" role="group" aria-label="Enveloppe"></div><select id="f-env" hidden></select></div>
     <div id="f-incbox" class="stack" hidden>
-      <label class="field"><span class="small muted">D'où vient cet argent ?</span><select id="f-cat"></select></label>
+      <div class="field"><span class="small muted">D'où vient cet argent ?</span><div class="igrid" id="g-cat" role="group" aria-label="Origine de l'argent"></div><select id="f-cat" hidden></select></div>
       <label class="field"><span class="small muted">Effet sur le budget</span><select id="f-renv"></select></label>
       <div class="notice">« Déduire » sert aux remboursements d'une dépense (mutuelle, ami qui rembourse un resto…) : l'enveloppe concernée retrouve ce montant. Sinon, l'argent s'ajoute au reste du cycle.</div>
+    </div>
+    <div id="f-trbox" class="stack" hidden>
+      <div class="field"><span class="small muted">Depuis</span><div class="igrid" id="g-from" role="group" aria-label="Compte de départ"></div></div>
+      <div class="trarrow" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></div>
+      <div class="field"><span class="small muted">Vers</span><div class="igrid" id="g-to" role="group" aria-label="Compte d'arrivée"></div></div>
+      <div class="notice" id="f-trnote"></div>
     </div>
     <label class="field"><span class="small muted">Libellé (facultatif)</span><input id="f-label" type="text" autocomplete="off" placeholder="Ex. Courses Saran"></label>
     <label class="field"><span class="small muted">Date</span><input id="f-date" type="date"></label>
@@ -684,7 +774,7 @@ details.tbl td.calc { padding: 6px 5px }
 
 <script>
 "use strict";
-const APP_VERSION = "1.6.0";
+const APP_VERSION = "1.7.0";
 const FB_VERSION = "10.12.2"; // SDK Firebase chargé depuis gstatic uniquement si la synchronisation est configurée
 const LS = { state: "fin.state", fb: "fin.firebase", dev: "fin.device", link: "fin.linked", lastSync: "fin.lastsync" };
 const CLASSES = [{ id: "stocks", c: "#2346d8" }, { id: "bonds", c: "#7a4fd0" }, { id: "gold", c: "#c99a0a" }, { id: "cash", c: "#138a5b" }];
@@ -726,6 +816,101 @@ const parseNum = v => { const n = toNum(v); return isFinite(n) ? n : 0 };
 let toastTimer = null;
 function toast(msg) { const t = $("toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true }, 2600) }
 
+/* ---------- Logos et natures de comptes ---------- */
+// Pictogrammes au trait (24 × 24), dessinés pour l'appli.
+const ICONS = {
+  cart: '<circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2.5 3.5h3l2.4 11.2a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1L21 7.5H6.4"/>',
+  food: '<path d="M7 3v18M4.5 3v5a2.5 2.5 0 0 0 5 0V3"/><path d="M17 21V3c-2.2 1-3.5 3.4-3.5 6.5V13H17"/>',
+  coffee: '<path d="M4 9h12v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V9z"/><path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M8 3.5v2M12 3.5v2"/>',
+  fuel: '<path d="M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16M3 21h12M4 10h10"/><path d="M14 8l3.5 3.5V17a1.5 1.5 0 0 0 3 0V9L18 6.5"/>',
+  car: '<path d="M4.5 16.5V12l1.9-4.8A2 2 0 0 1 8.3 6h7.4a2 2 0 0 1 1.9 1.2l1.9 4.8v4.5z"/><path d="M4.5 12h15"/><path d="M6.5 16.5V19M17.5 16.5V19"/><circle cx="8" cy="14.2" r=".6"/><circle cx="16" cy="14.2" r=".6"/>',
+  bus: '<rect x="5" y="3" width="14" height="15" rx="2"/><path d="M5 11h14M8 21v-3M16 21v-3"/><circle cx="8.5" cy="14.5" r=".6"/><circle cx="15.5" cy="14.5" r=".6"/>',
+  health: '<path d="M9 3.5h6V9h5.5v6H15v5.5H9V15H3.5V9H9z"/>',
+  heart: '<path d="M12 20.5s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.9c0 5.4-7.5 10-7.5 10z"/>',
+  game: '<path d="M7 8h10a4.5 4.5 0 0 1 4.3 5.8l-.9 3a2.6 2.6 0 0 1-4.4 1L14.5 16h-5L8 17.8a2.6 2.6 0 0 1-4.4-1l-.9-3A4.5 4.5 0 0 1 7 8z"/><path d="M8 11v3M6.5 12.5h3"/><circle cx="16" cy="12.5" r=".6"/>',
+  ticket: '<path d="M3 7a2 2 0 0 0 2-2h14a2 2 0 0 0 2 2v3a2 2 0 0 0 0 4v3a2 2 0 0 0-2 2H5a2 2 0 0 0-2-2v-3a2 2 0 0 0 0-4z"/><path d="M14 6v2M14 11v2M14 16v2"/>',
+  repeat: '<path d="M17 2.5l3 3-3 3"/><path d="M4 11V9.5a4 4 0 0 1 4-4h12"/><path d="M7 21.5l-3-3 3-3"/><path d="M20 13v1.5a4 4 0 0 1-4 4H4"/>',
+  bolt: '<path d="M13 2.5L4.5 13.5H12L11 21.5l8.5-11H12z"/>',
+  scissors: '<circle cx="6" cy="6.5" r="2.5"/><circle cx="6" cy="17.5" r="2.5"/><path d="M8 8l12 10M8 16L20 6"/>',
+  screen: '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
+  shirt: '<path d="M8.5 3.5L3.5 6.5l2 4 2-1v11h9v-11l2 1 2-4-5-3c-.5 1.5-1.8 2.5-3.5 2.5S9 5 8.5 3.5z"/>',
+  bank: '<path d="M3.5 9.5L12 4l8.5 5.5"/><path d="M5.5 10v8M9.5 10v8M14.5 10v8M18.5 10v8M3.5 20h17"/>',
+  home: '<path d="M3.5 10.5L12 4l8.5 6.5"/><path d="M5.5 9v11.5h13V9"/><path d="M10 20.5v-5h4v5"/>',
+  swap: '<path d="M4 8h14M14.5 4.5L18 8l-3.5 3.5"/><path d="M20 16H6M9.5 12.5L6 16l3.5 3.5"/>',
+  gift: '<rect x="3.5" y="8" width="17" height="4" rx="1"/><path d="M5 12v8.5h14V12M12 8v12.5"/><path d="M12 8C10.5 4 6.5 4.5 7.5 7c.4 1 2.5 1 4.5 1zM12 8c1.5-4 5.5-3.5 4.5-1-.4 1-2.5 1-4.5 1z"/>',
+  tag: '<path d="M3.5 12.2V4.5a1 1 0 0 1 1-1h7.7l8.3 8.3a1.5 1.5 0 0 1 0 2.1l-6.4 6.4a1.5 1.5 0 0 1-2.1 0z"/><circle cx="8" cy="8" r="1.5"/>',
+  star: '<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/>',
+  users: '<circle cx="9" cy="8" r="3.2"/><path d="M3 20c.5-3.5 3-5.5 6-5.5s5.5 2 6 5.5"/><path d="M16 4.8a3.2 3.2 0 0 1 0 6.4M18 14.8c1.7.7 2.8 2.5 3 5.2"/>',
+  receipt: '<path d="M5.5 3h13v18l-2.2-1.5L14 21l-2-1.5L10 21l-2.3-1.5L5.5 21z"/><path d="M9 8h6M9 12h6M9 16h3"/>',
+  book: '<path d="M4 4.5h6a2 2 0 0 1 2 2v14a1.5 1.5 0 0 0-1.5-1.5H4z"/><path d="M20 4.5h-6a2 2 0 0 0-2 2v14a1.5 1.5 0 0 1 1.5-1.5H20z"/>',
+  sport: '<path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/>',
+  phone: '<rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/>',
+  laundry: '<rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="13" r="4.5"/><path d="M7.5 6.5h1M11 6.5h1"/>',
+  plane: '<path d="M21 15.5l-8-4.5V5a1.5 1.5 0 0 0-3 0v6l-7 4.5V17l7-2v4l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-4l8 2z"/>',
+  paw: '<circle cx="7" cy="9" r="1.8"/><circle cx="11" cy="5.8" r="1.8"/><circle cx="15.5" cy="6.5" r="1.8"/><circle cx="18" cy="10.5" r="1.8"/><path d="M12.5 11.5c2.8 0 5 3.3 5 5.8 0 1.6-1.2 2.4-2.6 2.4-1.2 0-1.6-.6-2.4-.6s-1.2.6-2.4.6c-1.4 0-2.6-.8-2.6-2.4 0-2.5 2.2-5.8 5-5.8z"/>',
+  cash: '<rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v.01M18 14.5v.01"/>',
+  moneybag: '<path d="M9 3.5h6l-1.5 3h-3z"/><path d="M10.5 6.5C6.5 8.5 4.5 12 4.5 15c0 3 2.5 5.5 7.5 5.5s7.5-2.5 7.5-5.5c0-3-2-6.5-6-8.5"/><path d="M9.5 16.5l5-5"/><circle cx="10" cy="12" r=".6"/><circle cx="14" cy="16" r=".6"/>',
+  piggy: '<path d="M18.5 10c-1.1-2.4-3.8-4-7-4C7.4 6 4.5 8.7 4.5 12c0 1.9.9 3.6 2.4 4.7V20h3v-2h4v2h3v-3.2c.9-.6 1.6-1.4 2.1-2.3H21v-4h-1.5c-.3-.2-.6-.4-1-.5z"/><path d="M9.5 6.3A2.5 2.5 0 0 1 14 5"/><circle cx="15.5" cy="11" r=".6"/>',
+  chart: '<path d="M4 20h16"/><path d="M7 16v-3M11 16V9M15 16v-5M19 16V5"/>',
+  crypto: '<circle cx="12" cy="12" r="8.5"/><path d="M9.5 7.5v9M9.5 7.5h3.3a2.2 2.2 0 0 1 0 4.5H9.5M9.5 12h3.8a2.2 2.2 0 0 1 0 4.5H9.5M11 6v1.5M11 16.5V18"/>',
+  wallet: '<path d="M4 7.5V18a2 2 0 0 0 2 2h13a1 1 0 0 0 1-1v-3"/><path d="M20 11V8a1 1 0 0 0-1-1H6a2 2 0 0 1 0-4h11"/><path d="M16 11h5v5h-5a2.5 2.5 0 0 1 0-5z"/>',
+  card: '<rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M2.5 10h19M6 15h4"/>',
+  safe: '<rect x="3.5" y="3.5" width="17" height="17" rx="2"/><circle cx="12" cy="12" r="3.5"/><path d="M12 8.5v1M12 14.5v1M8.5 12h1M14.5 12h1"/>',
+  euro: '<circle cx="12" cy="12" r="8.5"/><path d="M15.5 8.5a4 4 0 1 0 0 7M7.5 10.5h6M7.5 13.5h6"/>',
+  dots: '<circle cx="6" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="18" cy="12" r="1.2"/>'
+};
+const ICON_NAMES = { cart: "Courses", food: "Restaurant", coffee: "Café", fuel: "Carburant", car: "Voiture", bus: "Transport", health: "Santé", heart: "Cœur", game: "Jeux", ticket: "Sorties",
+  repeat: "Abonnement", bolt: "Imprévu", scissors: "Coiffeur", screen: "Électronique", shirt: "Vêtements", bank: "Banque", home: "Maison", swap: "Virement", gift: "Cadeau", tag: "Vente",
+  star: "Prime", users: "Proches", receipt: "Achat", book: "Études", sport: "Sport", phone: "Téléphone", laundry: "Laverie", plane: "Voyage", paw: "Animaux", cash: "Billets",
+  moneybag: "Sac", piggy: "Tirelire", chart: "Placements", crypto: "Crypto", wallet: "Portefeuille", card: "Carte", safe: "Coffre", euro: "Euro", dots: "Autre" };
+const ico = k => `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[k] || ICONS.dots}</svg>`;
+const foldTxt = s => String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+const ICON_RULES = [[/courses|supermarch|aliment|epicerie/, "cart"], [/restau|resto|burger|kebab|pizza|fast/, "food"], [/cafe|bar\b|boisson/, "coffee"], [/carbur|essence|gasoil|plein/, "fuel"],
+  [/voiture|auto|parking|peage|moto|garage/, "car"], [/transport|train|sncf|bus|metro|tram|tao|uber|taxi/, "bus"], [/voyage|vacance|avion|hotel/, "plane"], [/sante|medec|pharma|mutuelle|uneo|docteur/, "health"],
+  [/jeu|steam|game|playstation|xbox|nintendo/, "game"], [/loisir|sortie|cine|concert|festival/, "ticket"], [/abonn|paiement regul|prelev|netflix|spotify/, "repeat"], [/imprevu|urgence/, "bolt"],
+  [/coiff|barbier/, "scissors"], [/electron|informatique|high.?tech|\bpc\b|ordi/, "screen"], [/sapo|vetement|habit|mode|chaussure/, "shirt"], [/etat|impot|amende|taxe|tresor/, "bank"],
+  [/banque|frais banc/, "card"], [/maison|logement|loyer|meuble|deco|bricol/, "home"], [/rembours/, "swap"], [/cadeau/, "gift"], [/vente/, "tag"], [/prime|bonus/, "star"],
+  [/proche|ami|famille/, "users"], [/achat/, "receipt"], [/enseign|ecole|etude|formation|livre/, "book"], [/sport|salle|fitness|muscu/, "sport"], [/telephone|mobile|forfait/, "phone"],
+  [/laverie|pressing/, "laundry"], [/animal|chien|chat\b|veto/, "paw"], [/epargn|livret/, "piggy"], [/invest|bourse|pea\b|degiro|placement|action/, "chart"], [/crypto|bitcoin/, "crypto"],
+  [/espece|retrait|liquide|cash/, "wallet"], [/salaire|paie/, "euro"]];
+const guessIcon = name => { const f = foldTxt(name); for (const [re, k] of ICON_RULES) if (re.test(f)) return k; return "dots" };
+const envIcon = e => (e && ICONS[e.icon]) ? e.icon : guessIcon(e?.name);
+const catIcon = c => (c && ICONS[c.icon]) ? c.icon : ({ mutuelle: "health", proche: "users", rembachat: "receipt", vente: "tag", prime: "star", cadeau: "gift", autre: "euro" }[c?.id] || guessIcon(c?.name));
+// Natures de comptes : couleur = case fixe de la palette (--n1…--n6), ordre du camembert = ordre des cases
+const NATURES = [{ id: "epargne", name: "Épargne", n: 1 }, { id: "logement", name: "Épargne logement", n: 2 }, { id: "titres", name: "Comptes titres & PEA", n: 3 },
+  { id: "crypto", name: "Trading & crypto", n: 4 }, { id: "courant", name: "Compte courant", n: 5 }, { id: "especes", name: "Espèces", n: 6 }];
+const GROUP_ORDER = ["courant", "epargne", "logement", "titres", "crypto", "especes"];
+const natureOf = id => NATURES.find(n => n.id === id) || NATURES[0];
+function guessKind(name) {
+  const f = foldTxt(name);
+  if (/courant|\bccp\b|cheque/.test(f)) return "courant";
+  if (/\bpel\b|\bcel\b|logement/.test(f)) return "logement";
+  if (/\bpea\b|degiro|trade ?republic|titre|bourse|\bcto\b|assurance.?vie|boursorama/.test(f)) return "titres";
+  if (/vantage|kraken|crypto|binance|coinbase|trading|bitcoin/.test(f)) return "crypto";
+  if (/espece|liquide|cash|portefeuille/.test(f)) return "especes";
+  return "epargne";
+}
+const KIND_ICON = { courant: "cash", epargne: "piggy", logement: "bank", titres: "chart", crypto: "crypto", especes: "wallet" };
+const ACCT_COLORS = ["#9BB58E", "#22C7C9", "#E030BE", "#67B04A", "#FF4D5A", "#222222", "#C8C8C8", "#FF8A3D", "#F2CF2E", "#2A78D6", "#6250D6", "#1BAF7A"];
+const KIND_COLOR = { courant: "#9BB58E", epargne: "#22C7C9", logement: "#67B04A", titres: "#FF4D5A", crypto: "#FF8A3D", especes: "#F2CF2E" };
+const okColor = c => /^#[0-9a-f]{6}$/i.test(String(c || "").trim());
+// Couleur du pictogramme sur un rond plein : sombre sur les couleurs claires
+const fgOn = hex => { const n = parseInt(String(hex).slice(1), 16), r = n >> 16 & 255, g = n >> 8 & 255, b = n & 255; return (0.299 * r + 0.587 * g + 0.114 * b) > 165 ? "#14202b" : "#ffffff" };
+const acctBadge = (color, icon) => `<span class="gic solid" style="--c:${color};--cf:${fgOn(color)}">${ico(icon)}</span>`;
+function iconFromWord(w) {
+  const f = foldTxt(w).trim(); if (!f) return "";
+  if (ICONS[f]) return f;
+  const map = [[/billet/, "cash"], [/sac/, "moneybag"], [/tirelire|cochon/, "piggy"], [/banque/, "bank"], [/graph|chart|bourse/, "chart"], [/bitcoin|crypto/, "crypto"],
+    [/portefeuille|wallet/, "wallet"], [/carte/, "card"], [/coffre/, "safe"], [/euro/, "euro"], [/maison/, "home"]];
+  for (const [re, k] of map) if (re.test(f)) return k;
+  return "";
+}
+function natureFromWord(w) {
+  const f = foldTxt(w); if (!f.trim()) return "";
+  if (/courant/.test(f)) return "courant"; if (/logement|\bpel\b/.test(f)) return "logement"; if (/titre|pea|bourse/.test(f)) return "titres";
+  if (/crypto|trading/.test(f)) return "crypto"; if (/espece|liquide/.test(f)) return "especes"; if (/epargn|livret/.test(f)) return "epargne"; return "";
+}
+
 /* ---------- Données ---------- */
 function defaultState() {
   const env = (id, name, kind = "spend") => ({ id, name, planned: 0, kind });
@@ -740,6 +925,8 @@ function defaultState() {
       expenses: [],    // { id, date: "AAAA-MM-JJ", amount, env, label, at }
       savings: [{ id: "reserve", name: "Réserve de sécurité", balance: 0, goal: 0 }, { id: "livreta", name: "Livret A", balance: 0, goal: 0 }],
       incomes: [],     // { id, date, amount, cat, env, label, at } : remboursements, ventes, primes…
+      transfers: [],   // { id, date, amount, from, to, label, at } : virements entre comptes
+      ccp: null, ccpLook: { color: "#9BB58E", icon: "cash" },
       incomeCats: [
         { id: "mutuelle", name: "Remboursement mutuelle / santé", env: "sante" },
         { id: "proche", name: "Remboursement d'un proche", env: "" },
@@ -755,7 +942,8 @@ function defaultState() {
       portfolio: { stocks: [], bonds: [], gold: [], cash: [] },
       band: 5, importAt: null, history: [],
       quotesUrl: "",                    // lien CSV du Google Sheets publié (cours GOOGLEFINANCE)
-      country: "FRA", method: "trend"   // conjoncture : pays et méthode choisis
+      country: "FRA", method: "trend",  // conjoncture : pays et méthode choisis
+      freeCash: null, look: { color: "#222222", icon: "chart" }
     },
     // Google Sheets privé (rempli par Claude) : identifiant client OAuth, lien du tableau, empreintes du dernier budget / portefeuille appliqués
     gs: { clientId: "", sheet: "", budgetHash: "", portHash: "", soldHash: "" }
@@ -773,17 +961,22 @@ function normalize(s) {
   if (b.lastImport === undefined) b.lastImport = null;
   if (!Array.isArray(b.incomeCats) || !b.incomeCats.length) b.incomeCats = d.budget.incomeCats;
   if (!b.cycles || typeof b.cycles !== "object") b.cycles = {};
-  if (!b.ccp || typeof b.ccp !== "object" || !b.ccp.date) b.ccp = null;   // { balance, date: "AAAA-MM-JJ", at } : dernier solde réel du compte courant
+  if (!b.ccp || typeof b.ccp !== "object" || !b.ccp.date) b.ccp = null;
+  if (!Array.isArray(b.transfers)) b.transfers = [];                  // { id, date, amount, from, to, label, at } : virements entre comptes
+  b.ccpLook = { color: KIND_COLOR.courant, icon: "cash", ...(b.ccpLook && typeof b.ccpLook === "object" ? b.ccpLook : {}) };
+  b.savings.forEach(a => { if (!NATURES.some(n => n.id === a.kind) || a.kind === "courant") a.kind = guessKind(a.name) === "courant" ? "epargne" : guessKind(a.name); if (!okColor(a.color)) a.color = KIND_COLOR[a.kind]; if (!ICONS[a.icon]) a.icon = KIND_ICON[a.kind] });   // { balance, date: "AAAA-MM-JJ", at } : dernier solde réel du compte courant
   b.payday = Math.min(31, Math.max(1, Math.round(+b.payday) || 25));
   i.classNames = { ...d.invest.classNames, ...(i.classNames || {}) };
   i.portfolio = Object.fromEntries(CLASSES.map(c => [c.id, Array.isArray(i.portfolio?.[c.id]) ? i.portfolio[c.id] : []]));
   if (!Array.isArray(i.history)) i.history = [];
   if (typeof i.quotesUrl !== "string") i.quotesUrl = "";
   if (!["trend", "absolute"].includes(i.method)) i.method = "trend";
+  if (!i.freeCash || typeof i.freeCash !== "object" || !isFinite(+i.freeCash.amount)) i.freeCash = null;   // marge libre DEGIRO { amount, date }
+  i.look = { color: "#222222", icon: "chart", ...(i.look && typeof i.look === "object" ? i.look : {}) };
   const g = { ...d.gs, ...(s.gs && typeof s.gs === "object" ? s.gs : {}) };
   return { v: 1, updatedAt: +s.updatedAt || 0, budget: b, invest: i, gs: g };
 }
-let S = (() => { try { const j = JSON.parse(ls.get(LS.state)); if (j && j.v) return normalize(j) } catch {} return defaultState() })();
+let S = (() => { try { const j = JSON.parse(ls.get(LS.state)); if (j && j.v) return normalize(j) } catch {} return normalize(defaultState()) })();
 
 function save() { if (!ls.set(LS.state, JSON.stringify(S))) toast("Stockage de l'appareil plein : exportez une sauvegarde.") }
 // Toute modification passe par commit : horodatage, sauvegarde locale, envoi en ligne si synchronisé.
@@ -857,13 +1050,31 @@ $("drawer").addEventListener("touchend", () => {
   if (dragX === null) return; dragX = null; $("drawer").style.transition = ""; $("drawer").style.transform = "";
   if (dragDx < -60) closeDrawer(false);
 });
+// Glisser depuis le bord gauche pour ouvrir le menu
+let edge = null;
+document.addEventListener("touchstart", e => {
+  const t = e.touches[0];
+  if (e.touches.length !== 1 || t.clientX > 28 || wideScreen() || $("drawer").classList.contains("open") || !$("sheet").hidden || !$("acsheet").hidden || !$("icsheet").hidden) { edge = null; return }
+  edge = { x: t.clientX, y: t.clientY, dx: 0, on: false };
+}, { passive: true });
+document.addEventListener("touchmove", e => {
+  if (!edge) return; const t = e.touches[0], dx = t.clientX - edge.x, dy = t.clientY - edge.y;
+  if (!edge.on) { if (Math.abs(dy) > 12 && Math.abs(dy) > dx) { edge = null; return } if (dx < 8) return; edge.on = true }
+  edge.dx = Math.max(0, dx); const d = $("drawer"), w = d.offsetWidth || 300;
+  d.style.transition = "none"; d.style.visibility = "visible"; d.style.transform = `translateX(${Math.min(0, edge.dx - w)}px)`;
+}, { passive: true });
+document.addEventListener("touchend", () => {
+  if (!edge) return; const open = edge.on && edge.dx > 70, d = $("drawer"); edge = null;
+  d.style.transition = ""; d.style.visibility = ""; d.style.transform = "";
+  if (open) openDrawer();
+});
 const savTotal = () => S.budget.savings.reduce((s, a) => s + (+a.balance || 0), 0);
 function fmtWhen(t) {
   const d = new Date(t), time = d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
   return d.toDateString() === new Date().toDateString() ? "à " + time : `le ${fmtDay(d)} à ${time}`;
 }
 function updateDrawer() {
-  const sv = savTotal(), inv = grandTotal(), cc = ccpEstimate();
+  const sv = savTotal(), inv = investTotal(), cc = ccpEstimate();
   $("d-total").textContent = fmtEUR(sv + inv + (cc ? cc.value : 0));
   $("d-detail").textContent = (cc ? `Courant ${fmtEUR(cc.value)} · ` : "") + `Épargne ${fmtEUR(sv)} · Placements ${fmtEUR(inv)}`;
   const st = sync.status, [txt] = PILL[st] || PILL.off;
@@ -901,12 +1112,14 @@ function cycleStats(c) {
   const spentBy = {}, refundBy = {}, byCat = {};
   let gross = 0, savedGross = 0, extra = 0, refunds = 0, savedRefunds = 0;
   ex.forEach(e => { const a = +e.amount || 0; spentBy[e.env] = (spentBy[e.env] || 0) + a; gross += a; if (kind(e.env) === "save") savedGross += a });
+  const tr = cycleTransfers(c);
+  tr.forEach(t => { const f = trFlow(t); if (!f) return; spentBy[f.env] = (spentBy[f.env] || 0) + f.amount; gross += f.amount; if (kind(f.env) === "save") savedGross += f.amount });
   inc.forEach(i => {
     const a = +i.amount || 0, env = refundEnv(i);
     byCat[i.cat] = (byCat[i.cat] || 0) + a;
     if (env) { refundBy[env] = (refundBy[env] || 0) + a; refunds += a; if (kind(env) === "save") savedRefunds += a } else extra += a;
   });
-  return { ex, inc, spentBy, refundBy, byCat, extra, refunds, out: gross - refunds, saved: savedGross - savedRefunds };
+  return { ex, inc, tr, spentBy, refundBy, byCat, extra, refunds, out: gross - refunds, saved: savedGross - savedRefunds };
 }
 
 function renderBudget() {
@@ -945,11 +1158,18 @@ function renderBudget() {
   // Mouvements du cycle : dépenses et entrées mélangées, du plus récent au plus ancien
   const exps = st.ex.filter(e => !envFilter || (envFilter === "__none" ? !envById(e.env) : e.env === envFilter)).map(e => ({ k: "exp", o: e }));
   const incs = st.inc.filter(i => !envFilter || refundEnv(i) === envFilter).map(i => ({ k: "inc", o: i }));
-  const list = [...exps, ...incs].sort((a, b) => b.o.date.localeCompare(a.o.date) || (b.o.at || 0) - (a.o.at || 0));
+  const trs = st.tr.filter(t => !envFilter || trEnv(t) === envFilter).map(t => ({ k: "tr", o: t }));
+  const list = [...exps, ...incs, ...trs].sort((a, b) => b.o.date.localeCompare(a.o.date) || (b.o.at || 0) - (a.o.at || 0));
   $("expcount").textContent = list.length ? `· ${list.length}` : "";
   $("expclear").hidden = !envFilter; $("gs-quick").hidden = !gsReady();
   $("explist").innerHTML = list.length ? list.map(({ k, o }) => {
     const d = parseYmd(o.date), day = `<span class="d">${pad(d.getDate())}/${pad(d.getMonth() + 1)}</span>`;
+    if (k === "tr") {
+      const f = acctById(o.from), t = acctById(o.to);
+      return `<button type="button" class="exp" data-tr="${esc(o.id)}">${day}
+        <span class="l"><b><span class="tdot t-sav"></span>${esc(o.label || "Virement")}</b><small>${esc(f?.name || "?")} → ${esc(t?.name || "?")}</small></span>
+        <span class="num" style="font-weight:600">${fmtEUR(o.amount)}</span></button>`;
+    }
     if (k === "inc") {
       const cat = incCat(o.cat), env = envById(refundEnv(o));
       return `<button type="button" class="exp" data-inc="${esc(o.id)}">${day}
@@ -970,6 +1190,7 @@ function ccpEstimate() {
   let out = 0, inc = 0, sal = 0;
   S.budget.expenses.forEach(e => { if (after(e)) out += +e.amount || 0 });
   S.budget.incomes.forEach(i => { if (after(i)) inc += +i.amount || 0 });
+  S.budget.transfers.forEach(x => { if (!after(x)) return; if (x.from === "ccp") out += +x.amount || 0; if (x.to === "ccp") inc += +x.amount || 0 });
   const t0 = parseYmd(t);
   for (let c = shiftCycle(cycleOf(parseYmd(a.date)), 1); c.start <= t0; c = shiftCycle(c, 1)) sal += cycleIncome(c);
   return { value: round2((+a.balance || 0) + inc + sal - out), inc: round2(inc + sal), out: round2(out) };
@@ -995,6 +1216,10 @@ function updateSummary() {
   $("b-pace").textContent = pace;
   // Compte courant (solde réel le plus récent + mouvements depuis)
   const cc = ccpEstimate();
+  // Alerte : le disponible du cycle dépasse ce qui est vraiment libre sur le compte courant
+  const free = cc ? round2(cc.value - (cur ? toSave : 0)) : null, warn = cur && cc && left > free + 1;
+  $("b-alert").hidden = !warn;
+  if (warn) $("b-alert").textContent = `⚠ C'est plus que ce qu'il y a vraiment sur ton compte courant (${fmtEUR(free)} libres après l'épargne à virer). Il manque peut-être un mouvement, ou le solde enregistré n'est plus à jour.`;
   $("b-ccp").innerHTML = cc
     ? `<span><span class="small muted">Sur le compte courant</span>${toSave > 0 && cur ? `<small>dont ${fmtEUR(toSave)} encore à virer vers l'épargne : ${fmtEUR(cc.value - toSave)} vraiment libres</small>` : `<small>estimé depuis le solde du ${fmtDay(parseYmd(S.budget.ccp.date))}</small>`}</span><b${cc.value < 0 ? ' style="color:var(--down)"' : ""}>${fmtEUR(cc.value)}</b>`
     : `<span><span class="small muted">Compte courant</span><small>Indiquez le solde de votre banque pour le suivre ici</small></span><b style="font-family:var(--body);font-size:.85rem;color:var(--accent)">Ajouter ›</b>`;
@@ -1010,6 +1235,7 @@ function updateSummary() {
   $("b-incdetail").textContent = cats.length ? "Entrées : " + cats.map(([id, v]) => `${incCat(id)?.name || "Autre"} ${fmtEUR(v)}`).join(" · ") : "";
   $("b-incdetail").hidden = !cats.length;
 }
+$("b-ccp").addEventListener("click", () => { if (S.budget.ccp) go("comptes"); else openAcct("ccp") });
 $("cprev").addEventListener("click", () => { viewCycle = shiftCycle(viewCycle, -1); renderBudget() });
 $("cnext").addEventListener("click", () => { viewCycle = shiftCycle(viewCycle, 1); renderBudget() });
 $("cnow").addEventListener("click", () => { viewCycle = cycleOf(new Date()); renderBudget() });
@@ -1024,21 +1250,64 @@ $("expclear").addEventListener("click", () => { envFilter = null; renderBudget()
 $("explist").addEventListener("click", e => {
   const x = e.target.closest("[data-exp]"); if (x) { openSheet("exp", S.budget.expenses.find(o => o.id === x.dataset.exp)); return }
   const i = e.target.closest("[data-inc]"); if (i) openSheet("inc", S.budget.incomes.find(o => o.id === i.dataset.inc));
+  const t = e.target.closest("[data-tr]"); if (t) openSheet("tr", S.budget.transfers.find(o => o.id === t.dataset.tr));
 });
 
-/* ---------- Feuille de saisie (dépense ou entrée) ---------- */
-let editing = null, sheetKind = "exp";
+/* ---------- Feuille de saisie (dépense, entrée ou virement) ---------- */
+let editing = null, sheetKind = "exp", trFrom = "ccp", trTo = "", lastTo = "";
 function defaultDate() {
   const c = viewCycle, t = new Date();
   if (isCurrent(c)) return ymd(t);
   return ymd(c.end < t ? c.end : c.start);
 }
+// Comptes utilisables dans un virement : compte courant, comptes d'épargne, marge libre DEGIRO
+function acctList() {
+  return [{ id: "ccp", name: "Compte courant", color: S.budget.ccpLook.color, icon: S.budget.ccpLook.icon, kind: "courant" }]
+    .concat(S.budget.savings.map(a => ({ id: a.id, name: a.name, color: a.color, icon: a.icon, kind: a.kind })))
+    .concat([{ id: "pf", name: "DEGIRO (marge libre)", color: S.invest.look.color, icon: S.invest.look.icon, kind: "titres" }]);
+}
+const acctById = id => acctList().find(a => a.id === id);
+// Solde net des virements d'un compte après une date (pour rattraper un solde relevé plus tôt)
+const trNetAfter = (id, date) => round2(S.budget.transfers.filter(t => t.date > date).reduce((n, t) => n + (t.to === id ? +t.amount : 0) - (t.from === id ? +t.amount : 0), 0));
+// Enveloppe d'épargne dans laquelle compte un virement depuis / vers le compte courant
+function trEnv(t) {
+  const other = t.from === "ccp" ? t.to : t.to === "ccp" ? t.from : null; if (!other || other === "ccp") return null;
+  const k = acctById(other)?.kind, saves = S.budget.envelopes.filter(e => e.kind === "save");
+  const inv = saves.find(e => /invest|bourse|placement|pea/.test(foldTxt(e.name))), ep = saves.find(e => /epargn|livret/.test(foldTxt(e.name)));
+  return ((k === "titres" || k === "crypto") ? (inv || ep) : (ep || inv) || saves[0])?.id || null;
+}
+// Effet d'un virement sur le budget du cycle : sortie d'épargne (+) depuis le compte courant, épargne reprise (−) vers lui
+const trFlow = t => { const env = trEnv(t); if (!env) return null; return { env, amount: t.from === "ccp" ? +t.amount || 0 : -(+t.amount || 0) } };
+const cycleTransfers = c => inRange(S.budget.transfers, c);
+// Les soldes des comptes d'épargne et la marge libre suivent les virements (le compte courant est estimé à part)
+function applyTransfer(t, sign) {
+  const move = (id, d) => {
+    if (id === "pf") { const fc = S.invest.freeCash || { amount: 0, date: t.date }; fc.amount = round2((+fc.amount || 0) + d); S.invest.freeCash = fc; return }
+    const a = S.budget.savings.find(x => x.id === id); if (a) a.balance = round2((+a.balance || 0) + d);
+  };
+  move(t.to, sign * t.amount); move(t.from, -sign * t.amount);
+}
+function gridHTML(items, sel) {
+  return items.map(it => `<button type="button" class="gi" data-v="${esc(it.id)}" aria-pressed="${it.id === sel}">${it.solid ? acctBadge(it.color, it.icon) : `<span class="gic" style="--c:${it.color}">${ico(it.icon)}</span>`}<span class="gil">${esc(it.name)}</span></button>`).join("");
+}
+function renderTrGrids() {
+  const items = acctList().map(a => ({ ...a, solid: true }));
+  $("g-from").innerHTML = gridHTML(items, trFrom);
+  $("g-to").innerHTML = gridHTML(items.filter(a => a.id !== trFrom), trTo);
+  const t = { from: trFrom, to: trTo, amount: 1 }, env = envById(trEnv(t)), f = acctById(trFrom)?.name, to = acctById(trTo)?.name;
+  $("f-trnote").textContent = !trTo ? "Choisissez le compte d'arrivée." : trFrom === "ccp"
+    ? `Compté comme épargne du cycle${env ? ` (enveloppe « ${env.name} »)` : ""} : le solde de ${to} augmente, celui du compte courant baisse.`
+    : trTo === "ccp" ? `Épargne reprise : réduit l'épargne du cycle${env ? ` (« ${env.name} »)` : ""} et remet l'argent sur le compte courant.`
+    : `Simple déplacement entre ${f} et ${to} : aucun effet sur le budget du cycle.`;
+}
 function setSheetKind(k) {
   sheetKind = k;
   document.querySelectorAll("#f-kind button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.k === k)));
-  $("f-expbox").hidden = k !== "exp"; $("f-incbox").hidden = k !== "inc";
-  $("sheettitle").textContent = editing ? (k === "inc" ? "Modifier l'entrée" : "Modifier la dépense") : (k === "inc" ? "Nouvelle entrée d'argent" : "Nouvelle dépense");
-  $("f-label").placeholder = k === "inc" ? "Ex. Vente casque sur Leboncoin" : "Ex. Courses Saran";
+  $("f-expbox").hidden = k !== "exp"; $("f-incbox").hidden = k !== "inc"; $("f-trbox").hidden = k !== "tr";
+  const T = { exp: ["Nouvelle dépense", "Modifier la dépense"], inc: ["Nouvelle entrée d'argent", "Modifier l'entrée"], tr: ["Nouveau virement", "Modifier le virement"] }[k];
+  $("sheettitle").textContent = editing ? T[1] : T[0];
+  $("f-label").placeholder = k === "inc" ? "Ex. Vente casque sur Leboncoin" : k === "tr" ? "Ex. Épargne du mois" : "Ex. Courses Saran";
+  if (k === "tr") renderTrGrids();
 }
 function fillRefundEnv(catId, value) {
   const cat = incCat(catId), v = value !== undefined ? value : (cat?.env && envById(cat.env) ? cat.env : "");
@@ -1048,14 +1317,20 @@ function fillRefundEnv(catId, value) {
 function openSheet(kind, item) {
   editing = item ? item.id : null;
   const envs = S.budget.envelopes, cats = S.budget.incomeCats;
-  $("f-env").innerHTML = envs.map(e => `<option value="${esc(e.id)}">${esc(e.name)}</option>`).join("")
-    + (kind === "exp" && item && !envById(item.env) ? `<option value="${esc(item.env)}">Sans enveloppe</option>` : "");
+  const orphan = kind === "exp" && item && !envById(item.env);
+  $("f-env").innerHTML = envs.map(e => `<option value="${esc(e.id)}">${esc(e.name)}</option>`).join("") + (orphan ? `<option value="${esc(item.env)}">Sans enveloppe</option>` : "");
   $("f-env").value = (kind === "exp" && item?.env) || (envFilter && envById(envFilter) ? envFilter : null) || (lastEnv && envById(lastEnv) ? lastEnv : envs[0]?.id || "");
+  $("g-env").innerHTML = gridHTML(envs.map(e => ({ id: e.id, name: e.name, icon: envIcon(e), color: e.kind === "save" ? "var(--c-sav)" : "var(--c-exp)" }))
+    .concat(orphan ? [{ id: item.env, name: "Sans enveloppe", icon: "dots", color: "var(--muted)" }] : []), $("f-env").value);
   $("f-cat").innerHTML = cats.map(c => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join("")
     + (kind === "inc" && item && !incCat(item.cat) ? `<option value="${esc(item.cat)}">Autre</option>` : "");
   const catId = (kind === "inc" && item?.cat) || (lastCat && incCat(lastCat) ? lastCat : cats[0]?.id || "");
   $("f-cat").value = catId;
+  $("g-cat").innerHTML = gridHTML(cats.map(c => ({ id: c.id, name: c.name, icon: catIcon(c), color: "var(--c-rev)" })), catId);
   fillRefundEnv(catId, kind === "inc" && item ? (item.env || "") : undefined);
+  const accts = acctList().map(a => a.id);
+  trFrom = kind === "tr" && item ? item.from : "ccp";
+  trTo = kind === "tr" && item ? item.to : (lastTo && accts.includes(lastTo) && lastTo !== trFrom ? lastTo : accts.find(id => id !== trFrom) || "");
   $("f-amount").value = item ? fmtIn(Math.abs(item.amount)) : "";
   if (kind === "exp" && item && item.amount < 0) $("f-amount").value = "-" + fmtIn(-item.amount);
   $("f-label").value = item?.label || "";
@@ -1070,7 +1345,10 @@ function openSheet(kind, item) {
 function closeSheet() { $("sheet").hidden = true; editing = null; if (renderLater) { renderLater = false; renderView() } }
 $("fab").addEventListener("click", () => openSheet("exp", null));
 $("f-kind").addEventListener("click", e => { const b = e.target.closest("[data-k]"); if (b) setSheetKind(b.dataset.k) });
-$("f-cat").addEventListener("change", e => fillRefundEnv(e.target.value));
+$("g-env").addEventListener("click", e => { const b = e.target.closest("[data-v]"); if (!b) return; $("f-env").value = b.dataset.v; $("g-env").querySelectorAll(".gi").forEach(x => x.setAttribute("aria-pressed", String(x === b))) });
+$("g-cat").addEventListener("click", e => { const b = e.target.closest("[data-v]"); if (!b) return; $("f-cat").value = b.dataset.v; $("g-cat").querySelectorAll(".gi").forEach(x => x.setAttribute("aria-pressed", String(x === b))); fillRefundEnv(b.dataset.v) });
+$("g-from").addEventListener("click", e => { const b = e.target.closest("[data-v]"); if (!b) return; trFrom = b.dataset.v; if (trTo === trFrom) trTo = acctList().find(a => a.id !== trFrom)?.id || ""; renderTrGrids() });
+$("g-to").addEventListener("click", e => { const b = e.target.closest("[data-v]"); if (!b) return; trTo = b.dataset.v; renderTrGrids() });
 $("sheet").addEventListener("click", e => { if (e.target.closest("[data-close]")) closeSheet() });
 document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("sheet").hidden) closeSheet() });
 $("expform").addEventListener("submit", e => {
@@ -1080,7 +1358,15 @@ $("expform").addEventListener("submit", e => {
   const date = /^\d{4}-\d{2}-\d{2}$/.test($("f-date").value) ? $("f-date").value : ymd(new Date());
   const label = $("f-label").value.trim();
   let wasEdit = false, msg;
-  if (sheetKind === "inc") {
+  if (sheetKind === "tr") {
+    amount = Math.abs(amount);
+    if (!trTo || trTo === trFrom) { $("f-err").textContent = "Choisissez deux comptes différents."; return }
+    const old = editing && S.budget.transfers.find(x => x.id === editing);
+    if (old) { applyTransfer(old, -1); Object.assign(old, { amount, date, from: trFrom, to: trTo, label }); applyTransfer(old, 1); wasEdit = true }
+    else { const t = { id: rid(), amount, date, from: trFrom, to: trTo, label, at: Date.now() }; S.budget.transfers.push(t); applyTransfer(t, 1) }
+    lastTo = trTo;
+    msg = wasEdit ? "Virement modifié." : `${fmtEUR(amount)} virés de ${acctById(trFrom)?.name} vers ${acctById(trTo)?.name}.`;
+  } else if (sheetKind === "inc") {
     amount = Math.abs(amount);
     const cat = $("f-cat").value, env = $("f-renv").value, it = editing && S.budget.incomes.find(x => x.id === editing);
     if (it) { Object.assign(it, { amount, date, cat, env, label }); wasEdit = true }
@@ -1102,9 +1388,10 @@ $("expform").addEventListener("submit", e => {
 $("f-del").addEventListener("click", e => {
   const b = e.currentTarget;
   if (!b.dataset.confirm) { b.dataset.confirm = "1"; b.textContent = "Confirmer la suppression"; return }
-  if (sheetKind === "inc") S.budget.incomes = S.budget.incomes.filter(x => x.id !== editing);
+  if (sheetKind === "tr") { const t = S.budget.transfers.find(x => x.id === editing); if (t) applyTransfer(t, -1); S.budget.transfers = S.budget.transfers.filter(x => x.id !== editing) }
+  else if (sheetKind === "inc") S.budget.incomes = S.budget.incomes.filter(x => x.id !== editing);
   else S.budget.expenses = S.budget.expenses.filter(x => x.id !== editing);
-  const what = sheetKind === "inc" ? "Entrée supprimée." : "Dépense supprimée.";
+  const what = { tr: "Virement supprimé.", inc: "Entrée supprimée.", exp: "Dépense supprimée." }[sheetKind];
   closeSheet(); commit(); toast(what);
 });
 
@@ -1231,55 +1518,122 @@ $("bl-chart").addEventListener("pointermove", e => { if (e.pointerType !== "mous
 $("bl-chart").addEventListener("pointerleave", e => { if (e.pointerType === "mouse" && !blPin) { const t = $("bl-tip"); if (t) t.hidden = true } });
 document.addEventListener("click", e => { if (blPin && view === "bilan" && !e.target.closest("#bl-chart")) blUnpin() });
 
-/* ---------- Comptes d'épargne et patrimoine ---------- */
-const goalBar = (b, g) => {
-  if (!(g > 0)) return "";
-  const pct = Math.min(100, Math.max(0, b / g * 100));
-  return `<div class="bar"><i class="t-sav" style="width:${pct}%"></i></div><div class="small muted" style="margin-top:4px">${b >= g
-    ? `<span style="color:var(--c-sav)">✓</span> Objectif de ${fmtEUR(g)} atteint${b > g + 0.005 ? ` (+${fmtEUR(b - g)})` : ""}`
-    : `Objectif ${fmtEUR(g)} · reste ${fmtEUR(g - b)} (${pct.toLocaleString("fr-FR", { maximumFractionDigits: 0 })} %)`}</div>`;
-};
-function renderComptes() {
-  const a = S.budget.ccp;
-  if (document.activeElement !== $("c-ccpbal")) $("c-ccpbal").value = a ? fmtIn(a.balance) : "";
-  if (document.activeElement !== $("c-ccpdate")) $("c-ccpdate").value = a ? a.date : ymd(new Date());
-  $("c-savs").innerHTML = S.budget.savings.map(a => { const g = +a.goal || 0, b = +a.balance || 0;
-    return `<div class="erow acct" data-said="${esc(a.id)}">
-      <input class="full" data-sak="name" type="text" value="${esc(a.name)}" aria-label="Nom du compte" placeholder="Nom du compte">
-      <label><span class="cap">Solde (€)</span><input class="n" data-sak="balance" type="text" inputmode="decimal" autocomplete="off" value="${fmtIn(b)}" placeholder="0" aria-label="Solde ${esc(a.name)}"></label>
-      <label><span class="cap">Objectif (€)</span><input class="n" data-sak="goal" type="text" inputmode="decimal" autocomplete="off" value="${fmtIn(g)}" placeholder="facultatif" aria-label="Objectif ${esc(a.name)}"></label>
-      <button class="del" type="button" data-sadel aria-label="Supprimer le compte ${esc(a.name)}" style="align-self:end">✕</button>
-      <div class="full" data-sbar>${goalBar(b, g)}</div></div>` }).join("") || `<div class="notice">Aucun compte.</div>`;
-  updateComptesTotals();
+/* ---------- Comptes par nature, camembert et fiche de compte ---------- */
+let cMode = "nature", acEdit = null, acColor = "", acIcon = "";
+const freeCash = () => +S.invest.freeCash?.amount || 0;
+const investTotal = () => grandTotal() + freeCash();
+const fmtDate = d => d ? `${fmtDay(parseYmd(d))} ${d.slice(0, 4)}` : "";
+// Tous les comptes avec leur valeur actuelle (compte courant estimé, portefeuille DEGIRO avec sa marge libre)
+function acctValues() {
+  const cc = ccpEstimate(), L = S.budget.ccpLook;
+  const list = [{ id: "ccp", name: "Compte courant", kind: "courant", color: L.color, icon: L.icon, value: cc ? cc.value : 0, sub: cc ? `estimé depuis le solde du ${fmtDay(parseYmd(S.budget.ccp.date))}` : "Touchez pour indiquer le solde de votre banque", set: !!cc }];
+  S.budget.savings.forEach(a => list.push({ id: a.id, name: a.name, kind: a.kind, color: a.color, icon: a.icon, value: +a.balance || 0, goal: +a.goal || 0, sub: a.date ? `solde du ${fmtDay(parseYmd(a.date))}` : "" }));
+  const pv = grandTotal(), fc = freeCash();
+  if (pv || fc || allAssets().length) list.push({ id: "pf", name: "Portefeuille DEGIRO", kind: "titres", color: S.invest.look.color, icon: S.invest.look.icon, value: pv + fc, sub: `positions ${fmtEUR(pv)}${fc ? ` · marge libre ${fmtEUR(fc)}` : ""}` });
+  return list;
 }
-function updateComptesTotals() {
-  const t = savTotal(), inv = grandTotal(), cc = ccpEstimate();
-  $("c-sav").textContent = fmtEUR(t); $("c-inv").textContent = fmtEUR(inv); $("c-all").textContent = fmtEUR(t + inv + (cc ? cc.value : 0));
-  $("c-cur").textContent = cc ? fmtEUR(cc.value) : "—";
-  $("c-ccpval").textContent = cc ? fmtEUR(cc.value) : "—"; $("c-ccpval").style.color = cc && cc.value < 0 ? "var(--down)" : "";
-  $("c-ccpnote").textContent = cc ? `Solde de ${fmtEUR(S.budget.ccp.balance)} le ${fmtDay(parseYmd(S.budget.ccp.date))}${cc.inc || cc.out ? `, puis +${fmtEUR(cc.inc)} d'entrées et salaires, −${fmtEUR(cc.out)} de dépenses et virements` : ", aucun mouvement depuis"}.` : "Pas encore de solde enregistré.";
+function donutSVG(parts, total) {
+  const R = 58, W = 22, C = 2 * Math.PI * R, gap = parts.length > 1 ? 2 : 0;
+  let off = 0;
+  const segs = parts.map(p => { const len = p.v / total * C, d = Math.max(0, len - gap); const el = `<circle cx="75" cy="75" r="${R}" fill="none" stroke="${p.color}" stroke-width="${W}" stroke-dasharray="${d} ${C - d}" stroke-dashoffset="${-off}" transform="rotate(-90 75 75)"><title>${esc(p.name)} : ${fmtEUR(p.v)}</title></circle>`; off += len; return el }).join("");
+  return `<svg viewBox="0 0 150 150" role="img" aria-label="Répartition du patrimoine">${segs}<text x="75" y="71" text-anchor="middle" style="font:11px var(--body);fill:var(--muted)">Total</text><text x="75" y="88" text-anchor="middle" style="font:600 13px var(--mono);fill:var(--fg)">${esc(fmtK(total))}</text></svg>`;
+}
+function renderComptes() {
+  const list = acctValues(), total = list.reduce((s, a) => s + a.value, 0);
+  $("c-all").textContent = fmtEUR(total);
+  document.querySelectorAll("#c-mode button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.cm === cMode)));
+  // Camembert : valeurs positives seulement ; par nature dans l'ordre fixe des couleurs
+  let parts = cMode === "nature"
+    ? NATURES.map(n => ({ name: n.name, color: `var(--n${n.n})`, v: list.filter(a => a.kind === n.id).reduce((s, a) => s + a.value, 0) }))
+    : list.map(a => ({ name: a.name, color: a.color, v: a.value }));
+  parts = parts.filter(p => p.v > 0.005);
+  const pos = parts.reduce((s, p) => s + p.v, 0);
+  $("c-donut").innerHTML = pos ? donutSVG(parts, pos) : "";
+  $("c-legend").innerHTML = pos ? parts.map(p => `<div><span class="sw" style="background:${p.color}"></span><span class="nm">${esc(p.name)}</span><span class="vl">${fmtEUR(p.v)}<small>${(p.v / pos * 100).toLocaleString("fr-FR", { maximumFractionDigits: 0 })} %</small></span></div>`).join("") : `<div class="small muted">Indiquez vos soldes pour voir la répartition.</div>`;
+  const neg = list.filter(a => a.value < -0.005);
+  $("c-donutnote").textContent = neg.length ? `Non représenté (solde négatif) : ${neg.map(a => a.name + " " + fmtEUR(a.value)).join(", ")}.` : "";
+  // Comptes groupés par nature
+  $("c-groups").innerHTML = GROUP_ORDER.map(id => {
+    const n = natureOf(id), items = list.filter(a => a.kind === id); if (!items.length) return "";
+    const sub = items.reduce((s, a) => s + a.value, 0);
+    return `<div class="panel"><div class="grphead"><h2><span class="sw" style="width:10px;height:10px;border-radius:3px;background:var(--n${n.n})"></span>${esc(n.name)}</h2><span class="num small" style="font-weight:600">${fmtEUR(sub)}</span></div>
+      ${items.map(a => {
+        const g = a.goal > 0 ? `${a.value >= a.goal ? '<span style="color:var(--c-sav)">✓</span> objectif atteint' : `objectif ${fmtEUR(a.goal)} · ${Math.round(Math.max(0, a.value) / a.goal * 100)} %`}` : "";
+        return `<button type="button" class="acct" data-acc="${esc(a.id)}">${acctBadge(a.color, a.icon)}<span class="an"><b>${esc(a.name)}</b><small>${[a.sub, g].filter(Boolean).join(" · ")}</small></span><span class="av"${a.value < 0 ? ' style="color:var(--down)"' : ""}>${a.id === "ccp" && !a.set ? "—" : fmtEUR(a.value)}</span></button>`;
+      }).join("")}</div>`;
+  }).join("");
   updateDrawer();
 }
-$("c-ccpsave").addEventListener("click", () => {
-  const v = toNum($("c-ccpbal").value), d = $("c-ccpdate").value || ymd(new Date());
-  if (!isFinite(v)) { toast("Indiquez le solde du compte courant."); $("c-ccpbal").focus(); return }
-  S.budget.ccp = { balance: round2(v), date: d, at: Date.now() }; commit(); toast("Solde du compte courant enregistré.");
+const updateComptesTotals = () => { if (view === "comptes") renderComptes(); else updateDrawer() };
+$("c-mode").addEventListener("click", e => { const b = e.target.closest("[data-cm]"); if (b) { cMode = b.dataset.cm; renderComptes() } });
+$("c-groups").addEventListener("click", e => { const b = e.target.closest("[data-acc]"); if (!b) return; if (b.dataset.acc === "pf") go("invest"); else openAcct(b.dataset.acc) });
+$("c-add").addEventListener("click", () => openAcct(null));
+function renderAcPickers() {
+  $("a-colors").innerHTML = ACCT_COLORS.map(c => `<button type="button" data-col="${c}" aria-label="Couleur ${c}" aria-pressed="${c.toLowerCase() === acColor.toLowerCase()}" style="background:${c}"></button>`).join("");
+  $("a-icons").innerHTML = ["cash", "bank", "piggy", "moneybag", "chart", "crypto", "wallet", "card", "safe", "euro", "home", "star"].map(k => `<button type="button" class="gi" data-ico="${k}" aria-pressed="${k === acIcon}" aria-label="${ICON_NAMES[k]}">${acctBadge(acColor, k)}</button>`).join("");
+}
+function openAcct(id) {
+  acEdit = id; const isCcp = id === "ccp", a = !isCcp && id ? S.budget.savings.find(x => x.id === id) : null;
+  $("actitle").textContent = isCcp ? "Compte courant" : a ? a.name : "Nouveau compte";
+  $("a-namebox").hidden = isCcp; $("a-goalbox").hidden = isCcp; $("a-kindbox").hidden = isCcp; $("a-del").hidden = !a;
+  delete $("a-del").dataset.confirm; $("a-del").textContent = "Supprimer";
+  $("a-ballabel").textContent = isCcp ? "Solde affiché par la banque (€)" : "Solde (€)";
+  $("a-kind").innerHTML = NATURES.filter(n => n.id !== "courant").map(n => `<option value="${n.id}">${esc(n.name)}</option>`).join("");
+  $("a-name").value = a?.name || "";
+  $("a-bal").value = isCcp ? (S.budget.ccp ? fmtIn(S.budget.ccp.balance) : "") : (a ? fmtIn(a.balance) : "");
+  $("a-date").value = isCcp ? (S.budget.ccp?.date || ymd(new Date())) : (a?.date || ymd(new Date()));
+  $("a-goal").value = a && +a.goal ? fmtIn(a.goal) : "";
+  $("a-kind").value = a?.kind || "epargne";
+  acColor = isCcp ? S.budget.ccpLook.color : a ? a.color : KIND_COLOR.epargne;
+  acIcon = isCcp ? S.budget.ccpLook.icon : a ? a.icon : KIND_ICON.epargne;
+  const cc = isCcp && ccpEstimate();
+  $("a-note").textContent = isCcp ? (cc ? `Estimation actuelle : ${fmtEUR(cc.value)} (solde réel + ${fmtEUR(cc.inc)} d'entrées et salaires − ${fmtEUR(cc.out)} de dépenses et virements depuis).` : "Recopiez le solde de votre appli bancaire : l'appli le fera évoluer avec vos mouvements.") : "";
+  $("a-err").textContent = "";
+  renderAcPickers(); $("acsheet").hidden = false;
+  setTimeout(() => (isCcp ? $("a-bal") : $("a-name")).focus(), 60);
+}
+const closeAcct = () => { $("acsheet").hidden = true; acEdit = null };
+$("acsheet").addEventListener("click", e => {
+  if (e.target.closest("[data-acclose]")) { closeAcct(); return }
+  const c = e.target.closest("[data-col]"); if (c) { acColor = c.dataset.col; renderAcPickers(); return }
+  const k = e.target.closest("[data-ico]"); if (k) { acIcon = k.dataset.ico; renderAcPickers() }
 });
-$("c-savs").addEventListener("input", e => {
-  const inp = e.target.closest("[data-sak]"); if (!inp) return;
-  const row = inp.closest("[data-said]"), a = S.budget.savings.find(x => x.id === row.dataset.said); if (!a) return;
-  a[inp.dataset.sak] = inp.dataset.sak === "name" ? inp.value : parseNum(inp.value);
-  commit(false);
-  row.querySelector("[data-sbar]").innerHTML = goalBar(+a.balance || 0, +a.goal || 0);
-  updateComptesTotals();
+$("a-kind").addEventListener("change", e => { if (!acEdit) { acIcon = KIND_ICON[e.target.value] || acIcon; acColor = KIND_COLOR[e.target.value] || acColor; renderAcPickers() } });
+$("acform").addEventListener("submit", e => {
+  e.preventDefault();
+  const isCcp = acEdit === "ccp", bal = toNum($("a-bal").value), date = $("a-date").value || ymd(new Date());
+  if (isCcp) {
+    if ($("a-bal").value.trim() && !isFinite(bal)) { $("a-err").textContent = "Solde illisible."; return }
+    if (isFinite(bal)) S.budget.ccp = { balance: round2(bal), date, at: Date.now() };
+    S.budget.ccpLook = { color: acColor, icon: acIcon };
+  } else {
+    const name = $("a-name").value.trim(); if (!name) { $("a-err").textContent = "Donnez un nom au compte."; $("a-name").focus(); return }
+    let a = acEdit && S.budget.savings.find(x => x.id === acEdit);
+    if (!a) { a = { id: rid() }; S.budget.savings.push(a) }
+    Object.assign(a, { name, balance: isFinite(bal) ? round2(bal + trNetAfter(a.id, date)) : (+a.balance || 0), date, goal: Math.max(0, parseNum($("a-goal").value)), kind: $("a-kind").value, color: acColor, icon: acIcon });
+  }
+  closeAcct(); commit(); toast("Compte enregistré.");
 });
-$("c-savs").addEventListener("click", e => {
-  const del = e.target.closest("[data-sadel]"); if (!del) return;
-  if (!del.dataset.confirm) { del.dataset.confirm = "1"; del.textContent = "Suppr. ?"; del.style.color = "var(--down)";
-    setTimeout(() => { if (del.isConnected) { delete del.dataset.confirm; del.textContent = "✕"; del.style.color = "" } }, 3000); return }
-  const id = del.closest("[data-said]").dataset.said; S.budget.savings = S.budget.savings.filter(x => x.id !== id); commit();
+$("a-del").addEventListener("click", e => {
+  const b = e.currentTarget; if (!b.dataset.confirm) { b.dataset.confirm = "1"; b.textContent = "Confirmer la suppression"; return }
+  S.budget.savings = S.budget.savings.filter(x => x.id !== acEdit); closeAcct(); commit(); toast("Compte supprimé.");
 });
-$("c-savadd").addEventListener("click", () => { S.budget.savings.push({ id: rid(), name: "Nouveau compte", balance: 0, goal: 0 }); commit(); const rows = document.querySelectorAll("#c-savs [data-sak=name]"); rows[rows.length - 1]?.select() });
+// Choix d'un logo pour une enveloppe ou une catégorie d'entrée
+let icTarget = null;
+function openIconPicker(kind, id) {
+  const item = kind === "env" ? envById(id) : incCat(id); if (!item) return;
+  icTarget = { kind, id }; const cur = kind === "env" ? envIcon(item) : catIcon(item), color = kind === "env" ? (item.kind === "save" ? "var(--c-sav)" : "var(--c-exp)") : "var(--c-rev)";
+  $("ictitle").textContent = `Logo de « ${item.name} »`;
+  $("ic-grid").innerHTML = Object.keys(ICONS).map(k => `<button type="button" class="gi" data-pick="${k}" aria-pressed="${k === cur}"><span class="gic" style="--c:${color}">${ico(k)}</span><span class="gil">${esc(ICON_NAMES[k])}</span></button>`).join("");
+  $("icsheet").hidden = false;
+}
+$("icsheet").addEventListener("click", e => {
+  if (e.target.closest("[data-icclose]")) { $("icsheet").hidden = true; return }
+  const b = e.target.closest("[data-pick]"); if (!b || !icTarget) return;
+  const item = icTarget.kind === "env" ? envById(icTarget.id) : incCat(icTarget.id); if (item) item.icon = b.dataset.pick;
+  $("icsheet").hidden = true; commit();
+});
+document.addEventListener("keydown", e => { if (e.key !== "Escape") return; if (!$("acsheet").hidden) closeAcct(); if (!$("icsheet").hidden) $("icsheet").hidden = true });
 
 /* ---------- Budget prévu : enveloppes, moyennes, budget collé ---------- */
 let planExcl = true, planUndo = null;
@@ -1290,6 +1644,7 @@ function envAverages() {
   done.forEach(c => {
     cycleExpenses(c).forEach(e => { const a = +e.amount || 0; if (planExcl && a >= 900 && envById(e.env)?.kind !== "save") return; tot[e.env] = (tot[e.env] || 0) + a });
     cycleIncomes(c).forEach(i => { const env = refundEnv(i); if (env) tot[env] = (tot[env] || 0) - (+i.amount || 0) });
+    cycleTransfers(c).forEach(t => { const f = trFlow(t); if (f) tot[f.env] = (tot[f.env] || 0) + f.amount });
   });
   const n = done.length;
   return { n, avg: id => n ? Math.max(0, (tot[id] || 0) / n) : 0 };
@@ -1300,7 +1655,7 @@ function renderPlan() {
   $("p-excl").checked = planExcl;
   $("s-envs").innerHTML = b.envelopes.map(e => { const avg = A.avg(e.id), r = roundBudget(avg), save = e.kind === "save";
     return `<div class="erow" data-eid="${esc(e.id)}">
-      <input class="full" data-ek="name" type="text" value="${esc(e.name)}" aria-label="Nom de l'enveloppe" placeholder="Nom">
+      <div class="full" style="display:flex;gap:8px;align-items:center"><button type="button" class="icopick" data-eico aria-label="Changer le logo de ${esc(e.name)}"><span class="gic" style="--c:${save ? "var(--c-sav)" : "var(--c-exp)"}">${ico(envIcon(e))}</span></button><input data-ek="name" type="text" value="${esc(e.name)}" aria-label="Nom de l'enveloppe" placeholder="Nom" style="flex:1;min-width:0"></div>
       <label><span class="cap">Prévu par cycle (€)</span><input class="n" data-ek="planned" type="text" inputmode="decimal" value="${fmtIn(e.planned)}" placeholder="0" aria-label="Montant prévu pour ${esc(e.name)}"></label>
       <label><span class="cap">Type</span><select data-ek="kind" aria-label="Type de ${esc(e.name)}"><option value="spend"${!save ? " selected" : ""}>Dépense</option><option value="save"${save ? " selected" : ""}>Épargne</option></select></label>
       <button class="del" type="button" data-edel aria-label="Supprimer l'enveloppe ${esc(e.name)}" style="align-self:end">✕</button>
@@ -1324,6 +1679,7 @@ const undoBtn = '<button class="linkbtn small" type="button" data-planundo>Annul
 $("p-income").addEventListener("input", e => { S.budget.income = parseNum(e.target.value); commit(false); updatePlanTotals() });
 $("p-excl").addEventListener("change", e => { planExcl = e.target.checked; renderPlan() });
 $("s-envs").addEventListener("click", e => {
+  const ic = e.target.closest("[data-eico]"); if (ic) { openIconPicker("env", ic.closest("[data-eid]").dataset.eid); return }
   const u = e.target.closest("[data-euse]"); if (!u) return;
   const env = envById(u.closest("[data-eid]").dataset.eid); if (!env) return;
   env.planned = +u.dataset.euse; commit();
@@ -1777,6 +2133,10 @@ function renderTotals() {
     const tEl = document.querySelector(`[data-total="${c.id}"]`); if (tEl) tEl.textContent = fmtEUR(totalOf(c.id));
   });
   $("grand").textContent = fmtEUR(grand);
+  if (document.activeElement !== $("fc-amount")) $("fc-amount").value = S.invest.freeCash ? fmtIn(S.invest.freeCash.amount) : "";
+  $("fc-total").textContent = fmtEUR(grand + freeCash());
+  $("fc-note").textContent = (S.invest.freeCash?.date ? `Mise à jour le ${fmtDate(S.invest.freeCash.date)}. ` : "") + "Comptée dans le patrimoine, pas dans la performance. Mise à jour par l'import DEGIRO, le tableau privé ou ici.";
+  $("ap-fc").hidden = !(freeCash() > 0.5); $("ap-fc").textContent = `Répartir ma marge libre (${fmtEUR(freeCash())})`;
   $("alloc").innerHTML = CLASSES.map(c => grand ? `<i style="width:${totalOf(c.id) / grand * 100}%;background:${c.c}"></i>` : "").join("");
   $("legend").innerHTML = CLASSES.map(c => `<div><span class="dot" style="background:${c.c}"></span><span>${esc(cname(c.id))}</span><span class="pct num muted">${grand ? (totalOf(c.id) / grand * 100).toLocaleString("fr-FR", { maximumFractionDigits: 1 }) : "0"} %</span></div>`).join("");
   renderRebalance(grand);
@@ -1941,6 +2301,8 @@ $("classes").addEventListener("click", e => {
 });
 $("band").addEventListener("input", e => { S.invest.band = +e.target.value; commit(false); renderTotals() });
 $("apport").addEventListener("input", e => { apport = parseNum(e.target.value); renderTotals() });
+$("ap-fc").addEventListener("click", () => { apport = round2(freeCash()); $("apport").value = fmtIn(apport); renderTotals() });
+$("fc-amount").addEventListener("input", e => { const v = toNum(e.target.value); S.invest.freeCash = e.target.value.trim() && isFinite(v) ? { amount: round2(v), date: ymd(new Date()) } : null; commit(false); $("fc-total").textContent = fmtEUR(grandTotal() + freeCash()); updateDrawer() });
 
 /* ---------- Import DEGIRO ---------- */
 function loadXLSX() {
@@ -2119,6 +2481,8 @@ $("impprev").addEventListener("click", e => {
     if (one?.isin && !a.isin) a.isin = one.isin;
     if (!a.sym && a.isin) { const s = symForIsin(a.isin); if (s) a.sym = s }
   });
+  const cashRows = impRows.filter(p => p.cash);
+  if (cashRows.length) S.invest.freeCash = { amount: round2(cashRows.reduce((t, p) => t + (+p.value || 0), 0)), date: ymd(new Date()) };
   S.invest.importAt = new Date().toISOString(); impRows = []; renderImpPreview();
   commit();
   $("impnote").textContent = `${n} position${n > 1 ? "s" : ""} importée${n > 1 ? "s" : ""} depuis DEGIRO. Les prochains imports reconnaîtront automatiquement ces lignes.`;
@@ -2187,7 +2551,7 @@ async function gsFetch(auto) {
     const id = sheetIdOf(S.gs.sheet);
     const meta = await gsGet(id + "?fields=sheets.properties.title");
     const titles = (meta.sheets || []).map(x => x.properties.title), find = re => titles.find(t => re.test(fold(t)));
-    const want = [["mv", find(/^mouvements?/), "A1:H3000"], ["bu", find(/^budget/), "A1:C300"], ["pf", find(/^portefeuille/), "A1:F300"], ["so", find(/^soldes?/), "A1:C100"]].filter(x => x[1]);
+    const want = [["mv", find(/^mouvements?/), "A1:H3000"], ["bu", find(/^budget/), "A1:C300"], ["pf", find(/^portefeuille/), "A1:F300"], ["so", find(/^soldes?/), "A1:G100"]].filter(x => x[1]);
     if (!want.length) throw new Error("Aucun onglet « Mouvements », « Budget », « Portefeuille » ou « Soldes » dans ce tableau.");
     const q = want.map(([, t, r]) => "ranges=" + encodeURIComponent(`'${t.replace(/'/g, "''")}'!${r}`)).join("&");
     const data = await gsGet(id + "/values:batchGet?" + q + "&valueRenderOption=UNFORMATTED_VALUE&dateTimeRenderOption=FORMATTED_STRING");
@@ -2267,11 +2631,15 @@ function applyBudgetRows(rows, res) {
 function gsPortRows(rows) {
   if (!rows.length) return [];
   const { idx, body } = gsCols(rows, { sym: [/symbole|ticker/, 0], units: [/quantit|nombre|parts/, 1], cost: [/investi|cout|prix de revient/, 2], cls: [/classe/, 3], isin: [/isin/, 4], name: [/^nom|libelle|valeur/, 5] });
-  return body.map(r => ({ sym: normSym(r[idx.sym]), units: toNum(r[idx.units]), cost: toNum(r[idx.cost]), cls: cell(r, idx.cls), isin: cell(r, idx.isin).toUpperCase(), name: cell(r, idx.name) }))
-    .filter(r => (r.sym || r.isin) && isFinite(r.units));
+  return body.map(r => {
+    const sym = normSym(r[idx.sym]), name = cell(r, idx.name);
+    if (/^(MARGE|CASH|LIQUID|ESPACE)/.test(sym) || /marge libre|liquidit/.test(foldTxt(name))) { const c = toNum(r[idx.cost]), u = toNum(r[idx.units]); return { cash: true, amount: isFinite(c) && c ? c : u } }
+    return { sym, units: toNum(r[idx.units]), cost: toNum(r[idx.cost]), cls: cell(r, idx.cls), isin: cell(r, idx.isin).toUpperCase(), name };
+  }).filter(r => r.cash ? isFinite(r.amount) : ((r.sym || r.isin) && isFinite(r.units)));
 }
 function applyPortRows(rows) {
   rows.forEach(r => {
+    if (r.cash) { S.invest.freeCash = { amount: round2(r.amount), date: ymd(new Date()) }; return }
     let a = allAssets().find(x => (r.isin && x.isin === r.isin) || (r.sym && normSym(x.sym) === r.sym));
     if (!a) {
       const f = fold(r.cls), c = CLASSES.find(k => f && (fold(cname(k.id)) === f || k.id === f)) || CLASSES.find(k => f.length >= 3 && fold(cname(k.id)).includes(f)) || CLASSES[0];
@@ -2286,16 +2654,23 @@ function applyPortRows(rows) {
 // Onglet Soldes : Compte, Solde, Date. « Compte courant » met à jour le solde réel du compte courant ; les autres lignes, les comptes d'épargne du même nom.
 function gsSoldRows(rows) {
   if (!rows.length) return [];
-  const { idx, body } = gsCols(rows, { name: [/compte|^nom|libelle/, 0], bal: [/solde|montant/, 1], date: [/^date/, 2] });
-  return body.map(r => ({ name: cell(r, idx.name), balance: round2(toNum(r[idx.bal])), date: gsDate(r[idx.date]) || ymd(new Date()) })).filter(r => r.name && isFinite(r.balance));
+  const { idx, body } = gsCols(rows, { name: [/^compte|^nom|libelle/, 0], bal: [/solde|montant/, 1], date: [/^date/, 2], color: [/couleur/, 3], icon: [/^icone|^logo/, 4], kind: [/^nature|^type/, 6] });
+  return body.map(r => ({ name: cell(r, idx.name), balance: round2(toNum(r[idx.bal])), date: gsDate(r[idx.date]) || ymd(new Date()),
+    color: okColor(cell(r, idx.color)) ? cell(r, idx.color).toUpperCase() : "", icon: iconFromWord(cell(r, idx.icon)), kind: natureFromWord(cell(r, idx.kind)) }))
+    .filter(r => r.name && (isFinite(r.balance) || r.color || r.icon || r.kind));
 }
+// « Compte courant » / CCP : solde réel du compte courant ; « Degiro » : couleur du portefeuille ; autres lignes : comptes du même nom.
+// Un solde n'écrase pas un solde plus récent saisi dans l'appli.
 function applySoldRows(rows) {
   rows.forEach(r => {
-    const f = fold(r.name);
-    if (/courant|\bccp\b|cheque|principal/.test(f)) { const cur = S.budget.ccp; if (!cur || r.date >= cur.date) S.budget.ccp = { balance: r.balance, date: r.date, at: Date.now() }; return }
-    let a = S.budget.savings.find(x => fold(x.name) === f) || S.budget.savings.find(x => { const g = fold(x.name); return g.length >= 3 && f.length >= 3 && (g.includes(f) || f.includes(g)) });
-    if (!a) { a = { id: rid(), name: r.name, balance: 0, goal: 0 }; S.budget.savings.push(a) }
-    a.balance = r.balance;
+    const f = foldTxt(r.name), look = o => { if (r.color) o.color = r.color; if (r.icon) o.icon = r.icon };
+    if (/courant|\bccp\b|cheque|principal/.test(f)) { const cur = S.budget.ccp; if (isFinite(r.balance) && (!cur || r.date >= cur.date)) S.budget.ccp = { balance: r.balance, date: r.date, at: Date.now() }; look(S.budget.ccpLook); return }
+    if (/degiro|portefeuille/.test(f)) { look(S.invest.look); return }
+    let a = S.budget.savings.find(x => foldTxt(x.name) === f) || S.budget.savings.find(x => { const g = foldTxt(x.name); return g.length >= 3 && f.length >= 3 && (g.includes(f) || f.includes(g)) });
+    if (!a) { if (!isFinite(r.balance)) return; const k = r.kind && r.kind !== "courant" ? r.kind : guessKind(r.name) === "courant" ? "epargne" : guessKind(r.name); a = { id: rid(), name: r.name, balance: 0, goal: 0, kind: k, color: KIND_COLOR[k], icon: KIND_ICON[k] }; S.budget.savings.push(a) }
+    if (isFinite(r.balance) && (!a.date || r.date >= a.date)) { a.balance = round2(r.balance + trNetAfter(a.id, r.date)); a.date = r.date }
+    if (r.kind && r.kind !== "courant") a.kind = r.kind;
+    look(a);
   });
 }
 function gsApply(v) {
@@ -2338,6 +2713,16 @@ $("gs-sheet").addEventListener("change", e => {
   const v = e.target.value.trim(); S.gs.sheet = v; commit(false); renderGsSettings();
   if (v && !sheetIdOf(v)) gsMsg("Ce lien ne ressemble pas à un lien Google Sheets (…/spreadsheets/d/…).", true); else gsMsg("");
 });
+// Thème : automatique (réglage de l'appareil), clair ou sombre
+const LS_THEME = "fin.theme";
+function applyTheme(v) {
+  const root = document.documentElement;
+  if (v === "light" || v === "dark") root.dataset.theme = v; else delete root.dataset.theme;
+  document.querySelectorAll('meta[name="theme-color"]').forEach(m => { const dark = m.media.includes("dark"); m.content = v === "light" ? "#f3f5f7" : v === "dark" ? "#0e1419" : (dark ? "#0e1419" : "#f3f5f7") });
+  document.querySelectorAll("#t-theme [data-th]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.th === (v || "auto"))));
+}
+$("t-theme").addEventListener("click", e => { const b = e.target.closest("[data-th]"); if (!b) return; ls.set(LS_THEME, b.dataset.th); applyTheme(b.dataset.th) });
+applyTheme(ls.get(LS_THEME) || "auto");
 function renderGsSettings() {
   if (document.activeElement !== $("gs-client")) $("gs-client").value = S.gs.clientId || "";
   if (document.activeElement !== $("gs-sheet")) $("gs-sheet").value = S.gs.sheet || "";
@@ -2548,7 +2933,7 @@ function renderSettings() {
   $("s-shift").setAttribute("aria-checked", String(!!b.shiftWeekend));
   const envOpts = sel => `<option value="">Aucune (argent en plus)</option>` + b.envelopes.map(e => `<option value="${esc(e.id)}"${sel === e.id ? " selected" : ""}>Déduire de « ${esc(e.name)} »</option>`).join("");
   $("s-incs").innerHTML = b.incomeCats.map(c => `<div class="erow" data-icid="${esc(c.id)}">
-      <input class="full" data-ick="name" type="text" value="${esc(c.name)}" aria-label="Nom de la catégorie" placeholder="Nom">
+      <div class="full" style="display:flex;gap:8px;align-items:center"><button type="button" class="icopick" data-cico aria-label="Changer le logo de ${esc(c.name)}"><span class="gic" style="--c:var(--c-rev)">${ico(catIcon(c))}</span></button><input data-ick="name" type="text" value="${esc(c.name)}" aria-label="Nom de la catégorie" placeholder="Nom" style="flex:1;min-width:0"></div>
       <select data-ick="env" aria-label="Enveloppe par défaut" style="grid-column:1 / 3">${envOpts(c.env)}</select>
       <button class="del" type="button" data-icdel aria-label="Supprimer la catégorie ${esc(c.name)}">✕</button></div>`).join("") || `<div class="notice">Aucune catégorie.</div>`;
   $("s-classes").innerHTML = CLASSES.map(c => `<label class="field"><span class="small muted" style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:${c.c}"></span>Classe ${CLASSES.indexOf(c) + 1}</span><input type="text" data-cn="${c.id}" value="${esc(cname(c.id))}"></label>`).join("");
@@ -2587,6 +2972,7 @@ $("s-incs").addEventListener("change", e => {
   const c = incCat(sel.closest("[data-icid]").dataset.icid); if (c) { c.env = sel.value; commit(false) }
 });
 $("s-incs").addEventListener("click", e => {
+  const ic = e.target.closest("[data-cico]"); if (ic) { openIconPicker("cat", ic.closest("[data-icid]").dataset.icid); return }
   const del = e.target.closest("[data-icdel]"); if (!del) return;
   if (S.budget.incomeCats.length <= 1) { toast("Gardez au moins une catégorie."); return }
   if (!del.dataset.confirm) { del.dataset.confirm = "1"; del.textContent = "Suppr. ?"; del.style.color = "var(--down)";
@@ -2644,7 +3030,7 @@ $("bk-file").addEventListener("change", async e => {
   } catch { $("bk-msg").textContent = "Ce fichier n'est pas une sauvegarde valide." }
 });
 $("bk-reset").addEventListener("click", () => confirmBox(`Effacer toutes les dépenses, comptes et positions ?${sync.user ? " Les données en ligne seront aussi effacées." : ""} Pensez à exporter une sauvegarde avant.`, "Tout effacer", () => {
-  S = defaultState(); viewCycle = cycleOf(new Date()); commit(); $("bk-msg").textContent = "Données effacées.";
+  S = normalize(defaultState()); viewCycle = cycleOf(new Date()); commit(); $("bk-msg").textContent = "Données effacées.";
 }));
 
 /* ---------- Synchronisation (Firebase) ---------- */
