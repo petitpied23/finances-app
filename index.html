@@ -368,6 +368,98 @@ details.tbl td.calc { padding: 6px 5px }
   background: color-mix(in srgb, var(--fg) 3%, transparent); padding: 10px 12px; text-align: left; color: var(--fg); margin-top: 4px }
 .ccprow b { font-family: var(--mono); font-weight: 600; font-size: 1.05rem; white-space: nowrap }
 .ccprow small { display: block; color: var(--muted); font-size: .78rem }
+
+/* ---------- 1.8 : ergonomie ---------- */
+.btn { min-height: 46px; padding: 10px 16px; border-radius: 12px }
+.seg button { min-height: 42px }
+.cyclenav button.arrow { height: 44px }
+.del { min-width: 40px; min-height: 40px }
+.exp, .env { padding: 12px 2px }
+.actions { gap: 10px }
+.sheetcard .actions .btn { flex: 1 1 auto }
+.linkbtn { padding: 8px 0 }
+.seg4 { grid-template-columns: repeat(4, 1fr) }
+.seg.sm button { padding: 6px 4px; min-height: 36px; font-size: .84rem }
+.periodbox { display: flex; flex-direction: column; gap: 10px; padding: 12px }
+.periodbox .cyclenav { padding: 0 }
+.eic { width: 26px; height: 26px; border-radius: 50%; display: inline-grid; place-items: center; vertical-align: -8px; margin-right: 8px; flex: none;
+  background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--c) }
+.eic .ico { width: 16px; height: 16px }
+.mgroup { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 16px 2px 6px; font-weight: 600; font-size: .86rem; border-bottom: 1px solid var(--line) }
+.mgroup:first-child { padding-top: 4px }
+.mgroup .num { font-family: var(--mono); font-weight: 500 }
+.subhead { font-size: .76rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; padding: 16px 0 4px }
+/* Choix des logos */
+#ic-q { width: 100%; padding: 11px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); font-size: 1rem }
+.icgroups { max-height: 46vh; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 4px; padding: 2px }
+.icgroups h3 { font-size: .74rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 10px 0 4px; font-weight: 600 }
+.icgroups h3:first-child { margin-top: 0 }
+.icgroups .igrid { max-height: none; overflow: visible }
+.icopick { position: relative }
+.icopick[style*="--ec"]::after { content: ""; position: absolute; right: -3px; bottom: -3px; width: 13px; height: 13px; border-radius: 50%; background: var(--ec); border: 2px solid var(--surface) }
+/* Réglages en rubriques */
+.setlist { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden }
+.setlist button { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 14px; border: 0; border-bottom: 1px solid var(--line);
+  background: none; text-align: left; color: var(--fg); min-height: 66px }
+.setlist button:last-child { border-bottom: 0 }
+.setlist b { display: block; font-weight: 600 }
+.setlist small { display: block; color: var(--muted); font-size: .8rem; margin-top: 2px }
+.setlist .chev { color: var(--muted); font-size: 1.4rem }
+.sethead { display: flex; flex-direction: column; align-items: flex-start; gap: 2px }
+.sethead .linkbtn { font-size: .95rem }
+/* Personnalisation */
+.plist { display: flex; flex-direction: column }
+.prow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line) }
+.prow:last-child { border-bottom: 0 }
+.prow .nm { display: flex; align-items: center; gap: 10px; min-width: 0; font-weight: 500 }
+.prow .nm > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.prow .nm svg { width: 20px; height: 20px; flex: none; color: var(--muted) }
+.prow.off .nm { opacity: .45; text-decoration: line-through }
+.prow .ctl { display: flex; gap: 6px; align-items: center }
+.prow .ctl button { width: 42px; height: 42px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); display: grid; place-items: center; font-size: .95rem }
+.prow .ctl button:disabled { opacity: .3 }
+.prow .ctl button[aria-pressed="false"] { color: var(--muted) }
+.prow .lock { font-size: .72rem; color: var(--muted); width: 42px; text-align: center }
+.perso-bar { position: sticky; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); z-index: 3; box-shadow: 0 6px 20px rgb(0 0 0 / .14); justify-content: stretch }
+.perso-bar .btn { flex: 1 1 0 }
+.pz-dirty { font-size: .82rem; font-weight: 600; color: var(--warn) }
+/* Répartition des dépenses (Bilan) */
+.mixbars { display: flex; flex-direction: column; gap: 12px }
+.mixrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 5px 10px; align-items: center; border: 0; background: none; padding: 0; text-align: left; color: var(--fg); font-size: .86rem; width: 100% }
+.mixrow .nm { display: flex; align-items: center; gap: 8px; min-width: 0 }
+.mixrow .nm span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.mixrow .sw, .dlegend .sw { width: 10px; height: 10px; border-radius: 3px; flex: none }
+.mixrow .vl { font-family: var(--mono); font-size: .8rem; white-space: nowrap }
+.mixrow .vl small { color: var(--muted); margin-left: 6px }
+.mixrow .tr { grid-column: 1 / -1; height: 10px; border-radius: 4px; background: color-mix(in srgb, var(--fg) 6%, transparent); overflow: hidden }
+.mixrow .tr i { display: block; height: 100%; border-radius: 4px }
+.dlegend .lg { display: grid; grid-template-columns: 12px minmax(0, 1fr) auto; gap: 8px; align-items: center; border: 0; background: none; padding: 3px 0; text-align: left; color: var(--fg); font: inherit; width: 100% }
+.dim { opacity: .35 }
+/* Résumé : trois barres */
+.tribars { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 6px 0 4px }
+.tb { display: flex; flex-direction: column; gap: 6px; min-width: 0 }
+.tb .eyebrow { white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.tb .bar { height: 10px }
+.tb .v { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: .96rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.tb .small { line-height: 1.25; margin-top: -3px }
+.incrow { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center }
+.incrow input { width: 100%; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); font-family: var(--mono); font-variant-numeric: tabular-nums }
+/* Fenêtres du bas : poignée pour glisser vers le bas */
+.sheetcard::before { content: ""; flex: none; align-self: center; width: 40px; height: 5px; border-radius: 3px; background: var(--line); margin: -8px 0 0 }
+@media (min-width: 600px) { .sheetcard::before { display: none } }
+@keyframes slideL { from { transform: translateX(28px); opacity: .4 } to { transform: none; opacity: 1 } }
+@keyframes slideR { from { transform: translateX(-28px); opacity: .4 } to { transform: none; opacity: 1 } }
+.slide-l > :not(#f-kind) { animation: slideL .18s ease-out }
+.slide-r > :not(#f-kind) { animation: slideR .18s ease-out }
+/* Réorganiser les logos par appui long */
+.gi { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none }
+.igrid.reorder .gi:not(.fixed) { animation: jiggle .3s ease-in-out infinite alternate; border-style: dashed; border-color: var(--accent); touch-action: none }
+.igrid.reorder .gi.fixed { opacity: .4 }
+.igrid.reorder .gi.drag { animation: none; pointer-events: none; position: relative; z-index: 3; box-shadow: 0 10px 24px rgb(0 0 0 / .25); background: var(--surface) }
+@keyframes jiggle { from { transform: rotate(-1.4deg) } to { transform: rotate(1.4deg) } }
+.robar { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: .84rem; color: var(--accent); font-weight: 600 }
+.robar .btn { min-height: 38px; padding: 6px 16px }
+@media (prefers-reduced-motion: reduce) { .igrid.reorder .gi, .slide-l > *, .slide-r > * { animation: none } }
 </style>
 </head>
 <body>
@@ -400,36 +492,46 @@ details.tbl td.calc { padding: 6px 5px }
 
 <!-- ============ BUDGET ============ -->
 <section id="v-budget" class="wrap" hidden>
-  <div class="panel cyclenav">
-    <button class="arrow" type="button" id="cprev" aria-label="Cycle précédent">‹</button>
-    <div><b id="clabel"></b><div class="small muted"><span id="csub"></span> <button class="linkbtn small" type="button" id="cnow" hidden>Revenir au cycle en cours</button></div></div>
-    <button class="arrow" type="button" id="cnext" aria-label="Cycle suivant">›</button>
+  <div class="panel periodbox">
+    <div class="seg seg4" id="p-mode" role="group" aria-label="Période affichée"><button type="button" data-pm="day" aria-pressed="false">Jour</button><button type="button" data-pm="week" aria-pressed="false">Semaine</button><button type="button" data-pm="cycle" aria-pressed="true">Cycle</button><button type="button" data-pm="multi" aria-pressed="false">Plusieurs</button></div>
+    <div class="seg seg4 sm" id="p-multi" role="group" aria-label="Nombre de cycles" hidden><button type="button" data-pn="2" aria-pressed="false">2 cycles</button><button type="button" data-pn="3" aria-pressed="true">3 cycles</button><button type="button" data-pn="6" aria-pressed="false">6 cycles</button><button type="button" data-pn="12" aria-pressed="false">12 cycles</button></div>
+    <div class="cyclenav">
+      <button class="arrow" type="button" id="cprev" aria-label="Période précédente">‹</button>
+      <div><b id="clabel"></b><div class="small muted"><span id="csub"></span> <button class="linkbtn small" type="button" id="cnow" hidden>Revenir au cycle en cours</button></div></div>
+      <button class="arrow" type="button" id="cnext" aria-label="Période suivante">›</button>
+    </div>
   </div>
 
-  <div class="panel total">
+  <div class="panel total" data-block="summary">
     <div class="eyebrow" id="b-lefttitle">Disponible à dépenser</div>
     <div class="big" id="b-left">0,00 €</div>
-    <div class="bar" aria-hidden="true"><i id="b-bar" style="width:0"></i></div>
+    <div class="tribars">
+      <div class="tb"><span class="eyebrow" id="b-revlbl">Revenus</span><span class="bar" aria-hidden="true"><i class="t-rev" id="b-revbar"></i></span><span class="v" id="b-revv">0,00 €</span><span class="small muted" id="b-revnote"></span></div>
+      <div class="tb"><span class="eyebrow">Dépenses</span><span class="bar" aria-hidden="true"><i class="t-exp" id="b-outbar"></i></span><span class="v" id="b-out">0,00 €</span><span class="small muted" id="b-outnote"></span></div>
+      <div class="tb"><span class="eyebrow">Épargne</span><span class="bar" aria-hidden="true"><i class="t-sav" id="b-savbar"></i></span><span class="v" id="b-saved">0,00 €</span><span class="small muted" id="b-savenote"></span></div>
+    </div>
     <div class="small" id="b-pace" style="font-weight:600"></div>
     <div class="small muted" id="b-calc"></div>
     <div class="warnbox" id="b-alert" hidden></div>
     <button type="button" class="ccprow" id="b-ccp"></button>
-    <div class="stats">
-      <label class="stat"><span class="eyebrow"><span class="tdot t-rev"></span>Revenu du cycle</span><input id="b-income" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><span class="small muted" id="b-incnote"></span></label>
-      <div class="stat"><span class="eyebrow"><span class="tdot t-rev"></span>Autres entrées</span><span class="v" id="b-extra">0,00 €</span><span class="small muted" id="b-extranote"></span></div>
-      <div class="stat"><span class="eyebrow"><span class="tdot t-exp"></span>Dépenses</span><span class="v" id="b-out">0,00 €</span><span class="small muted" id="b-outnote"></span></div>
-      <div class="stat"><span class="eyebrow"><span class="tdot t-sav"></span>Épargne</span><span class="v" id="b-saved">0,00 €</span><span class="small muted" id="b-savenote"></span></div>
-    </div>
+    <label class="incrow" id="b-incbox"><span class="small muted">Revenu de ce cycle</span><input id="b-income" type="text" inputmode="decimal" autocomplete="off" placeholder="0" aria-label="Revenu de ce cycle"><span class="small muted" id="b-incnote"></span></label>
     <div class="notice" id="b-incdetail" hidden></div>
   </div>
 
-  <div class="panel">
+  <div class="panel" data-block="envs">
     <div class="clshead"><h2>Enveloppes</h2><button class="linkbtn" type="button" data-goto="plan">Modifier le budget</button></div>
+    <div class="small muted" id="env-pnote" hidden></div>
     <div id="envlist"></div>
   </div>
 
-  <div class="panel">
+  <div class="panel" data-block="savs" id="b-savs">
+    <div class="clshead"><h2>Épargne &amp; placements</h2><button class="linkbtn" type="button" data-goto="comptes">Mes comptes</button></div>
+    <div id="savlist"></div>
+  </div>
+
+  <div class="panel" data-block="movs">
     <div class="clshead"><h2>Mouvements <span class="small muted" id="expcount"></span></h2><span style="display:flex;gap:14px"><button class="linkbtn" type="button" id="expclear" hidden>Tout afficher</button><button class="linkbtn" type="button" id="gs-quick" data-gsfetch hidden>↻ Google Sheets</button></span></div>
+    <div class="seg sm" id="m-sort" role="group" aria-label="Classer les mouvements" style="margin:10px 0 4px"><button type="button" data-ms="date" aria-pressed="true">Par date</button><button type="button" data-ms="env" aria-pressed="false">Par enveloppe</button></div>
     <div id="explist"></div>
   </div>
 </section>
@@ -446,6 +548,12 @@ details.tbl td.calc { padding: 6px 5px }
     <div class="bchart" id="bl-chart"></div>
     <div class="notice" id="bl-chartnote"></div>
     <details class="tbl" id="bl-tblbox" hidden><summary>Voir les chiffres par cycle</summary><div class="tablewrap"><table id="bl-tbl"></table></div></details>
+  </div>
+  <div class="panel stack" id="bl-mix">
+    <div class="clshead"><h2>Répartition des dépenses</h2></div>
+    <div class="seg" id="bl-mixmode" role="group" aria-label="Type de graphique"><button type="button" data-mx="pie" aria-pressed="true">Camembert</button><button type="button" data-mx="bars" aria-pressed="false">Barres</button></div>
+    <div id="bl-mixchart"></div>
+    <div class="small muted" id="bl-mixnote"></div>
   </div>
   <div class="panel"><div class="clshead"><h2>Par enveloppe</h2></div><div id="bl-env"></div></div>
   <div class="panel"><div class="clshead"><h2>Entrées</h2></div><div id="bl-inc"></div></div>
@@ -602,19 +710,36 @@ details.tbl td.calc { padding: 6px 5px }
 
 <!-- ============ RÉGLAGES ============ -->
 <section id="v-reglages" class="wrap" hidden>
-  <div class="panel stack" id="set-sync">
+  <div id="set-home" class="setlist"></div>
+  <div id="set-head" class="sethead" hidden><button type="button" class="linkbtn" id="set-back">‹ Réglages</button><h2 id="set-title"></h2></div>
+
+  <div class="panel stack" data-sec="perso" id="set-perso" hidden>
+    <div class="notice">Changez l'ordre avec ▲ ▼ et masquez ce qui ne vous sert pas. Rien ne change tant que vous n'avez pas touché « Enregistrer ».</div>
+    <h3 class="eyebrow">Accueil</h3><div class="plist" id="pz-home"></div>
+    <h3 class="eyebrow">Menu</h3><div class="plist" id="pz-menu"></div>
+    <h3 class="eyebrow">Enveloppes</h3><div class="plist" id="pz-env"></div>
+    <div class="notice">Le logo et la couleur d'une enveloppe se changent dans Budget (touchez son logo) ; ceux d'un compte dans Comptes.</div>
+  </div>
+  <div class="panel actions perso-bar" data-sec="perso" hidden>
+    <span class="pz-dirty" id="pz-dirty" hidden>Modifications non enregistrées</span>
+    <button class="btn" type="button" id="pz-reset">Réinitialiser</button>
+    <button class="btn" type="button" id="pz-cancel">Annuler</button>
+    <button class="btn primary" type="button" id="pz-save">Enregistrer</button>
+  </div>
+
+  <div class="panel stack" id="set-sync" data-sec="sync" hidden>
     <div class="clshead"><h2>Synchronisation</h2></div>
     <div id="syncbox" class="stack"></div>
     <div class="notice" id="syncmsg" aria-live="polite"></div>
   </div>
 
-  <div class="panel stack" id="set-theme">
+  <div class="panel stack" id="set-theme" data-sec="theme" hidden>
     <h2>Apparence</h2>
     <div class="seg" id="t-theme" role="group" aria-label="Thème" style="grid-template-columns:repeat(3,1fr)"><button type="button" data-th="auto">Automatique</button><button type="button" data-th="light">Clair</button><button type="button" data-th="dark">Sombre</button></div>
     <div class="small muted">« Automatique » suit le réglage clair / sombre de l'appareil. Ce choix est propre à chaque appareil.</div>
   </div>
 
-  <div class="panel stack" id="set-gs">
+  <div class="panel stack" id="set-gs" data-sec="gs" hidden>
     <h2>Google Sheets privé</h2>
     <div class="notice">Un tableau de votre Google Drive que Claude remplit à partir de vos captures : mouvements, budget prévu, quantités du portefeuille. L'appli le lit avec votre compte Google, en lecture seule ; il n'est pas publié. Une seule récupération suffit : les autres appareils reçoivent les données par la synchronisation.</div>
     <label class="field"><span class="small muted">Identifiant client Google (OAuth)</span><input id="gs-client" type="text" autocomplete="off" spellcheck="false" autocapitalize="off" placeholder="123456789-abc….apps.googleusercontent.com"></label>
@@ -634,7 +759,7 @@ details.tbl td.calc { padding: 6px 5px }
     </details>
   </div>
 
-  <div class="panel stack">
+  <div class="panel stack" id="set-cycle" data-sec="cycle" hidden>
     <h2>Cycle de paie</h2>
     <div class="row2">
       <label class="field"><span class="small muted">Jour de paie</span><input id="s-payday" class="n" type="number" min="1" max="31" inputmode="numeric" style="text-align:left"></label>
@@ -646,14 +771,14 @@ details.tbl td.calc { padding: 6px 5px }
     </div>
   </div>
 
-  <div class="panel stack" id="set-inc">
+  <div class="panel stack" id="set-inc" data-sec="inc" hidden>
     <h2>Catégories d'entrées</h2>
     <div class="notice">Pour savoir d'où vient l'argent qui rentre en plus du salaire. « Déduire par défaut » préremplit l'enveloppe à créditer (ex. mutuelle → Santé).</div>
     <div id="s-incs"></div>
     <div><button class="btn" type="button" id="s-incadd">+ Ajouter une catégorie</button></div>
   </div>
 
-  <div class="panel stack" id="set-quotes">
+  <div class="panel stack" id="set-quotes" data-sec="quotes" hidden>
     <h2>Cours en direct</h2>
     <div class="notice">Les cours viennent d'un Google Sheets à vous (fonction GOOGLEFINANCE : toutes les places, différé d'environ 20 minutes), puis sont convertis en euros au taux du jour de la BCE.</div>
     <ol class="steps notice">
@@ -668,13 +793,13 @@ details.tbl td.calc { padding: 6px 5px }
     <div class="notice">Nouvelle ligne plus tard : ajoutez son symbole, puis recopiez les lignes et recollez-les en A1 du même tableau (le lien publié ne change pas).</div>
   </div>
 
-  <div class="panel stack">
+  <div class="panel stack" id="set-invest" data-sec="invest" hidden>
     <h2>Investissements</h2>
     <div class="notice">Nom des quatre classes du rééquilibrage.</div>
     <div class="row2" id="s-classes"></div>
   </div>
 
-  <div class="panel stack" id="set-hist">
+  <div class="panel stack" id="set-hist" data-sec="hist" hidden>
     <h2>Importer un historique</h2>
     <div class="notice">Fichier Excel (.xlsx, .xls), LibreOffice (.ods) ou CSV : export d'une autre appli de budget, tableau de dépenses ou relevé bancaire. Les mouvements sont ajoutés à ceux de l'appli sans rien écraser ; vous vérifiez tout avant de valider, et l'import peut être annulé.</div>
     <div><label class="btn" for="hx-file">Choisir le fichier<input type="file" id="hx-file" class="vh" accept=".xlsx,.xls,.ods,.csv,text/csv"></label></div>
@@ -683,7 +808,7 @@ details.tbl td.calc { padding: 6px 5px }
     <div id="hx-last" class="stack" hidden></div>
   </div>
 
-  <div class="panel stack">
+  <div class="panel stack" id="set-backup" data-sec="backup" hidden>
     <h2>Sauvegarde</h2>
     <div class="notice">Exportez régulièrement une copie de vos données (fichier .json), surtout sans synchronisation.</div>
     <div class="actions" style="justify-content:flex-start">
@@ -695,7 +820,7 @@ details.tbl td.calc { padding: 6px 5px }
     <div class="notice" id="bk-msg" aria-live="polite"></div>
   </div>
 
-  <div class="panel stack">
+  <div class="panel stack" id="set-about" data-sec="about" hidden>
     <div class="kv"><span>Version de l'appli</span><code id="appver"></code></div>
     <div><button class="btn" type="button" id="reload">Recharger l'appli</button></div>
   </div>
@@ -719,7 +844,7 @@ details.tbl td.calc { padding: 6px 5px }
     <label class="field" id="a-goalbox"><span class="small muted">Objectif (€, facultatif)</span><input id="a-goal" type="text" inputmode="decimal" autocomplete="off" placeholder="Ex. 5 000"></label>
     <label class="field" id="a-kindbox"><span class="small muted">Nature</span><select id="a-kind"></select></label>
     <div class="field"><span class="small muted">Couleur</span><div class="swatches" id="a-colors" role="group" aria-label="Couleur"></div></div>
-    <div class="field"><span class="small muted">Logo</span><div class="igrid small" id="a-icons" role="group" aria-label="Logo"></div></div>
+    <div class="field"><span class="small muted">Logo</span><div class="igrid small" id="a-icons" role="group" aria-label="Logo"></div><button type="button" class="linkbtn" id="a-moreico" style="align-self:flex-start">Plus de logos…</button></div>
     <div class="notice" id="a-note"></div>
     <div class="notice err" id="a-err"></div>
     <div class="actions">
@@ -730,13 +855,15 @@ details.tbl td.calc { padding: 6px 5px }
   </form>
 </div>
 
-<!-- Choix d'un logo (enveloppes, catégories) -->
+<!-- Choix d'un logo et d'une couleur (enveloppes, catégories, comptes) -->
 <div id="icsheet" class="sheet" hidden>
   <div class="sheetbg" data-icclose></div>
   <div class="sheetcard">
     <h2 id="ictitle">Choisir un logo</h2>
-    <div class="igrid" id="ic-grid" role="group" aria-label="Logos" style="max-height:none"></div>
-    <div class="actions"><button type="button" class="btn" data-icclose>Fermer</button></div>
+    <div class="field" id="ic-colbox"><span class="small muted" id="ic-collbl">Couleur</span><div class="swatches" id="ic-colors" role="group" aria-label="Couleur"></div></div>
+    <input id="ic-q" type="search" enterkeyhint="search" autocomplete="off" placeholder="Rechercher : resto, loyer, livret, prime…" aria-label="Rechercher un logo">
+    <div class="icgroups" id="ic-grid" role="group" aria-label="Logos"></div>
+    <div class="actions"><button type="button" class="btn" data-icclose>Annuler</button><button type="button" class="btn primary" id="ic-ok">Enregistrer</button></div>
   </div>
 </div>
 
@@ -774,7 +901,7 @@ details.tbl td.calc { padding: 6px 5px }
 
 <script>
 "use strict";
-const APP_VERSION = "1.7.0";
+const APP_VERSION = "1.8.0";
 const FB_VERSION = "10.12.2"; // SDK Firebase chargé depuis gstatic uniquement si la synchronisation est configurée
 const LS = { state: "fin.state", fb: "fin.firebase", dev: "fin.device", link: "fin.linked", lastSync: "fin.lastsync" };
 const CLASSES = [{ id: "stocks", c: "#2346d8" }, { id: "bonds", c: "#7a4fd0" }, { id: "gold", c: "#c99a0a" }, { id: "cash", c: "#138a5b" }];
@@ -857,15 +984,88 @@ const ICONS = {
   card: '<rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M2.5 10h19M6 15h4"/>',
   safe: '<rect x="3.5" y="3.5" width="17" height="17" rx="2"/><circle cx="12" cy="12" r="3.5"/><path d="M12 8.5v1M12 14.5v1M8.5 12h1M14.5 12h1"/>',
   euro: '<circle cx="12" cy="12" r="8.5"/><path d="M15.5 8.5a4 4 0 1 0 0 7M7.5 10.5h6M7.5 13.5h6"/>',
-  dots: '<circle cx="6" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="18" cy="12" r="1.2"/>'
+  dots: '<circle cx="6" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="18" cy="12" r="1.2"/>',
+  pizza: '<path d="M12 21.5L3.5 6.5C8.8 3.5 15.2 3.5 20.5 6.5z"/><path d="M5 9.2c4.5-2.2 9.5-2.2 14 0"/><circle cx="10" cy="11.8" r="1"/><circle cx="14" cy="13.5" r="1"/><circle cx="12" cy="17" r=".8"/>',
+  burger: '<path d="M4 10.5C4 6.5 7.6 4 12 4s8 2.5 8 6.5z"/><path d="M3.5 14h17"/><path d="M5 17.5h14v.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 5 18z"/>',
+  bread: '<path d="M5.5 20.5V11A3.5 3.5 0 0 1 3.5 8C3.5 5.5 7.3 3.5 12 3.5s8.5 2 8.5 4.5a3.5 3.5 0 0 1-2 3v9.5z"/><path d="M9.5 12v4.5M14.5 12v4.5"/>',
+  apple: '<path d="M12 7.5c-1.5-1-3-1.2-4.5-.8C5 7.4 4 10 4.5 13c.6 3.8 3 7.5 5.5 7.5 1 0 1.3-.5 2-.5s1 .5 2 .5c2.5 0 4.9-3.7 5.5-7.5.5-3-.5-5.6-3-6.3-1.5-.4-3-.2-4.5.8z"/><path d="M12 7.5c0-2 1-3.5 3-4"/>',
+  cake: '<path d="M4 20.5h16M5 20.5v-7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v7"/><path d="M5 15.5c1.2 1 2.3 1 3.5 0s2.3-1 3.5 0 2.3 1 3.5 0 2.3-1 3.5 0"/><path d="M12 11.5V8.5"/><path d="M12 4.5c.8.8.8 1.8 0 2.5-.8-.7-.8-1.7 0-2.5z"/>',
+  icecream: '<path d="M7 11.5a5 5 0 0 1 10 0z"/><path d="M7.5 11.5L12 21.5l4.5-10"/>',
+  wine: '<path d="M8 3.5h8l-.5 5a3.5 3.5 0 0 1-7 0z"/><path d="M8.4 7h7.2M12 12v8.5M8.5 20.5h7"/>',
+  beer: '<path d="M6 8h9v10.5a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2z"/><path d="M15 10.5h2a2 2 0 0 1 2 2v2.5a2 2 0 0 1-2 2h-2"/><path d="M6 8a2.5 2.5 0 0 1 2-3.4 3 3 0 0 1 5 0A2.5 2.5 0 0 1 15 8"/><path d="M9.5 11.5v5.5M12 11.5v5.5"/>',
+  cocktail: '<path d="M4 4.5h16L12 13z"/><path d="M12 13v7.5M8 20.5h8M7 7.8h10"/>',
+  bike: '<circle cx="5.5" cy="16" r="3.5"/><circle cx="18.5" cy="16" r="3.5"/><path d="M5.5 16L9 9.5h7l2.5 6.5M9 9.5L7.8 7H6M12 16l4-6.5M14.5 6.5h2.5"/>',
+  moto: '<circle cx="5.5" cy="16.5" r="3"/><circle cx="18.5" cy="16.5" r="3"/><path d="M8.5 16.5h5l3-5h-4.5L10 9H7.5M15.5 7h2l3 9.5M5.5 16.5L9 11.5h3"/>',
+  train: '<rect x="5.5" y="3" width="13" height="14" rx="3"/><path d="M5.5 10h13"/><circle cx="9" cy="13.5" r=".7"/><circle cx="15" cy="13.5" r=".7"/><path d="M8 21l2-4M16 21l-2-4"/>',
+  parking: '<rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="M9.5 17V7h3.5a3 3 0 0 1 0 6H9.5"/>',
+  ev: '<rect x="4.5" y="3" width="10" height="18" rx="2"/><path d="M3 21h13M10 7l-2 3.5h3l-2 3.5"/><path d="M14.5 9h2a1.5 1.5 0 0 1 1.5 1.5V16a1.5 1.5 0 0 0 3 0v-5l-2-2"/>',
+  key: '<circle cx="7.5" cy="15.5" r="4"/><path d="M10.5 12.5l8-8M15.5 7.5l2.5 2.5M17.5 5.5l2 2"/>',
+  sofa: '<path d="M5 11V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3"/><path d="M3 13a2 2 0 0 1 4 0v2h10v-2a2 2 0 0 1 4 0v4a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M5.5 18v2M18.5 18v2"/>',
+  bulb: '<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.4 1.1 2.2v.5h5V16c0-.8.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"/>',
+  drop: '<path d="M12 3.5c3.5 4.2 6 7.7 6 10.5a6 6 0 0 1-12 0c0-2.8 2.5-6.3 6-10.5z"/>',
+  flame: '<path d="M12 21a6 6 0 0 0 6-6c0-3.5-2.5-5.5-3.5-9-1.5 1.5-2.5 3-2.5 5-1-1-1.5-2-1.5-3.5C8 9.5 6 12 6 15a6 6 0 0 0 6 6z"/>',
+  wifi: '<path d="M3 9a13 13 0 0 1 18 0M6 12.5a8.5 8.5 0 0 1 12 0M9 16a4 4 0 0 1 6 0"/><circle cx="12" cy="19" r=".8"/>',
+  wrench: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9z"/>',
+  plant: '<path d="M12 20.5v-8"/><path d="M12 12.5c0-4 2.5-6.5 7-6.5 0 4.5-2.5 6.5-7 6.5z"/><path d="M12 15.5C12 12 10 10 5.5 10c0 4 2 5.5 6.5 5.5z"/><path d="M7.5 20.5h9"/>',
+  pill: '<rect x="2.8" y="8.5" width="18.4" height="7" rx="3.5" transform="rotate(-45 12 12)"/><path d="M8.8 8.8l6.4 6.4"/>',
+  tooth: '<path d="M12 6c-1.5-1.5-3.5-2-5-1.5C5 5 4 7 4.5 9.5c.4 2 1.3 3.5 1.8 5.5.5 2.2 1 5.5 2.5 5.5 1.5 0 1.7-2.5 2-4 .2-1 .6-1.5 1.2-1.5s1 .5 1.2 1.5c.3 1.5.5 4 2 4 1.5 0 2-3.3 2.5-5.5.5-2 1.4-3.5 1.8-5.5C20 7 19 5 17 4.5c-1.5-.5-3.5 0-5 1.5z"/>',
+  glasses: '<circle cx="6.5" cy="14" r="3.5"/><circle cx="17.5" cy="14" r="3.5"/><path d="M10 14c1.2-1 2.8-1 4 0M3 14l1.5-6.5H7M21 14l-1.5-6.5H17"/>',
+  beauty: '<path d="M8.5 21h7v-9.5h-7z"/><path d="M9.5 11.5V7l5-3.5v8M8.5 15h7"/>',
+  music: '<path d="M9 18V5.5l11-2V16"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/>',
+  film: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/>',
+  camera: '<path d="M4 8h3l2-2.5h6L17 8h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/>',
+  palette: '<path d="M12 3.5a8.5 8.5 0 0 0 0 17c1.2 0 1.8-.8 1.8-1.7 0-1.2-1-1.5-1-2.6 0-1 .8-1.7 1.8-1.7h2.2a3.7 3.7 0 0 0 3.7-3.7C20.5 6.8 16.7 3.5 12 3.5z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7.3" r="1"/><circle cx="14.5" cy="7.3" r="1"/>',
+  ball: '<circle cx="12" cy="12" r="8.5"/><path d="M12 8l3.3 2.4-1.3 3.9h-4l-1.3-3.9z"/><path d="M12 8V3.5M15.3 10.4l4.2-1.4M14 14.3l2.6 3.6M10 14.3l-2.6 3.6M8.7 10.4L4.5 9"/>',
+  tent: '<path d="M2.5 20.5h19M4 20.5L12 5l8 15.5"/><path d="M9.5 20.5L12 15l2.5 5.5M10.5 3.5L12 5l1.5-1.5"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/>',
+  bed: '<path d="M3 19.5V6M3 15.5h18v4M21 15.5V12a3 3 0 0 0-3-3h-7v6.5"/><circle cx="7" cy="11.5" r="2"/>',
+  pin: '<path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.5"/>',
+  dice: '<rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="8.5" cy="8.5" r=".9"/><circle cx="15.5" cy="15.5" r=".9"/><circle cx="12" cy="12" r=".9"/><circle cx="15.5" cy="8.5" r=".9"/><circle cx="8.5" cy="15.5" r=".9"/>',
+  suitcase: '<rect x="4" y="7" width="16" height="13" rx="2"/><path d="M9 7V4.5h6V7M8 7v13M16 7v13"/>',
+  bag: '<path d="M5 7.5h14l-1 13H6z"/><path d="M9 10V6a3 3 0 0 1 6 0v4"/>',
+  watch: '<rect x="6" y="6.5" width="12" height="11" rx="3"/><path d="M9 6.5L9.5 3h5l.5 3.5M9 17.5l.5 3.5h5l.5-3.5M12 9.5V12l1.5 1.5"/>',
+  gem: '<path d="M6.5 4h11l3.5 5-9 11.5L3 9z"/><path d="M3 9h18M9.5 4L8 9l4 11.5L16 9l-1.5-5"/>',
+  headphones: '<path d="M4 17v-4a8 8 0 0 1 16 0v4"/><rect x="3" y="14" width="4.5" height="6.5" rx="1.5"/><rect x="16.5" y="14" width="4.5" height="6.5" rx="1.5"/>',
+  laptop: '<rect x="4.5" y="4.5" width="15" height="11" rx="1.5"/><path d="M2.5 19h19M3.5 19l1-3.5h15l1 3.5"/>',
+  cloud: '<path d="M7 19a4.5 4.5 0 0 1-.6-9A6 6 0 0 1 18 9a5 5 0 0 1-.5 10z"/>',
+  tv: '<rect x="3" y="6.5" width="18" height="12.5" rx="2"/><path d="M8.5 3l3.5 3.5L15.5 3M8 21.5h8"/>',
+  news: '<path d="M4.5 4.5h12v14a2 2 0 0 0 2 2h-12a2 2 0 0 1-2-2z"/><path d="M16.5 8.5h3v10a2 2 0 0 1-2 2M7.5 8.5h6M7.5 12h6M7.5 15.5h4"/>',
+  mail: '<rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="M3.5 7l8.5 6 8.5-6"/>',
+  calendar: '<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+  clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.5 2"/>',
+  baby: '<circle cx="12" cy="12.5" r="8"/><path d="M9 11.5v.01M15 11.5v.01M9.5 15a3.5 3.5 0 0 0 5 0M12 4.5c-1 1-1 2.3 0 3"/>',
+  school: '<path d="M2.5 9L12 4.5 21.5 9 12 13.5z"/><path d="M6 11v5c1.5 1.5 3.7 2.3 6 2.3s4.5-.8 6-2.3v-5M21.5 9v5.5"/>',
+  hand: '<path d="M2.5 15.5h3v5h-3z"/><path d="M5.5 16.5h3.8l4.2 1.5c.9.3 1.9-.1 2.2-1 .2-.7-.1-1.5-.8-1.8L11 13.5H8.5l-3 1.5"/><path d="M5.5 20h8.3c.8 0 1.6-.3 2.2-.8l5.2-4.4c.5-.5.6-1.3.1-1.9-.5-.5-1.3-.6-1.9-.2L15.6 15"/><circle cx="15.5" cy="6.5" r="3"/>',
+  building: '<rect x="5" y="3" width="14" height="18" rx="1"/><path d="M9 7h.01M15 7h.01M9 11h.01M15 11h.01M9 15h.01M15 15h.01M10.5 21v-3h3v3"/>',
+  box: '<path d="M3.5 7.5L12 3l8.5 4.5v9L12 21l-8.5-4.5z"/><path d="M3.5 7.5L12 12l8.5-4.5M12 12v9"/>',
+  doc: '<path d="M6.5 3h7.5l4.5 4.5V20a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M13.5 3v5h5M8.5 12.5h7M8.5 16h7"/>',
+  shield: '<path d="M12 3l7.5 3v5.5c0 4.7-3.2 8.2-7.5 9.5-4.3-1.3-7.5-4.8-7.5-9.5V6z"/><path d="M9 12l2 2 4-4"/>',
+  percent: '<path d="M19 5L5 19"/><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="17" r="2.5"/>',
+  calculator: '<rect x="5" y="2.5" width="14" height="19" rx="2"/><rect x="8" y="5.5" width="8" height="4" rx=".5"/><path d="M8.5 13v.01M12 13v.01M15.5 13v.01M8.5 16.5v.01M12 16.5v.01M15.5 16.5v.01"/>',
+  lock: '<rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/>',
+  umbrella: '<path d="M3 12a9 9 0 0 1 18 0z"/><path d="M12 12v6.5a2 2 0 0 1-4 0M12 3v-.5"/>',
+  briefcase: '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 5v2M3 12.5h18"/>',
+  trophy: '<path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 5.5H5a3 3 0 0 0 3 4M16 5.5h3a3 3 0 0 1-3 4M12 13v4M8.5 20.5h7M9.5 20.5c0-2 1-3.5 2.5-3.5s2.5 1.5 2.5 3.5"/>',
+  undo: '<path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',
+  coins: '<ellipse cx="9" cy="7" rx="5.5" ry="2.5"/><path d="M3.5 7v4c0 1.4 2.5 2.5 5.5 2.5s5.5-1.1 5.5-2.5V7"/><path d="M14.5 10.6c3.4 0 6 1 6 2.4v6c0 1.4-2.5 2.5-5.5 2.5s-5.5-1.1-5.5-2.5v-4.5"/><path d="M9.5 15c0 1.4 2.5 2.5 5.5 2.5s5.5-1.1 5.5-2.5"/>',
+  trend: '<path d="M3.5 17l6-6 4 4 7-7.5"/><path d="M15 7.5h5.5V13"/>',
+  gold: '<path d="M3 20.5l1.5-5h6l1.5 5zM12 20.5l1.5-5h6l1.5 5zM7.5 15.5l1.5-5h6l1.5 5z"/>',
+  target: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>',
+  rocket: '<path d="M9.5 14.5l-2-2C9 7.5 12.8 4.5 19.5 4.5c0 6.7-3 10.5-8 12z"/><path d="M7.5 12.5L4.5 12l2.5-3h3.5M11.5 16.5l.5 3 3-2.5v-3.5M5 19c.5-1.5 1.5-2.5 3-3"/><circle cx="15" cy="9" r="1.3"/>',
+  flag: '<path d="M5 21V4M5 4.5c3-1.5 5.5 1.5 8.5 0s4.5-1 5.5 0v9c-1-1-2.5-1.5-5.5 0s-5.5-1.5-8.5 0"/>'
 };
 const ICON_NAMES = { cart: "Courses", food: "Restaurant", coffee: "Café", fuel: "Carburant", car: "Voiture", bus: "Transport", health: "Santé", heart: "Cœur", game: "Jeux", ticket: "Sorties",
   repeat: "Abonnement", bolt: "Imprévu", scissors: "Coiffeur", screen: "Électronique", shirt: "Vêtements", bank: "Banque", home: "Maison", swap: "Virement", gift: "Cadeau", tag: "Vente",
   star: "Prime", users: "Proches", receipt: "Achat", book: "Études", sport: "Sport", phone: "Téléphone", laundry: "Laverie", plane: "Voyage", paw: "Animaux", cash: "Billets",
-  moneybag: "Sac", piggy: "Tirelire", chart: "Placements", crypto: "Crypto", wallet: "Portefeuille", card: "Carte", safe: "Coffre", euro: "Euro", dots: "Autre" };
+  moneybag: "Sac", piggy: "Tirelire", chart: "Placements", crypto: "Crypto", wallet: "Portefeuille", card: "Carte", safe: "Coffre", euro: "Euro", dots: "Autre",
+  pizza: "Pizza", burger: "Fast-food", bread: "Boulangerie", apple: "Primeur", cake: "Pâtisserie", icecream: "Glace", wine: "Vin", beer: "Bière", cocktail: "Bar", bike: "Vélo", moto: "Moto", train: "Train", parking: "Parking", ev: "Recharge", key: "Loyer", sofa: "Meubles", bulb: "Électricité", drop: "Eau", flame: "Gaz", wifi: "Internet", wrench: "Réparations", plant: "Jardin", pill: "Pharmacie", tooth: "Dentiste", glasses: "Optique", beauty: "Beauté", music: "Musique", film: "Cinéma", camera: "Photo", palette: "Créatif", ball: "Foot", tent: "Camping", sun: "Vacances", bed: "Hôtel", pin: "Sortie", dice: "Jeux d'argent", suitcase: "Valise", bag: "Shopping", watch: "Montre", gem: "Bijoux", headphones: "Audio", laptop: "Ordinateur", cloud: "Cloud", tv: "Streaming", news: "Presse", mail: "Courrier", calendar: "Échéancier", clock: "Échéance", baby: "Bébé", school: "École", hand: "Don", building: "Appartement", box: "Colis", doc: "Papiers", shield: "Assurance", percent: "Intérêts", calculator: "Comptable", lock: "Coffre-fort", umbrella: "Précaution", briefcase: "Travail", trophy: "Gains", undo: "Remboursé", coins: "Pièces", trend: "Croissance", gold: "Or", target: "Objectif", rocket: "Projet", flag: "But" };
 const ico = k => `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[k] || ICONS.dots}</svg>`;
 const foldTxt = s => String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
-const ICON_RULES = [[/courses|supermarch|aliment|epicerie/, "cart"], [/restau|resto|burger|kebab|pizza|fast/, "food"], [/cafe|bar\b|boisson/, "coffee"], [/carbur|essence|gasoil|plein/, "fuel"],
+const ICON_RULES = [[/pharma/, "pill"], [/dentist/, "tooth"], [/optique|lunette|opticien/, "glasses"], [/loyer|location/, "key"], [/electricit|\bedf\b/, "bulb"], [/\beau\b/, "drop"], [/\bgaz\b/, "flame"],
+  [/internet|\bbox\b|fibre/, "wifi"], [/assurance/, "shield"], [/cinema|\bcine\b/, "film"], [/musique|spotify|deezer/, "music"], [/bijou/, "gem"], [/bebe|creche|nounou/, "baby"], [/boulang/, "bread"],
+  [/pizza/, "pizza"], [/burger|kebab|tacos|fast/, "burger"], [/alcool|\bbar\b|apero/, "cocktail"], [/hotel|airbnb/, "bed"], [/don\b|dons\b|association|charit/, "hand"], [/beaute|cosmet|parfum/, "beauty"],
+  [/streaming|netflix|disney|canal/, "tv"], [/dividende/, "coins"], [/interet/, "percent"], [/reparat|bricol/, "wrench"], [/colis|amazon/, "box"], [/jardin/, "plant"], [/train|sncf|tgv/, "train"],
+  [/velo|trottinette/, "bike"], [/parking|peage/, "parking"], [/courses|supermarch|aliment|epicerie/, "cart"], [/restau|resto|burger|kebab|pizza|fast/, "food"], [/cafe|bar\b|boisson/, "coffee"], [/carbur|essence|gasoil|plein/, "fuel"],
   [/voiture|auto|parking|peage|moto|garage/, "car"], [/transport|train|sncf|bus|metro|tram|tao|uber|taxi/, "bus"], [/voyage|vacance|avion|hotel/, "plane"], [/sante|medec|pharma|mutuelle|uneo|docteur/, "health"],
   [/jeu|steam|game|playstation|xbox|nintendo/, "game"], [/loisir|sortie|cine|concert|festival/, "ticket"], [/abonn|paiement regul|prelev|netflix|spotify/, "repeat"], [/imprevu|urgence/, "bolt"],
   [/coiff|barbier/, "scissors"], [/electron|informatique|high.?tech|\bpc\b|ordi/, "screen"], [/sapo|vetement|habit|mode|chaussure/, "shirt"], [/etat|impot|amende|taxe|tresor/, "bank"],
@@ -911,6 +1111,143 @@ function natureFromWord(w) {
   if (/crypto|trading/.test(f)) return "crypto"; if (/espece|liquide/.test(f)) return "especes"; if (/epargn|livret/.test(f)) return "epargne"; return "";
 }
 
+
+// Logos classés par thème (fenêtre de choix) et mots-clés pour la recherche
+const ICON_GROUPS = [
+  { name: "Alimentation", keys: ["cart", "food", "coffee", "pizza", "burger", "bread", "apple", "cake", "icecream", "wine", "beer", "cocktail"] },
+  { name: "Transport", keys: ["car", "fuel", "bus", "train", "bike", "moto", "parking", "ev", "plane", "suitcase"] },
+  { name: "Logement & maison", keys: ["home", "building", "key", "sofa", "bulb", "drop", "flame", "wifi", "wrench", "plant", "laundry", "box"] },
+  { name: "Santé & bien-être", keys: ["health", "pill", "tooth", "glasses", "heart", "sport", "beauty", "scissors"] },
+  { name: "Loisirs & sorties", keys: ["ticket", "game", "film", "music", "camera", "palette", "ball", "tent", "sun", "bed", "pin", "dice", "book"] },
+  { name: "Shopping & high-tech", keys: ["bag", "shirt", "receipt", "watch", "gem", "gift", "screen", "laptop", "phone", "headphones"] },
+  { name: "Abonnements & services", keys: ["repeat", "tv", "cloud", "news", "mail", "calendar", "clock"] },
+  { name: "Famille & proches", keys: ["users", "baby", "school", "paw", "hand"] },
+  { name: "Banque & administratif", keys: ["bank", "card", "doc", "shield", "percent", "calculator", "lock", "umbrella"] },
+  { name: "Revenus & entrées", keys: ["euro", "briefcase", "star", "trophy", "undo", "tag", "swap", "cash", "coins"] },
+  { name: "Épargne & placements", keys: ["piggy", "moneybag", "safe", "chart", "trend", "crypto", "gold", "target", "rocket", "wallet"] },
+  { name: "Divers", keys: ["bolt", "flag", "dots"] }
+];
+const ICON_KW = {
+  cart: "supermarché courses épicerie alimentation leclerc carrefour lidl drive",
+  food: "restaurant resto repas manger cantine traiteur",
+  coffee: "café bar boisson thé petit-déjeuner",
+  pizza: "pizzeria italien livraison",
+  burger: "mcdo burger king kebab tacos fast food uber eats deliveroo",
+  bread: "boulangerie pain viennoiserie croissant",
+  apple: "fruits légumes marché primeur bio",
+  cake: "gâteau pâtisserie anniversaire dessert",
+  icecream: "glace dessert été",
+  wine: "vin cave apéro alcool",
+  beer: "bière bar pub apéro alcool",
+  cocktail: "bar soirée boîte alcool apéro",
+  car: "voiture auto garage entretien contrôle technique",
+  fuel: "essence carburant gasoil plein station",
+  bus: "transport bus métro tram navigo tao ticket",
+  train: "sncf tgv ter train ouigo",
+  bike: "vélo trottinette",
+  moto: "moto scooter deux-roues",
+  parking: "parking stationnement péage",
+  ev: "recharge électrique borne",
+  plane: "avion voyage vol aéroport",
+  suitcase: "valise voyage bagage séjour",
+  home: "maison logement foyer",
+  building: "appartement immeuble syndic charges copropriété",
+  key: "loyer location clé caution",
+  sofa: "meuble ameublement déco ikea canapé",
+  bulb: "électricité edf énergie lumière",
+  drop: "eau facture veolia",
+  flame: "gaz chauffage énergie",
+  wifi: "internet box fibre adsl",
+  wrench: "réparation bricolage outils entretien plombier",
+  plant: "jardin plantes fleurs jardinerie",
+  laundry: "laverie pressing lessive linge",
+  box: "colis livraison amazon commande poste",
+  health: "santé médecin docteur hôpital soins",
+  pill: "pharmacie médicaments ordonnance",
+  tooth: "dentiste dents orthodontiste",
+  glasses: "optique lunettes opticien lentilles",
+  heart: "cœur amour couple bien-être",
+  sport: "sport salle fitness muscu musculation",
+  beauty: "beauté maquillage cosmétique parfum soin",
+  scissors: "coiffeur barbier coupe cheveux",
+  ticket: "sortie loisirs spectacle concert billet",
+  game: "jeux vidéo console steam playstation xbox nintendo",
+  film: "cinéma film ciné",
+  music: "musique concert spotify deezer instrument",
+  camera: "photo appareil",
+  palette: "créatif art peinture dessin loisirs",
+  ball: "foot football sport club match",
+  tent: "camping randonnée nature",
+  sun: "vacances été plage soleil",
+  bed: "hôtel nuit hébergement airbnb",
+  pin: "sortie lieu visite balade",
+  dice: "jeux d'argent pari loto casino poker",
+  book: "livre études lecture école formation",
+  bag: "shopping achats magasin",
+  shirt: "vêtements habits sapologie mode chaussures",
+  receipt: "achat ticket facture",
+  watch: "montre accessoire",
+  gem: "bijoux bijou bague luxe",
+  gift: "cadeau cadeaux anniversaire noël",
+  screen: "électronique écran high-tech informatique",
+  laptop: "ordinateur pc informatique high-tech",
+  phone: "téléphone mobile forfait smartphone",
+  headphones: "audio casque écouteurs",
+  repeat: "abonnement paiement régulier prélèvement mensuel",
+  tv: "streaming netflix disney canal tv télé",
+  cloud: "cloud stockage icloud google drive",
+  news: "presse journal magazine",
+  mail: "courrier poste lettre",
+  calendar: "échéancier mensualité calendrier",
+  clock: "échéance délai horaire",
+  users: "proches famille amis",
+  baby: "bébé enfant crèche nounou",
+  school: "école études université scolarité cantine",
+  paw: "animaux chien chat vétérinaire",
+  hand: "don dons association aide charité",
+  bank: "banque état impôts taxes trésor public",
+  card: "carte bancaire frais bancaires cb",
+  doc: "papiers administratif document dossier",
+  shield: "assurance mutuelle protection",
+  percent: "intérêts taux crédit prêt",
+  calculator: "comptable calcul budget",
+  lock: "coffre-fort sécurité bloqué",
+  umbrella: "précaution imprévu sécurité réserve",
+  euro: "salaire paie euro argent",
+  briefcase: "travail salaire job freelance mission",
+  star: "prime bonus récompense",
+  trophy: "gains gagnant concours jeux",
+  undo: "remboursement retour avoir",
+  tag: "vente vinted leboncoin occasion",
+  swap: "virement transfert remboursement",
+  cash: "billets espèces liquide argent",
+  coins: "pièces monnaie dividendes",
+  piggy: "tirelire épargne livret économies",
+  moneybag: "sac argent trésor",
+  safe: "coffre épargne réserve",
+  chart: "placements bourse actions pea investissement",
+  trend: "croissance rendement hausse investissement",
+  crypto: "crypto bitcoin ethereum",
+  gold: "or lingot métaux",
+  target: "objectif but épargne",
+  rocket: "projet décollage startup ambition",
+  wallet: "portefeuille espèces argent",
+  bolt: "imprévu urgence éclair",
+  flag: "but projet objectif",
+  dots: "autre divers"
+};
+// Couleurs des enveloppes dans les graphiques (couleur propre à chaque enveloppe, réglable avec son logo)
+const ENV_COLORS = ["#2A78D6", "#FF8A3D", "#22C7C9", "#F2CF2E", "#E030BE", "#1BAF7A", "#6250D6", "#FF4D5A"], OTHER_COLOR = "#A0A7AF";
+const envColor = e => okColor(e?.color) ? e.color : ENV_COLORS[Math.max(0, S.budget.envelopes.indexOf(e)) % ENV_COLORS.length];
+// Personnalisation (Réglages › Personnalisation)
+const HOME_IDS = ["summary", "envs", "savs", "movs"], MENU_IDS = ["budget", "bilan", "comptes", "plan", "invest", "conj"];
+function normUi(u) {
+  u = u && typeof u === "object" ? u : {};
+  const ord = (a, all) => { const x = (Array.isArray(a) ? a : []).filter((v, i, arr) => all.includes(v) && arr.indexOf(v) === i); return x.concat(all.filter(v => !x.includes(v))) };
+  const hid = (a, all) => [...new Set((Array.isArray(a) ? a : []).filter(v => all.includes(v)))];
+  return { homeOrder: ord(u.homeOrder, HOME_IDS), homeHidden: hid(u.homeHidden, HOME_IDS), menuOrder: ord(u.menuOrder, MENU_IDS), menuHidden: hid(u.menuHidden, MENU_IDS).filter(v => v !== "budget") };
+}
+
 /* ---------- Données ---------- */
 function defaultState() {
   const env = (id, name, kind = "spend") => ({ id, name, planned: 0, kind });
@@ -946,7 +1283,8 @@ function defaultState() {
       freeCash: null, look: { color: "#222222", icon: "chart" }
     },
     // Google Sheets privé (rempli par Claude) : identifiant client OAuth, lien du tableau, empreintes du dernier budget / portefeuille appliqués
-    gs: { clientId: "", sheet: "", budgetHash: "", portHash: "", soldHash: "" }
+    gs: { clientId: "", sheet: "", budgetHash: "", portHash: "", soldHash: "" },
+    ui: normUi({})   // ordre et blocs masqués de l'accueil et du menu
   };
 }
 function normalize(s) {
@@ -954,6 +1292,7 @@ function normalize(s) {
   if (!s || typeof s !== "object") return d;
   const b = { ...d.budget, ...(s.budget || {}) }, i = { ...d.invest, ...(s.invest || {}) };
   if (!Array.isArray(b.envelopes)) b.envelopes = d.budget.envelopes;
+  b.envelopes.forEach((e, k) => { if (!okColor(e.color)) e.color = ENV_COLORS[k % ENV_COLORS.length] });   // couleur dans les graphiques
   if (!Array.isArray(b.expenses)) b.expenses = [];
   if (!Array.isArray(b.savings)) b.savings = [];
   if (!Array.isArray(b.incomes)) b.incomes = [];
@@ -974,7 +1313,7 @@ function normalize(s) {
   if (!i.freeCash || typeof i.freeCash !== "object" || !isFinite(+i.freeCash.amount)) i.freeCash = null;   // marge libre DEGIRO { amount, date }
   i.look = { color: "#222222", icon: "chart", ...(i.look && typeof i.look === "object" ? i.look : {}) };
   const g = { ...d.gs, ...(s.gs && typeof s.gs === "object" ? s.gs : {}) };
-  return { v: 1, updatedAt: +s.updatedAt || 0, budget: b, invest: i, gs: g };
+  return { v: 1, updatedAt: +s.updatedAt || 0, budget: b, invest: i, gs: g, ui: normUi(s.ui) };
 }
 let S = (() => { try { const j = JSON.parse(ls.get(LS.state)); if (j && j.v) return normalize(j) } catch {} return normalize(defaultState()) })();
 
@@ -1000,7 +1339,10 @@ const VIEWS = ["budget", "bilan", "comptes", "plan", "invest", "conj", "reglages
 const TITLES = { budget: "Accueil", bilan: "Bilan", comptes: "Comptes", plan: "Budget", invest: "Portefeuille", conj: "Conjoncture", reglages: "Réglages" };
 let view = "budget", pendingAnchor = null;
 function show(v, anchor) {
+  let sec = null; v = String(v || ""); if (v.includes("/")) [v, sec] = v.split("/");
   if (!VIEWS.includes(v)) v = "budget";
+  if (v === "reglages") { if (!sec && anchor) sec = secOf(anchor); setSec = SET_SECS.some(x => x.id === sec) ? sec : null }
+  if (v !== "reglages" || !setSec) setFromList = false;
   view = v;
   VIEWS.forEach(x => { $("v-" + x).hidden = x !== v });
   document.querySelectorAll("#dnav [data-view]").forEach(b => b.setAttribute("aria-current", b.dataset.view === v ? "page" : "false"));
@@ -1009,14 +1351,25 @@ function show(v, anchor) {
   $("fab").hidden = v !== "budget";
   closeDrawer(false);
   renderView();
-  if (anchor && $(anchor)) $(anchor).scrollIntoView({ block: "start" }); else window.scrollTo(0, 0);
+  if (anchor && $(anchor) && !(v === "reglages" && $(anchor).dataset.sec)) $(anchor).scrollIntoView({ block: "start" }); else window.scrollTo(0, 0);
 }
 function renderView() {
+  applyMenu();
   ({ budget: renderBudget, bilan: renderBilan, comptes: renderComptes, plan: renderPlan, invest: renderInvest, conj: renderConj, reglages: renderSettings })[view]();
   renderSync();
 }
 // Changer de rubrique en passant par l'adresse (#bilan…), pour que le bouton Retour du téléphone fonctionne
-function go(v, anchor) { if (location.hash.slice(1) === v) show(v, anchor); else { pendingAnchor = anchor || null; location.hash = v } }
+function go(v, anchor) {
+  if (v === "reglages" && anchor) { const sc = secOf(anchor); if (sc) v = "reglages/" + sc }
+  if (location.hash.slice(1) === v) show(v, anchor); else { pendingAnchor = anchor || null; location.hash = v }
+}
+// Menu : ordre et rubriques masquées choisis dans Réglages › Personnalisation (Accueil et Réglages restent toujours là)
+function applyMenu() {
+  const nav = $("dnav"), u = S.ui, btn = v => nav.querySelector(`[data-view="${v}"]`);
+  nav.querySelectorAll("hr").forEach(h => h.remove());
+  [...u.menuOrder, "reglages"].forEach(v => { const b = btn(v); if (b) { nav.appendChild(b); b.hidden = u.menuHidden.includes(v) } });
+  nav.insertBefore(document.createElement("hr"), btn("reglages"));
+}
 document.addEventListener("click", e => { const g = e.target.closest("[data-goto]"); if (g) go(g.dataset.goto, g.dataset.anchor) });
 window.addEventListener("hashchange", () => { const a = pendingAnchor; pendingAnchor = null; show(location.hash.slice(1), a) });
 window.addEventListener("scroll", () => $("appbar").classList.toggle("scrolled", window.scrollY > 4), { passive: true });
@@ -1122,21 +1475,135 @@ function cycleStats(c) {
   return { ex, inc, tr, spentBy, refundBy, byCat, extra, refunds, out: gross - refunds, saved: savedGross - savedRefunds };
 }
 
+/* ---------- Accueil : période affichée (jour, semaine, cycle, plusieurs cycles) ---------- */
+const PREFS_KEY = "fin.prefs";
+let PF = (() => { const d = { period: "cycle", multi: 3, movSort: "date", mix: "pie" }; try { return { ...d, ...JSON.parse(ls.get(PREFS_KEY) || "{}") } } catch { return d } })();
+if (!["day", "week", "cycle", "multi"].includes(PF.period)) PF.period = "cycle";
+if (![2, 3, 6, 12].includes(+PF.multi)) PF.multi = 3;
+const savePrefs = () => ls.set(PREFS_KEY, JSON.stringify(PF));   // choix d'affichage propres à cet appareil
+const midnight = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+const dayDiff = (a, b) => Math.round((midnight(b) - midnight(a)) / 864e5);
+const mondayOf = d => addDays(d, -((d.getDay() + 6) % 7));
+let viewDate = midnight(new Date()), lastToday = midnight(new Date());
+function periodInfo() {
+  const today = midnight(new Date()), m = PF.period;
+  if (m === "day") return { m, a: viewDate, b: viewDate, now: +viewDate === +today };
+  if (m === "week") { const a = mondayOf(viewDate), b = addDays(a, 6); return { m, a, b, now: today >= a && today <= b } }
+  if (m === "multi") { const n = +PF.multi, cs = Array.from({ length: n }, (_, i) => shiftCycle(viewCycle, i - n + 1)); return { m, a: cs[0].start, b: viewCycle.end, cs, now: isCurrent(viewCycle) } }
+  return { m, a: viewCycle.start, b: viewCycle.end, cs: [viewCycle], now: isCurrent(viewCycle) };
+}
+function periodLabel(pi) {
+  const today = midnight(new Date()), yr = d => ` ${d.getFullYear()}`;
+  if (pi.m === "day") {
+    const t = pi.a.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" }), k = dayDiff(today, pi.a);
+    return [t.charAt(0).toUpperCase() + t.slice(1), k === 0 ? "Aujourd'hui" : k === -1 ? "Hier" : k === 1 ? "Demain" : k < 0 ? "Jour passé" : "Jour à venir"];
+  }
+  if (pi.m === "week") return [`Semaine du ${fmtDay(pi.a)} au ${fmtDay(pi.b)}`, pi.now ? "Cette semaine" : pi.b < today ? "Semaine passée" : "Semaine à venir"];
+  if (pi.m === "multi") return [`${fmtDay(pi.a)}${pi.a.getFullYear() !== pi.b.getFullYear() ? yr(pi.a) : ""} → ${fmtDay(pi.b)}${yr(pi.b)}`, `${pi.cs.length} cycles` + (pi.now ? " jusqu'au cycle en cours" : pi.b < today ? " terminés" : "")];
+  const c = viewCycle; return [`${fmtDay(c.start)} → ${fmtDay(c.end)}${yr(c.end)}`, pi.now ? "Cycle en cours" : (c.start > today ? "Cycle à venir" : "Cycle terminé")];
+}
+function setPeriod(m) {
+  if (m === PF.period) return;
+  const was = PF.period, wide = x => x === "cycle" || x === "multi";
+  // On garde le même moment : d'un cycle vers le jour, on prend aujourd'hui si le cycle est en cours, sinon son premier jour
+  if (wide(was) && !wide(m)) viewDate = isCurrent(viewCycle) ? midnight(new Date()) : midnight(viewCycle.start);
+  if (!wide(was) && wide(m)) viewCycle = cycleOf(viewDate);
+  PF.period = m; savePrefs(); envFilter = null; renderBudget();
+}
+function shiftPeriod(dir) {
+  if (PF.period === "day") viewDate = addDays(viewDate, dir);
+  else if (PF.period === "week") viewDate = addDays(viewDate, 7 * dir);
+  else viewCycle = shiftCycle(viewCycle, dir * (PF.period === "multi" ? +PF.multi : 1));
+  renderBudget();
+}
+const savePlanned = () => S.budget.envelopes.filter(e => e.kind === "save").reduce((s, e) => s + (+e.planned || 0), 0);
+// Budget d'un jour : ce qui reste à dépenser sur le cycle au matin de ce jour, réparti sur les jours restants jusqu'à la veille de la paie
+function dayRate(C, from) {
+  const st = from > C.start ? cycleStats({ start: C.start, end: addDays(from, -1) }) : null;
+  const spend = st ? st.out - st.saved : 0, saved = st ? st.saved : 0, extra = st ? st.extra : 0;
+  const dispo = round2(cycleIncome(C) + extra - spend - Math.max(savePlanned(), saved)), days = dayDiff(from, C.end) + 1;
+  return { dispo, days, rate: Math.max(0, dispo) / days };
+}
+// Budget d'une période de quelques jours (une semaine peut chevaucher deux cycles) et part des enveloppes à lui attribuer
+function periodBudget(a, b) {
+  let total = 0, first = null, factor = 0;
+  for (let d = a; d <= b;) {
+    const C = cycleOf(d), to = C.end < b ? C.end : b, n = dayDiff(d, to) + 1, r = dayRate(C, d);
+    total += r.rate * n; factor += n / (dayDiff(C.start, C.end) + 1); if (!first) first = r;
+    d = addDays(to, 1);
+  }
+  return { total: round2(total), first, factor };
+}
+function periodSummary(pi) {
+  const envs = S.budget.envelopes, savePlan = savePlanned(), plannedSpend = envs.filter(e => e.kind !== "save").reduce((s, e) => s + (+e.planned || 0), 0);
+  const st = cycleStats({ start: pi.a, end: pi.b }), spend = round2(st.out - st.saved), today = midnight(new Date());
+  const pct = (sp, room) => room > 0 ? Math.min(100, Math.max(0, sp / room * 100)) : (sp > 0 ? 100 : 0);
+  if (pi.m === "day" || pi.m === "week") {
+    const pb = periodBudget(pi.a, pi.b), room = pb.total + st.extra, left = round2(room - spend), day = pi.m === "day", f = pb.first;
+    return { st, spend, factor: pb.factor, left, pct: pct(spend, room),
+      title: pi.a > today ? (day ? "Budget prévu ce jour" : "Budget prévu sur la semaine") : day ? (pi.now ? "Reste pour aujourd'hui" : "Reste ce jour-là") : (pi.now ? "Reste cette semaine" : "Reste sur la semaine"),
+      calc: `${fmtEUR(pb.total)} de budget${st.extra ? ` + ${fmtEUR(st.extra)} d'entrées` : ""} − ${fmtEUR(spend)} dépensés`,
+      pace: !cycleIncome(cycleOf(pi.a)) && !S.budget.income ? "Indiquez votre revenu habituel dans Budget pour calculer un budget par jour."
+        : f ? `${fmtEUR(Math.max(0, f.dispo))} encore disponibles ÷ ${f.days} jour${f.days > 1 ? "s" : ""} jusqu'à la paie = ${fmtEUR(f.rate)} par jour` + (f.dispo < 0 ? " · objectif d'épargne compromis" : "") : "",
+      pstat: true, revLbl: "Budget", rev: round2(room), revNote: st.extra ? `dont ${fmtEUR(st.extra)} d'entrées` : day ? "reste ÷ jours restants" : `≈ ${fmtEUR(pb.total / 7)} par jour`,
+      outTarget: room, savTarget: round2(savePlan * pb.factor),
+      outNote: `sur ${fmtEUR(room)}`, savedNote: savePlan ? `objectif ${fmtEUR(savePlan * pb.factor)} (prorata)` : "virements" };
+  }
+  if (pi.m === "multi") {
+    let sal = 0, goal = 0;
+    pi.cs.forEach(c => { const s = cycleStats(c), past = c.end < today && !isCurrent(c); sal += cycleIncome(c); goal += past ? s.saved : Math.max(savePlan, s.saved) });
+    const n = pi.cs.length, income = sal + st.extra, left = round2(income - spend - goal), past = pi.b < today;
+    return { st, spend, factor: n, left, pct: pct(spend, income - goal),
+      title: past ? `Restant sur ${n} cycles` : `Disponible sur ${n} cycles`,
+      calc: income || spend ? `${fmtEUR(income)} de revenus − ${fmtEUR(spend)} de dépenses − ${fmtEUR(goal)} d'épargne` : "",
+      pace: `En moyenne ${fmtEUR(spend / n)} de dépenses et ${fmtEUR(st.saved / n)} d'épargne par cycle`,
+      pstat: true, revLbl: "Revenus", rev: income, revNote: st.extra ? `dont ${fmtEUR(st.extra)} d'entrées` : `salaires de ${n} cycles`,
+      outTarget: plannedSpend ? plannedSpend * n : income - goal, savTarget: savePlan * n,
+      outNote: plannedSpend ? `sur ${fmtEUR(plannedSpend * n)} prévus` : "hors épargne",
+      savedNote: savePlan ? (st.saved >= savePlan * n - 0.005 ? `<span style="color:var(--c-sav)">✓</span> objectif de ${fmtEUR(savePlan * n)} atteint` : `objectif ${fmtEUR(savePlan * n)}`) : "virements vers l'épargne" };
+  }
+  // Un cycle : revenus du cycle − dépenses − objectif d'épargne (ou ce qui a déjà été viré, si c'est plus)
+  const c = viewCycle, salary = cycleIncome(c), cur = pi.now, past = c.end < new Date() && !cur;
+  const income = salary + st.extra, saveGoal = past ? st.saved : Math.max(savePlan, st.saved), toSave = Math.max(0, savePlan - st.saved), left = round2(income - spend - saveGoal);
+  let pace = "";
+  if (!salary && !S.budget.income) pace = "Indiquez votre revenu habituel dans Budget (ou le revenu de ce cycle ci-dessous).";
+  else if (cur) { const days = dayDiff(new Date(), c.end) + 1; pace = `${days} jour${days > 1 ? "s" : ""} jusqu'à la paie` + (left > 0 ? ` · environ ${fmtEUR(left / days)} par jour` : left < 0 ? " · objectif d'épargne compromis" : "") }
+  else pace = past ? (left >= 0 ? "Cycle terminé." : "Cycle terminé en dépassement.") : "Cycle à venir.";
+  return { st, spend, factor: 1, left, pct: pct(spend, income - saveGoal), cur, toSave,
+    title: past ? "Restant en fin de cycle" : "Disponible à dépenser",
+    calc: income || spend ? `${fmtEUR(income)} de revenus − ${fmtEUR(spend)} de dépenses − ${fmtEUR(saveGoal)} ${past ? "virés vers l'épargne" : "d'objectif d'épargne"}` : "",
+    pace, pstat: null, revLbl: "Revenus", rev: income, revNote: st.extra ? `dont ${fmtEUR(st.extra)} d'entrées` : (typeof S.budget.cycles[c.key]?.income === "number" ? "revenu propre à ce cycle" : "salaire du cycle"),
+    outTarget: plannedSpend || income - saveGoal, savTarget: savePlan,
+    outNote: plannedSpend ? `sur ${fmtEUR(plannedSpend)} prévus` : "hors épargne",
+    savedNote: savePlan ? (st.saved >= savePlan - 0.005 ? `<span style="color:var(--c-sav)">✓</span> objectif de ${fmtEUR(savePlan)} atteint` : `objectif ${fmtEUR(savePlan)} · reste ${fmtEUR(toSave)}`) : "virements vers l'épargne" };
+}
+// Ordre et blocs masqués de l'accueil (Réglages › Personnalisation)
+function applyHome() {
+  const sec = $("v-budget"), u = S.ui, cur = [...sec.querySelectorAll(":scope > [data-block]")].map(e => e.dataset.block).join();
+  if (cur !== u.homeOrder.join()) u.homeOrder.forEach(id => { const el = sec.querySelector(`:scope > [data-block="${id}"]`); if (el) sec.appendChild(el) });
+  sec.querySelectorAll(":scope > [data-block]").forEach(el => { el.hidden = u.homeHidden.includes(el.dataset.block) });
+}
 function renderBudget() {
-  const c = viewCycle, cur = isCurrent(c), now = new Date();
-  $("clabel").textContent = `${fmtDay(c.start)} → ${fmtDay(c.end)} ${c.end.getFullYear()}`;
-  $("csub").textContent = cur ? "Cycle en cours" : (c.start > now ? "Cycle à venir" : "Cycle terminé");
-  $("cnow").hidden = cur;
-  const custom = S.budget.cycles[c.key]?.income;
-  if (document.activeElement !== $("b-income")) $("b-income").value = typeof custom === "number" ? fmtIn(custom) : "";
-  $("b-income").placeholder = fmtIn(S.budget.income) || "0";
-  $("b-incnote").textContent = typeof custom === "number" ? "propre à ce cycle" : "revenu habituel";
-  updateSummary();
-
-  const st = cycleStats(c), envs = S.budget.envelopes;
+  applyHome();
+  const today = midnight(new Date()); lastToday = today;
+  const pi = periodInfo(), [lbl, sub] = periodLabel(pi), cyc = PF.period === "cycle";
+  document.querySelectorAll("#p-mode [data-pm]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.pm === PF.period)));
+  $("p-multi").hidden = PF.period !== "multi";
+  document.querySelectorAll("#p-multi [data-pn]").forEach(b => b.setAttribute("aria-pressed", String(+b.dataset.pn === +PF.multi)));
+  $("clabel").textContent = lbl; $("csub").textContent = sub;
+  $("cnow").hidden = pi.now;
+  $("cnow").textContent = PF.period === "day" ? "Revenir à aujourd'hui" : PF.period === "week" ? "Revenir à cette semaine" : "Revenir au cycle en cours";
+  if (cyc) {
+    const c = viewCycle, custom = S.budget.cycles[c.key]?.income;
+    if (document.activeElement !== $("b-income")) $("b-income").value = typeof custom === "number" ? fmtIn(custom) : "";
+    $("b-income").placeholder = fmtIn(S.budget.income) || "0";
+    $("b-incnote").textContent = typeof custom === "number" ? "propre à ce cycle" : "revenu habituel";
+  }
+  const sm = updateSummary(pi), st = sm.st, f = sm.factor, envs = S.budget.envelopes;
   const orphan = Object.keys(st.spentBy).filter(id => !envById(id)).reduce((s, id) => s + st.spentBy[id], 0);
   // Dépense : barre orange, hachurée en rouge si l'enveloppe est dépassée. Épargne : barre bleue, et mettre plus que prévu est une bonne nouvelle.
-  const envRow = (id, name, sp, refund, pl, kind) => {
+  const envRow = (id, name, sp, refund, pl, kind, icon) => {
     const net = sp - refund, save = kind === "save", rest = pl - net;
     const pct = pl > 0 ? Math.min(100, Math.max(0, net / pl * 100)) : (net > 0 ? 100 : 0);
     const over = !save && (pl > 0 ? net > pl + 0.005 : net > 0);
@@ -1146,28 +1613,36 @@ function renderBudget() {
       : (pl > 0 || net ? (rest >= 0 ? "reste " + fmtEUR(rest) : "⚠ dépassé de " + fmtEUR(-rest)) : "—");
     const note = save && pl > 0 ? (rest > 0.005 ? " · à épargner" : rest < -0.005 ? " · objectif dépassé" : " · objectif atteint") : "";
     return `<button type="button" class="env${envFilter === id ? " on" : ""}" data-env="${esc(id)}">
-      <span><b>${esc(name)}</b>${save ? '<span class="tag">épargne</span>' : ""}<br><span class="small muted num">${fmtEUR(net)} / ${fmtEUR(pl)}${refund ? ` · dont ${fmtEUR(refund)} remboursés` : ""}</span><span class="small muted">${note}</span></span>
+      <span><b><span class="eic" style="--c:${save ? "var(--c-sav)" : "var(--c-exp)"}">${ico(icon)}</span>${esc(name)}</b><br><span class="small muted num">${fmtEUR(net)} / ${fmtEUR(pl)}${refund ? ` · dont ${fmtEUR(refund)} remboursés` : ""}</span><span class="small muted">${note}</span></span>
       <span class="num small" style="font-weight:600;text-align:right;color:${over ? "var(--down)" : "var(--fg)"}">${right}</span>
       <span class="bar"><i class="${over ? "over" : save ? "t-sav" : "t-exp"}" style="width:${pct}%"></i></span></button>`;
   };
-  const shown = envs.filter(e => +e.planned || st.spentBy[e.id] || st.refundBy[e.id] || envFilter === e.id), hidden = envs.length - shown.length;
-  $("envlist").innerHTML = (envs.length ? shown.map(e => envRow(e.id, e.name, st.spentBy[e.id] || 0, st.refundBy[e.id] || 0, +e.planned || 0, e.kind)).join("") : `<div class="notice">Aucune enveloppe : ajoutez-en dans <button class="linkbtn small" type="button" data-goto="plan">Budget</button>.</div>`)
-    + (orphan ? envRow("__none", "Sans enveloppe", orphan, 0, 0, "spend") : "")
-    + (hidden ? `<div class="notice" style="padding-top:8px">${hidden} enveloppe${hidden > 1 ? "s" : ""} sans budget ni mouvement sur ce cycle ${hidden > 1 ? "sont masquées" : "est masquée"}.</div>` : "");
+  const row = e => envRow(e.id, e.name, st.spentBy[e.id] || 0, st.refundBy[e.id] || 0, round2((+e.planned || 0) * f), e.kind, envIcon(e));
+  const visible = e => +e.planned || st.spentBy[e.id] || st.refundBy[e.id] || envFilter === e.id;
+  const spendE = envs.filter(e => e.kind !== "save"), saveE = envs.filter(e => e.kind === "save"), shown = spendE.filter(visible), hidden = spendE.length - shown.length;
+  $("env-pnote").hidden = f === 1;
+  $("env-pnote").textContent = PF.period === "multi" ? `Budget prévu × ${PF.multi} cycles.` : "Budget prévu ramené à la période, au prorata des jours du cycle.";
+  $("envlist").innerHTML = (spendE.length ? shown.map(row).join("") : `<div class="notice">Aucune enveloppe de dépenses : ajoutez-en dans <button class="linkbtn small" type="button" data-goto="plan">Budget</button>.</div>`)
+    + (orphan ? envRow("__none", "Sans enveloppe", orphan, 0, 0, "spend", "dots") : "")
+    + (hidden ? `<div class="notice" style="padding-top:8px">${hidden} enveloppe${hidden > 1 ? "s" : ""} sans budget ni mouvement sur cette période ${hidden > 1 ? "sont masquées" : "est masquée"}.</div>` : "");
+  const savShown = saveE.filter(visible);
+  $("savlist").innerHTML = savShown.length ? savShown.map(row).join("")
+    : `<div class="notice">${saveE.length ? "Rien de prévu ni de viré sur cette période." : "Pour suivre ici vos virements vers l'épargne, créez une enveloppe de type « Épargne » dans Budget."}</div>`;
 
-  // Mouvements du cycle : dépenses et entrées mélangées, du plus récent au plus ancien
+  // Mouvements de la période : dépenses, entrées et virements mélangés
   const exps = st.ex.filter(e => !envFilter || (envFilter === "__none" ? !envById(e.env) : e.env === envFilter)).map(e => ({ k: "exp", o: e }));
   const incs = st.inc.filter(i => !envFilter || refundEnv(i) === envFilter).map(i => ({ k: "inc", o: i }));
   const trs = st.tr.filter(t => !envFilter || trEnv(t) === envFilter).map(t => ({ k: "tr", o: t }));
   const list = [...exps, ...incs, ...trs].sort((a, b) => b.o.date.localeCompare(a.o.date) || (b.o.at || 0) - (a.o.at || 0));
   $("expcount").textContent = list.length ? `· ${list.length}` : "";
   $("expclear").hidden = !envFilter; $("gs-quick").hidden = !gsReady();
-  $("explist").innerHTML = list.length ? list.map(({ k, o }) => {
+  document.querySelectorAll("#m-sort [data-ms]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.ms === PF.movSort)));
+  const movRow = ({ k, o }) => {
     const d = parseYmd(o.date), day = `<span class="d">${pad(d.getDate())}/${pad(d.getMonth() + 1)}</span>`;
     if (k === "tr") {
-      const f = acctById(o.from), t = acctById(o.to);
+      const fr = acctById(o.from), to = acctById(o.to);
       return `<button type="button" class="exp" data-tr="${esc(o.id)}">${day}
-        <span class="l"><b><span class="tdot t-sav"></span>${esc(o.label || "Virement")}</b><small>${esc(f?.name || "?")} → ${esc(t?.name || "?")}</small></span>
+        <span class="l"><b><span class="tdot t-sav"></span>${esc(o.label || "Virement")}</b><small>${esc(fr?.name || "?")} → ${esc(to?.name || "?")}</small></span>
         <span class="num" style="font-weight:600">${fmtEUR(o.amount)}</span></button>`;
     }
     if (k === "inc") {
@@ -1180,7 +1655,21 @@ function renderBudget() {
     return `<button type="button" class="exp" data-exp="${esc(o.id)}">${day}
       <span class="l"><b><span class="tdot ${en?.kind === "save" ? "t-sav" : "t-exp"}"></span>${esc(o.label || en?.name || "Dépense")}</b><small>${esc(en?.name || "Sans enveloppe")}</small></span>
       <span class="num" style="font-weight:600">${o.amount < 0 ? "+" + fmtEUR(-o.amount) : fmtEUR(o.amount)}</span></button>`;
-  }).join("") : `<div class="notice">${envFilter ? "Aucun mouvement dans cette enveloppe sur ce cycle." : "Aucun mouvement sur ce cycle. Touchez + pour ajouter une dépense ou une entrée."}</div>`;
+  };
+  let html = "";
+  if (list.length && PF.movSort === "env") {
+    // Regroupés par enveloppe, dans l'ordre des enveloppes ; entrées et virements sans effet sur le budget à la fin
+    const gkey = ({ k, o }) => k === "exp" ? (envById(o.env) ? o.env : "__none") : k === "inc" ? (refundEnv(o) || "__inc") : (trEnv(o) || "__tr");
+    const val = ({ k, o }, g) => k === "inc" ? (g === "__inc" ? +o.amount : -o.amount) : k === "tr" ? (g === "__tr" ? +o.amount : (trFlow(o)?.amount || 0)) : +o.amount;
+    const groups = {}; list.forEach(x => (groups[gkey(x)] ||= []).push(x));
+    html = [...envs.map(e => e.id), "__none", "__inc", "__tr"].filter(g => groups[g]).map(g => {
+      const items = groups[g], tot = items.reduce((s, x) => s + val(x, g), 0), e = envById(g);
+      const name = e?.name || { __none: "Sans enveloppe", __inc: "Entrées d'argent", __tr: "Virements entre comptes" }[g];
+      const icon = e ? envIcon(e) : { __none: "dots", __inc: "euro", __tr: "swap" }[g], col = e ? (e.kind === "save" ? "var(--c-sav)" : "var(--c-exp)") : g === "__inc" ? "var(--c-rev)" : g === "__tr" ? "var(--c-sav)" : "var(--muted)";
+      return `<div class="mgroup"><span><span class="eic" style="--c:${col}">${ico(icon)}</span>${esc(name)} <span class="muted" style="font-weight:500">· ${items.length}</span></span><span class="num">${g === "__inc" ? "+" : ""}${fmtEUR(tot)}</span></div>` + items.map(movRow).join("");
+    }).join("");
+  } else html = list.map(movRow).join("");
+  $("explist").innerHTML = html || `<div class="notice">${envFilter ? "Aucun mouvement dans cette enveloppe sur cette période." : "Aucun mouvement sur cette période. Touchez + pour ajouter une dépense, une entrée ou un virement."}</div>`;
 }
 // Solde estimé du compte courant : dernier solde réel + salaires et entrées − dépenses (virements d'épargne compris) saisis depuis
 function ccpEstimate() {
@@ -1195,57 +1684,51 @@ function ccpEstimate() {
   for (let c = shiftCycle(cycleOf(parseYmd(a.date)), 1); c.start <= t0; c = shiftCycle(c, 1)) sal += cycleIncome(c);
   return { value: round2((+a.balance || 0) + inc + sal - out), inc: round2(inc + sal), out: round2(out) };
 }
-function updateSummary() {
-  const c = viewCycle, st = cycleStats(c), salary = cycleIncome(c), cur = isCurrent(c), past = c.end < new Date() && !cur;
-  const envs = S.budget.envelopes, savePlan = envs.filter(e => e.kind === "save").reduce((s, e) => s + (+e.planned || 0), 0);
-  const income = salary + st.extra, spend = round2(st.out - st.saved), saveGoal = past ? st.saved : Math.max(savePlan, st.saved), toSave = Math.max(0, savePlan - st.saved);
-  // Disponible = revenus du cycle − dépenses − objectif d'épargne (ou ce qui a déjà été viré, si c'est plus)
-  const left = round2(income - spend - saveGoal);
-  $("b-lefttitle").textContent = past ? "Restant en fin de cycle" : "Disponible à dépenser";
-  $("b-left").textContent = fmtEUR(left); $("b-left").style.color = left < 0 ? "var(--down)" : "";
-  const room = income - saveGoal, pct = room > 0 ? Math.min(100, Math.max(0, spend / room * 100)) : (spend > 0 ? 100 : 0);
-  $("b-bar").style.width = pct + "%"; $("b-bar").className = left < 0 ? "over" : "t-exp";
-  $("b-calc").textContent = income || spend ? `${fmtEUR(income)} de revenus − ${fmtEUR(spend)} de dépenses − ${fmtEUR(saveGoal)} ${past ? "virés vers l'épargne" : "d'objectif d'épargne"}` : "";
-  let pace = "";
-  if (!salary && !S.budget.income) pace = "Indiquez votre revenu habituel dans Budget (ou le revenu de ce cycle ci-dessous).";
-  else if (cur) {
-    const t = new Date(), t0 = new Date(t.getFullYear(), t.getMonth(), t.getDate()), days = Math.round((c.end - t0) / 864e5) + 1;
-    pace = `${days} jour${days > 1 ? "s" : ""} jusqu'à la paie` + (left > 0 ? ` · environ ${fmtEUR(left / days)} par jour` : left < 0 ? " · objectif d'épargne compromis" : "");
-  } else if (past) pace = left >= 0 ? "Cycle terminé." : "Cycle terminé en dépassement.";
-  else pace = "Cycle à venir.";
-  $("b-pace").textContent = pace;
+function updateSummary(pi = periodInfo()) {
+  const s = periodSummary(pi), st = s.st, cyc = pi.m === "cycle";
+  $("b-lefttitle").textContent = s.title;
+  $("b-left").textContent = fmtEUR(s.left); $("b-left").style.color = s.left < 0 ? "var(--down)" : "";
+  $("b-calc").textContent = s.calc; $("b-pace").textContent = s.pace;
+  $("b-incbox").hidden = !!s.pstat;
+  // Trois barres : revenus (vert, pleine), dépenses (orange, rouge une fois le budget atteint), épargne (bleu, jusqu'à l'objectif)
+  const fill = (v, t) => t > 0.005 ? Math.min(100, Math.max(0, v / t * 100)) : (v > 0.005 ? 100 : 0);
+  $("b-revlbl").textContent = s.revLbl; $("b-revv").textContent = fmtEUR(s.rev); $("b-revnote").textContent = s.revNote;
+  $("b-revbar").style.width = (s.rev > 0.005 ? 100 : 0) + "%";
+  const full = s.outTarget > 0.005 ? s.spend >= s.outTarget - 0.005 && s.spend > 0.005 : s.spend > 0.005;
+  $("b-outbar").style.width = fill(s.spend, s.outTarget) + "%"; $("b-outbar").className = full ? "over" : "t-exp";
+  $("b-savbar").style.width = fill(st.saved, s.savTarget) + "%";
   // Compte courant (solde réel le plus récent + mouvements depuis)
-  const cc = ccpEstimate();
+  const cc = ccpEstimate(), toSave = cyc && s.cur ? s.toSave : 0;
   // Alerte : le disponible du cycle dépasse ce qui est vraiment libre sur le compte courant
-  const free = cc ? round2(cc.value - (cur ? toSave : 0)) : null, warn = cur && cc && left > free + 1;
+  const free = cc ? round2(cc.value - toSave) : null, warn = cyc && s.cur && cc && s.left > free + 1;
   $("b-alert").hidden = !warn;
   if (warn) $("b-alert").textContent = `⚠ C'est plus que ce qu'il y a vraiment sur ton compte courant (${fmtEUR(free)} libres après l'épargne à virer). Il manque peut-être un mouvement, ou le solde enregistré n'est plus à jour.`;
   $("b-ccp").innerHTML = cc
-    ? `<span><span class="small muted">Sur le compte courant</span>${toSave > 0 && cur ? `<small>dont ${fmtEUR(toSave)} encore à virer vers l'épargne : ${fmtEUR(cc.value - toSave)} vraiment libres</small>` : `<small>estimé depuis le solde du ${fmtDay(parseYmd(S.budget.ccp.date))}</small>`}</span><b${cc.value < 0 ? ' style="color:var(--down)"' : ""}>${fmtEUR(cc.value)}</b>`
+    ? `<span><span class="small muted">Sur le compte courant</span>${toSave > 0 ? `<small>dont ${fmtEUR(toSave)} encore à virer vers l'épargne : ${fmtEUR(cc.value - toSave)} vraiment libres</small>` : `<small>estimé depuis le solde du ${fmtDay(parseYmd(S.budget.ccp.date))}</small>`}</span><b${cc.value < 0 ? ' style="color:var(--down)"' : ""}>${fmtEUR(cc.value)}</b>`
     : `<span><span class="small muted">Compte courant</span><small>Indiquez le solde de votre banque pour le suivre ici</small></span><b style="font-family:var(--body);font-size:.85rem;color:var(--accent)">Ajouter ›</b>`;
-  const entries = st.extra + st.refunds;
-  $("b-extra").textContent = fmtEUR(entries);
-  $("b-extranote").textContent = st.refunds ? `dont ${fmtEUR(st.refunds)} déduits des enveloppes` : (entries ? "argent en plus" : "ventes, remboursements…");
-  $("b-out").textContent = fmtEUR(spend);
-  const plannedSpend = envs.filter(e => e.kind !== "save").reduce((s, e) => s + (+e.planned || 0), 0);
-  $("b-outnote").textContent = plannedSpend ? `sur ${fmtEUR(plannedSpend)} prévus` : "hors virements d'épargne";
-  $("b-saved").textContent = fmtEUR(st.saved);
-  $("b-savenote").innerHTML = savePlan ? (st.saved >= savePlan - 0.005 ? `<span style="color:var(--c-sav)">✓</span> objectif de ${fmtEUR(savePlan)} atteint` : `objectif ${fmtEUR(savePlan)} · reste ${fmtEUR(toSave)}`) : "virements vers l'épargne";
+  $("b-out").textContent = fmtEUR(s.spend); $("b-outnote").textContent = s.outNote;
+  $("b-saved").textContent = fmtEUR(st.saved); $("b-savenote").innerHTML = s.savedNote;
   const cats = Object.entries(st.byCat).sort((a, b) => b[1] - a[1]);
-  $("b-incdetail").textContent = cats.length ? "Entrées : " + cats.map(([id, v]) => `${incCat(id)?.name || "Autre"} ${fmtEUR(v)}`).join(" · ") : "";
+  $("b-incdetail").textContent = cats.length ? "Entrées : " + cats.map(([id, v]) => `${incCat(id)?.name || "Autre"} ${fmtEUR(v)}`).join(" · ") + (st.refunds ? ` (dont ${fmtEUR(st.refunds)} déduits des enveloppes)` : "") : "";
   $("b-incdetail").hidden = !cats.length;
+  return s;
 }
 $("b-ccp").addEventListener("click", () => { if (S.budget.ccp) go("comptes"); else openAcct("ccp") });
-$("cprev").addEventListener("click", () => { viewCycle = shiftCycle(viewCycle, -1); renderBudget() });
-$("cnext").addEventListener("click", () => { viewCycle = shiftCycle(viewCycle, 1); renderBudget() });
-$("cnow").addEventListener("click", () => { viewCycle = cycleOf(new Date()); renderBudget() });
+$("cprev").addEventListener("click", () => shiftPeriod(-1));
+$("cnext").addEventListener("click", () => shiftPeriod(1));
+$("cnow").addEventListener("click", () => { viewDate = midnight(new Date()); viewCycle = cycleOf(new Date()); renderBudget() });
+$("p-mode").addEventListener("click", e => { const b = e.target.closest("[data-pm]"); if (b) setPeriod(b.dataset.pm) });
+$("p-multi").addEventListener("click", e => { const b = e.target.closest("[data-pn]"); if (!b) return; PF.multi = +b.dataset.pn; savePrefs(); renderBudget() });
+$("m-sort").addEventListener("click", e => { const b = e.target.closest("[data-ms]"); if (!b) return; PF.movSort = b.dataset.ms; savePrefs(); renderBudget() });
 $("b-income").addEventListener("input", e => {
   const v = e.target.value.trim();
   if (v === "") delete S.budget.cycles[viewCycle.key]; else S.budget.cycles[viewCycle.key] = { income: parseNum(v) };
   $("b-incnote").textContent = v === "" ? "revenu habituel" : "propre à ce cycle";
   commit(false); updateSummary();
 });
-$("envlist").addEventListener("click", e => { const b = e.target.closest("[data-env]"); if (!b) return; envFilter = envFilter === b.dataset.env ? null : b.dataset.env; renderBudget() });
+const envClick = e => { const b = e.target.closest("[data-env]"); if (!b) return; envFilter = envFilter === b.dataset.env ? null : b.dataset.env; renderBudget() };
+$("envlist").addEventListener("click", envClick);
+$("savlist").addEventListener("click", envClick);
 $("expclear").addEventListener("click", () => { envFilter = null; renderBudget() });
 $("explist").addEventListener("click", e => {
   const x = e.target.closest("[data-exp]"); if (x) { openSheet("exp", S.budget.expenses.find(o => o.id === x.dataset.exp)); return }
@@ -1291,6 +1774,7 @@ function gridHTML(items, sel) {
   return items.map(it => `<button type="button" class="gi" data-v="${esc(it.id)}" aria-pressed="${it.id === sel}">${it.solid ? acctBadge(it.color, it.icon) : `<span class="gic" style="--c:${it.color}">${ico(it.icon)}</span>`}<span class="gil">${esc(it.name)}</span></button>`).join("");
 }
 function renderTrGrids() {
+  if (roState && (roState.grid.id === "g-from" || roState.grid.id === "g-to")) roEnd();
   const items = acctList().map(a => ({ ...a, solid: true }));
   $("g-from").innerHTML = gridHTML(items, trFrom);
   $("g-to").innerHTML = gridHTML(items.filter(a => a.id !== trFrom), trTo);
@@ -1301,7 +1785,7 @@ function renderTrGrids() {
     : `Simple déplacement entre ${f} et ${to} : aucun effet sur le budget du cycle.`;
 }
 function setSheetKind(k) {
-  sheetKind = k;
+  roEnd(); sheetKind = k;
   document.querySelectorAll("#f-kind button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.k === k)));
   $("f-expbox").hidden = k !== "exp"; $("f-incbox").hidden = k !== "inc"; $("f-trbox").hidden = k !== "tr";
   const T = { exp: ["Nouvelle dépense", "Modifier la dépense"], inc: ["Nouvelle entrée d'argent", "Modifier l'entrée"], tr: ["Nouveau virement", "Modifier le virement"] }[k];
@@ -1315,7 +1799,7 @@ function fillRefundEnv(catId, value) {
   $("f-renv").value = envById(v) ? v : "";
 }
 function openSheet(kind, item) {
-  editing = item ? item.id : null;
+  roEnd(); editing = item ? item.id : null;
   const envs = S.budget.envelopes, cats = S.budget.incomeCats;
   const orphan = kind === "exp" && item && !envById(item.env);
   $("f-env").innerHTML = envs.map(e => `<option value="${esc(e.id)}">${esc(e.name)}</option>`).join("") + (orphan ? `<option value="${esc(item.env)}">Sans enveloppe</option>` : "");
@@ -1342,7 +1826,109 @@ function openSheet(kind, item) {
   $("sheet").hidden = false;
   setTimeout(() => $("f-amount").focus(), 60);
 }
-function closeSheet() { $("sheet").hidden = true; editing = null; if (renderLater) { renderLater = false; renderView() } }
+function closeSheet() { roEnd(); $("sheet").hidden = true; editing = null; if (renderLater) { renderLater = false; renderView() } }
+// Fenêtres du bas : glisser vers le bas pour fermer (depuis le haut de la fenêtre) ; dans la saisie, glisser à gauche ou à droite
+// pour passer de Dépense à Entrée puis à Virement (nouveau mouvement seulement)
+function sheetGestures(id, close, swipeX) {
+  const card = $(id).querySelector(".sheetcard"); let g = null;
+  const reset = () => { card.style.transition = "transform .2s ease"; card.style.transform = ""; setTimeout(() => { card.style.transition = "" }, 220) };
+  card.addEventListener("touchstart", e => {
+    if (e.touches.length !== 1 || roState) { g = null; return }
+    const t = e.touches[0], sc = e.target.closest(".igrid, .icgroups, textarea");
+    g = { x: t.clientX, y: t.clientY, mode: null, dx: 0, dy: 0, top: card.scrollTop <= 0 && !(sc && sc.scrollTop > 0), field: !!e.target.closest("input, textarea, select") };
+  }, { passive: true });
+  card.addEventListener("touchmove", e => {
+    if (!g) return; if (roState) { g = null; reset(); return }
+    const t = e.touches[0]; g.dx = t.clientX - g.x; g.dy = t.clientY - g.y;
+    if (!g.mode) {
+      if (Math.abs(g.dx) < 10 && Math.abs(g.dy) < 10) return;
+      if (g.dy > 0 && Math.abs(g.dy) > Math.abs(g.dx) * 1.3 && g.top) g.mode = "down";
+      else if (swipeX && !g.field && Math.abs(g.dx) > Math.abs(g.dy) * 1.5) g.mode = "x";
+      else { g = null; return }
+    }
+    e.preventDefault(); card.style.transition = "none";
+    card.style.transform = g.mode === "down" ? `translateY(${Math.max(0, g.dy)}px)` : `translateX(${g.dx * 0.3}px)`;
+  }, { passive: false });
+  const end = () => {
+    if (!g) return; const { mode, dx, dy } = g; g = null; if (!mode) return;
+    if (mode === "down" && dy > 90) { card.style.transform = ""; close(); return }
+    reset(); if (mode === "x" && Math.abs(dx) > 60) swipeX(dx < 0 ? 1 : -1);
+  };
+  card.addEventListener("touchend", end); card.addEventListener("touchcancel", () => { g = null; reset() });
+}
+const KINDS = ["exp", "inc", "tr"];
+sheetGestures("sheet", closeSheet, dir => {
+  if (editing) return; const j = KINDS.indexOf(sheetKind) + dir; if (j < 0 || j >= KINDS.length) return;
+  setSheetKind(KINDS[j]); const c = $("expform"); c.classList.remove("slide-l", "slide-r"); void c.offsetWidth; c.classList.add(dir > 0 ? "slide-l" : "slide-r");
+});
+sheetGestures("acsheet", () => closeAcct());
+sheetGestures("icsheet", () => { $("icsheet").hidden = true });
+
+// Appui long sur un logo de la saisie (enveloppe, catégorie d'entrée, compte) : les logos bougent, on les fait glisser pour changer l'ordre.
+// L'ordre est enregistré à chaque dépôt et sert partout dans l'appli ; « Terminé » sort du mode.
+let roState = null, lastTouch = 0;
+const RO_GRIDS = { "g-env": "env", "g-cat": "cat", "g-from": "acct", "g-to": "acct" };
+const roList = k => k === "env" ? S.budget.envelopes : k === "cat" ? S.budget.incomeCats : S.budget.savings;
+const roMovable = (k, id) => roList(k).some(x => x.id === id);
+function roStart(grid) {
+  roEnd();
+  const kind = RO_GRIDS[grid.id], bar = document.createElement("div");
+  bar.className = "robar"; bar.innerHTML = `<span>Glissez les logos pour changer l'ordre</span><button type="button" class="btn primary" data-rodone>Terminé</button>`;
+  grid.before(bar); grid.classList.add("reorder");
+  grid.querySelectorAll(".gi").forEach(b => b.classList.toggle("fixed", !roMovable(kind, b.dataset.v)));
+  roState = { grid, kind, bar };
+  try { navigator.vibrate?.(15) } catch {}
+}
+function roEnd() {
+  if (!roState) return; const { grid, bar } = roState; roState = null;
+  bar.remove(); grid.classList.remove("reorder"); grid.querySelectorAll(".gi").forEach(b => { b.classList.remove("fixed", "drag"); b.style.transform = "" });
+}
+function roSave() {
+  const { grid, kind } = roState, ids = [...grid.querySelectorAll(".gi")].map(b => b.dataset.v).filter(id => roMovable(kind, id));
+  const list = roList(kind), byId = Object.fromEntries(list.map(x => [x.id, x])), next = list.slice();
+  list.map((x, i) => ids.includes(x.id) ? i : -1).filter(i => i >= 0).forEach((slot, k) => { next[slot] = byId[ids[k]] });   // les éléments absents de la grille gardent leur place
+  if (next.every((x, i) => x === list[i])) return;
+  if (kind === "env") S.budget.envelopes = next; else if (kind === "cat") S.budget.incomeCats = next; else S.budget.savings = next;
+  commit();
+}
+function roBind(grid) {
+  let lp = null, drag = null;
+  const tileAt = (x, y) => { const el = document.elementFromPoint(x, y)?.closest?.(".gi"); return el && grid.contains(el) && !el.classList.contains("fixed") ? el : null };
+  const startDrag = (tile, x, y) => { const r = tile.getBoundingClientRect(); drag = { tile, ox: x - r.left, oy: y - r.top }; tile.classList.add("drag") };
+  const moveDrag = (x, y) => {
+    const t = drag.tile, o = tileAt(x, y);
+    if (o && o !== t) { const all = [...grid.querySelectorAll(".gi")]; if (all.indexOf(o) > all.indexOf(t)) o.after(t); else o.before(t) }
+    t.style.transform = ""; const r = t.getBoundingClientRect();
+    t.style.transform = `translate(${x - drag.ox - r.left}px, ${y - drag.oy - r.top}px)`;
+    const gr = grid.getBoundingClientRect(); if (y < gr.top + 28) grid.scrollTop -= 8; else if (y > gr.bottom - 28) grid.scrollTop += 8;
+  };
+  const endDrag = () => { if (!drag) return; drag.tile.style.transform = ""; drag.tile.classList.remove("drag"); drag = null; if (roState?.grid === grid) roSave() };
+  const press = (tile, x, y) => {
+    if (roState?.grid === grid) { if (!tile.classList.contains("fixed")) startDrag(tile, x, y); return }
+    if (!roMovable(RO_GRIDS[grid.id], tile.dataset.v)) return;
+    lp = { x, y, timer: setTimeout(() => { lp = null; roStart(grid); startDrag(tile, x, y) }, 480) };
+  };
+  const move = (x, y, e) => {
+    if (lp && Math.hypot(x - lp.x, y - lp.y) > 10) { clearTimeout(lp.timer); lp = null }
+    if (drag) { e.preventDefault(); moveDrag(x, y) }
+  };
+  const up = () => { if (lp) { clearTimeout(lp.timer); lp = null } endDrag() };
+  grid.addEventListener("touchstart", e => { lastTouch = Date.now(); const tile = e.target.closest(".gi"); if (tile && e.touches.length === 1) press(tile, e.touches[0].clientX, e.touches[0].clientY) }, { passive: true });
+  grid.addEventListener("touchmove", e => move(e.touches[0].clientX, e.touches[0].clientY, e), { passive: false });
+  grid.addEventListener("touchend", up); grid.addEventListener("touchcancel", up);
+  // À la souris (ordinateur) : rester appuyé puis glisser
+  grid.addEventListener("mousedown", e => {
+    if (e.button || Date.now() - lastTouch < 800) return; const tile = e.target.closest(".gi"); if (!tile) return;
+    press(tile, e.clientX, e.clientY);
+    const mm = ev => move(ev.clientX, ev.clientY, ev), mu = () => { up(); document.removeEventListener("mousemove", mm); document.removeEventListener("mouseup", mu) };
+    document.addEventListener("mousemove", mm); document.addEventListener("mouseup", mu);
+  });
+  // Pendant la réorganisation, toucher un logo ne le sélectionne pas
+  grid.addEventListener("click", e => { if (roState?.grid === grid) { e.stopImmediatePropagation(); e.preventDefault() } }, true);
+  grid.addEventListener("contextmenu", e => { if (e.target.closest(".gi")) e.preventDefault() });
+}
+Object.keys(RO_GRIDS).forEach(id => roBind($(id)));
+document.addEventListener("click", e => { if (e.target.closest("[data-rodone]")) roEnd() });
 $("fab").addEventListener("click", () => openSheet("exp", null));
 $("f-kind").addEventListener("click", e => { const b = e.target.closest("[data-k]"); if (b) setSheetKind(b.dataset.k) });
 $("g-env").addEventListener("click", e => { const b = e.target.closest("[data-v]"); if (!b) return; $("f-env").value = b.dataset.v; $("g-env").querySelectorAll(".gi").forEach(x => x.setAttribute("aria-pressed", String(x === b))) });
@@ -1381,7 +1967,7 @@ $("expform").addEventListener("submit", e => {
     msg = wasEdit ? "Dépense modifiée." : `${fmtEUR(amount)} ajoutés à ${envById(env)?.name || "la dépense"}.`;
   }
   closeSheet();
-  viewCycle = cycleOf(parseYmd(date));
+  viewCycle = cycleOf(parseYmd(date)); viewDate = midnight(parseYmd(date));
   commit();
   toast(msg);
 });
@@ -1436,7 +2022,7 @@ function renderBilan() {
     Object.entries(p.st.spentBy).forEach(([id, v]) => { if (envById(id)) tot[id] = (tot[id] || 0) + v; else orphan += v });
     Object.entries(p.st.refundBy).forEach(([id, v]) => { tot[id] = (tot[id] || 0) - v });
   });
-  const rows = S.budget.envelopes.map(e => ({ name: e.name, v: tot[e.id] || 0, pl: +e.planned || 0, kind: e.kind })).concat(orphan ? [{ name: "Sans enveloppe", v: orphan, pl: 0 }] : [])
+  const rows = S.budget.envelopes.map(e => ({ id: e.id, name: e.name, v: tot[e.id] || 0, pl: +e.planned || 0, kind: e.kind, color: envColor(e) })).concat(orphan ? [{ id: "__none", name: "Sans enveloppe", v: orphan, pl: 0, color: OTHER_COLOR }] : [])
     .filter(r => Math.abs(r.v) > 0.004).sort((a, b) => (a.kind === "save") - (b.kind === "save") || b.v - a.v);
   const maxv = Math.max(1, ...rows.map(r => r.v));
   $("bl-env").innerHTML = rows.length ? rows.map(r => { const save = r.kind === "save", avg = r.v / n, over = !save && r.pl > 0 && avg > r.pl + 0.005, good = save && r.pl > 0 && avg >= r.pl - 0.005;
@@ -1444,6 +2030,7 @@ function renderBilan() {
       <span class="num small" style="font-weight:600;color:${over ? "var(--down)" : "var(--fg)"};text-align:right">${over ? "⚠ " : good ? '<span style="color:var(--c-sav)">✓</span> ' : ""}${fmtEUR(r.v)}<br><span class="muted" style="font-weight:500">${spend && !save ? (r.v / spend * 100).toLocaleString("fr-FR", { maximumFractionDigits: 0 }) + " % des dépenses" : ""}</span></span>
       <span class="bar"><i class="${over ? "over" : save ? "t-sav" : "t-exp"}" style="width:${Math.max(0, r.v / maxv * 100)}%"></i></span></div>`; }).join("")
     : `<div class="notice">Aucune dépense sur cette période.</div>`;
+  blMixRows = rows; blMixN = n; renderMix();
   // Entrées par catégorie (+ salaires)
   const byCat = {}; per.forEach(p => Object.entries(p.st.byCat).forEach(([id, v]) => { byCat[id] = (byCat[id] || 0) + v }));
   const sal = per.reduce((s, p) => s + p.sal, 0), custom = per.filter(p => typeof S.budget.cycles[p.c.key]?.income === "number").length;
@@ -1501,7 +2088,7 @@ function blTip(i, pinned) {
 }
 function blUnpin() { blPin = null; const t = $("bl-tip"); if (t) t.hidden = true; $("bl-chart").querySelectorAll("g.sel").forEach(x => x.classList.remove("sel")) }
 function openCycle(key) { const [y, m] = key.split("-").map(Number); viewCycle = cycleOf(payDate(y, m - 1)); envFilter = null; blPin = null; go("budget") }
-$("bl-period").addEventListener("change", e => { bPeriod = e.target.value; blPin = null; renderBilan() });
+$("bl-period").addEventListener("change", e => { bPeriod = e.target.value; blPin = null; blMix = null; renderBilan() });
 $("bl-chart").addEventListener("click", e => {
   const o = e.target.closest("[data-open]"); if (o) { openCycle(o.dataset.open); return }
   if (e.target.closest("#bl-tip")) return;
@@ -1532,12 +2119,39 @@ function acctValues() {
   if (pv || fc || allAssets().length) list.push({ id: "pf", name: "Portefeuille DEGIRO", kind: "titres", color: S.invest.look.color, icon: S.invest.look.icon, value: pv + fc, sub: `positions ${fmtEUR(pv)}${fc ? ` · marge libre ${fmtEUR(fc)}` : ""}` });
   return list;
 }
-function donutSVG(parts, total) {
+// Anneau (camembert) : parts dans l'ordre donné, 2 px d'écart, part choisie mise en avant
+function ringSVG(parts, total, o = {}) {
   const R = 58, W = 22, C = 2 * Math.PI * R, gap = parts.length > 1 ? 2 : 0;
   let off = 0;
-  const segs = parts.map(p => { const len = p.v / total * C, d = Math.max(0, len - gap); const el = `<circle cx="75" cy="75" r="${R}" fill="none" stroke="${p.color}" stroke-width="${W}" stroke-dasharray="${d} ${C - d}" stroke-dashoffset="${-off}" transform="rotate(-90 75 75)"><title>${esc(p.name)} : ${fmtEUR(p.v)}</title></circle>`; off += len; return el }).join("");
-  return `<svg viewBox="0 0 150 150" role="img" aria-label="Répartition du patrimoine">${segs}<text x="75" y="71" text-anchor="middle" style="font:11px var(--body);fill:var(--muted)">Total</text><text x="75" y="88" text-anchor="middle" style="font:600 13px var(--mono);fill:var(--fg)">${esc(fmtK(total))}</text></svg>`;
+  const segs = parts.map((p, i) => { const len = p.v / total * C, d = Math.max(0, len - gap), on = o.sel === i, dim = o.sel != null && !on;
+    const el = `<circle data-mi="${i}" cx="75" cy="75" r="${R}" fill="none" stroke="${p.color}" stroke-width="${on ? W + 5 : W}" stroke-dasharray="${d} ${C - d}" stroke-dashoffset="${-off}" transform="rotate(-90 75 75)"${dim ? ' opacity=".35"' : ""}><title>${esc(p.name)} : ${fmtEUR(p.v)}</title></circle>`; off += len; return el }).join("");
+  const top = String(o.top ?? "Total"), t = top.length > 17 ? top.slice(0, 16) + "…" : top;
+  return `<svg viewBox="0 0 150 150" role="img" aria-label="${esc(o.aria || "Répartition")}">${segs}<text x="75" y="71" text-anchor="middle" style="font:11px var(--body);fill:var(--muted)">${esc(t)}</text><text x="75" y="88" text-anchor="middle" style="font:600 13px var(--mono);fill:var(--fg)">${esc(o.val ?? fmtK(total))}</text></svg>`;
 }
+const donutSVG = (parts, total) => ringSVG(parts, total, { aria: "Répartition du patrimoine" });
+// Bilan : répartition des dépenses par enveloppe (7 plus grosses + Autres), en camembert ou en barres
+let blMixRows = [], blMixN = 1, blMix = null;
+function renderMix() {
+  const sp = blMixRows.filter(r => r.kind !== "save" && r.v > 0.004).sort((a, b) => b.v - a.v), total = sp.reduce((t, r) => t + r.v, 0), n = blMixN;
+  document.querySelectorAll("#bl-mixmode [data-mx]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.mx === PF.mix)));
+  if (!total) { $("bl-mixchart").innerHTML = `<div class="notice">Aucune dépense sur cette période.</div>`; $("bl-mixnote").textContent = ""; return }
+  const parts = sp.slice(0, 7).map(r => ({ name: r.name, v: r.v, color: r.color })), rest = sp.slice(7);
+  if (rest.length) parts.push({ name: `Autres (${rest.length})`, v: rest.reduce((t, r) => t + r.v, 0), color: OTHER_COLOR });
+  if (blMix != null && blMix >= parts.length) blMix = null;
+  const pc = v => (v / total * 100).toLocaleString("fr-FR", { maximumFractionDigits: v / total < 0.1 ? 1 : 0 }) + " %", dim = i => blMix != null && blMix !== i ? " dim" : "";
+  const sel = blMix != null ? parts[blMix] : null;
+  if (PF.mix === "bars") {
+    const max = Math.max(...parts.map(p => p.v));
+    $("bl-mixchart").innerHTML = `<div class="mixbars">${parts.map((p, i) => `<button type="button" class="mixrow${dim(i)}" data-mi="${i}"><span class="nm"><span class="sw" style="background:${p.color}"></span><span>${esc(p.name)}</span></span><span class="vl">${fmtEUR(p.v)}<small>${pc(p.v)}</small></span><span class="tr"><i style="width:${p.v / max * 100}%;background:${p.color}"></i></span></button>`).join("")}</div>`;
+  } else {
+    $("bl-mixchart").innerHTML = `<div class="donutwrap"><div class="donut">${ringSVG(parts, total, { aria: "Répartition des dépenses par enveloppe", top: sel ? sel.name : "Total", val: sel ? fmtEUR(sel.v) : fmtK(total), sel: blMix })}</div>
+      <div class="dlegend">${parts.map((p, i) => `<button type="button" class="lg${dim(i)}" data-mi="${i}"><span class="sw" style="background:${p.color}"></span><span class="nm">${esc(p.name)}</span><span class="vl">${fmtEUR(p.v)}<small>${pc(p.v)}</small></span></button>`).join("")}</div></div>`;
+  }
+  $("bl-mixnote").textContent = sel ? `${sel.name} : ${fmtEUR(sel.v)} sur ${n} cycle${n > 1 ? "s" : ""}, soit ${fmtEUR(sel.v / n)} par cycle. Touchez à nouveau pour tout revoir.`
+    : `Total ${fmtEUR(total)} sur ${n} cycle${n > 1 ? "s" : ""}, soit ${fmtEUR(total / n)} par cycle en moyenne (hors épargne, remboursements déduits). Touchez une enveloppe pour la détailler.`;
+}
+$("bl-mixmode").addEventListener("click", e => { const b = e.target.closest("[data-mx]"); if (!b) return; PF.mix = b.dataset.mx; savePrefs(); renderMix() });
+$("bl-mixchart").addEventListener("click", e => { const b = e.target.closest("[data-mi]"); if (!b) return; const i = +b.getAttribute("data-mi"); blMix = blMix === i ? null : i; renderMix() });
 function renderComptes() {
   const list = acctValues(), total = list.reduce((s, a) => s + a.value, 0);
   $("c-all").textContent = fmtEUR(total);
@@ -1570,7 +2184,8 @@ $("c-groups").addEventListener("click", e => { const b = e.target.closest("[data
 $("c-add").addEventListener("click", () => openAcct(null));
 function renderAcPickers() {
   $("a-colors").innerHTML = ACCT_COLORS.map(c => `<button type="button" data-col="${c}" aria-label="Couleur ${c}" aria-pressed="${c.toLowerCase() === acColor.toLowerCase()}" style="background:${c}"></button>`).join("");
-  $("a-icons").innerHTML = ["cash", "bank", "piggy", "moneybag", "chart", "crypto", "wallet", "card", "safe", "euro", "home", "star"].map(k => `<button type="button" class="gi" data-ico="${k}" aria-pressed="${k === acIcon}" aria-label="${ICON_NAMES[k]}">${acctBadge(acColor, k)}</button>`).join("");
+  const base = ["cash", "bank", "piggy", "moneybag", "chart", "crypto", "wallet", "card", "safe", "euro", "home", "star"], keys = base.includes(acIcon) ? base : [acIcon, ...base.slice(0, 11)];
+  $("a-icons").innerHTML = keys.map(k => `<button type="button" class="gi" data-ico="${k}" aria-pressed="${k === acIcon}" aria-label="${ICON_NAMES[k]}">${acctBadge(acColor, k)}</button>`).join("");
 }
 function openAcct(id) {
   acEdit = id; const isCcp = id === "ccp", a = !isCcp && id ? S.budget.savings.find(x => x.id === id) : null;
@@ -1618,22 +2233,42 @@ $("a-del").addEventListener("click", e => {
   const b = e.currentTarget; if (!b.dataset.confirm) { b.dataset.confirm = "1"; b.textContent = "Confirmer la suppression"; return }
   S.budget.savings = S.budget.savings.filter(x => x.id !== acEdit); closeAcct(); commit(); toast("Compte supprimé.");
 });
-// Choix d'un logo pour une enveloppe ou une catégorie d'entrée
-let icTarget = null;
+// Choix d'un logo (et d'une couleur) pour une enveloppe, une catégorie d'entrée ou un compte
+let icTarget = null, icSel = "", icCol = "";
+function renderIcColors() { $("ic-colors").innerHTML = ACCT_COLORS.map(c => `<button type="button" data-iccol="${c}" aria-label="Couleur ${c}" aria-pressed="${c.toLowerCase() === icCol.toLowerCase()}" style="background:${c}"></button>`).join("") }
+function renderIcGrid() {
+  const t = icTarget, q = foldTxt($("ic-q").value).trim(), solid = t.kind === "acct";
+  const tint = t.kind === "cat" ? "var(--c-rev)" : envById(t.id)?.kind === "save" ? "var(--c-sav)" : "var(--c-exp)";
+  const groups = ICON_GROUPS.map(g => ({ name: g.name, keys: g.keys.filter(k => !q || foldTxt(`${ICON_NAMES[k]} ${ICON_KW[k] || ""} ${g.name}`).includes(q)) })).filter(g => g.keys.length);
+  $("ic-grid").innerHTML = groups.length ? groups.map(g => `<h3>${esc(g.name)}</h3><div class="igrid">${g.keys.map(k => `<button type="button" class="gi" data-pick="${k}" aria-pressed="${k === icSel}">${solid ? acctBadge(icCol, k) : `<span class="gic" style="--c:${tint}">${ico(k)}</span>`}<span class="gil">${esc(ICON_NAMES[k])}</span></button>`).join("")}</div>`).join("")
+    : `<div class="notice">Aucun logo pour « ${esc($("ic-q").value)} ». Essayez un autre mot : resto, loyer, livret, prime…</div>`;
+}
 function openIconPicker(kind, id) {
-  const item = kind === "env" ? envById(id) : incCat(id); if (!item) return;
-  icTarget = { kind, id }; const cur = kind === "env" ? envIcon(item) : catIcon(item), color = kind === "env" ? (item.kind === "save" ? "var(--c-sav)" : "var(--c-exp)") : "var(--c-rev)";
-  $("ictitle").textContent = `Logo de « ${item.name} »`;
-  $("ic-grid").innerHTML = Object.keys(ICONS).map(k => `<button type="button" class="gi" data-pick="${k}" aria-pressed="${k === cur}"><span class="gic" style="--c:${color}">${ico(k)}</span><span class="gil">${esc(ICON_NAMES[k])}</span></button>`).join("");
-  $("icsheet").hidden = false;
+  let name;
+  if (kind === "acct") { name = $("a-name").value.trim() || $("actitle").textContent; icSel = acIcon; icCol = acColor }
+  else { const item = kind === "env" ? envById(id) : incCat(id); if (!item) return; name = item.name; icSel = kind === "env" ? envIcon(item) : catIcon(item); icCol = kind === "env" ? envColor(item) : "" }
+  icTarget = { kind, id };
+  $("ictitle").textContent = `Logo de « ${name} »`;
+  $("ic-colbox").hidden = kind === "cat"; $("ic-collbl").textContent = kind === "env" ? "Couleur dans les graphiques" : "Couleur";
+  $("ic-q").value = ""; renderIcColors(); renderIcGrid(); $("icsheet").hidden = false; $("ic-grid").scrollTop = 0;
+  setTimeout(() => { const g = $("ic-grid"), x = g.querySelector('[aria-pressed="true"]'); if (x) g.scrollTop = Math.max(0, x.offsetTop - g.offsetTop - 60) }, 30);
 }
 $("icsheet").addEventListener("click", e => {
   if (e.target.closest("[data-icclose]")) { $("icsheet").hidden = true; return }
-  const b = e.target.closest("[data-pick]"); if (!b || !icTarget) return;
-  const item = icTarget.kind === "env" ? envById(icTarget.id) : incCat(icTarget.id); if (item) item.icon = b.dataset.pick;
-  $("icsheet").hidden = true; commit();
+  const c = e.target.closest("[data-iccol]"); if (c) { icCol = c.dataset.iccol; renderIcColors(); if (icTarget?.kind === "acct") renderIcGrid(); return }
+  const b = e.target.closest("[data-pick]"); if (b) { icSel = b.dataset.pick; $("ic-grid").querySelectorAll("[data-pick]").forEach(x => x.setAttribute("aria-pressed", String(x === b))) }
 });
-document.addEventListener("keydown", e => { if (e.key !== "Escape") return; if (!$("acsheet").hidden) closeAcct(); if (!$("icsheet").hidden) $("icsheet").hidden = true });
+$("ic-q").addEventListener("input", renderIcGrid);
+$("ic-ok").addEventListener("click", () => {
+  const t = icTarget; if (!t) return;
+  $("icsheet").hidden = true;
+  if (t.kind === "acct") { acIcon = icSel; if (okColor(icCol)) acColor = icCol; renderAcPickers(); return }
+  const item = t.kind === "env" ? envById(t.id) : incCat(t.id); if (!item) return;
+  item.icon = icSel; if (t.kind === "env" && okColor(icCol)) item.color = icCol;
+  commit(); toast("Logo enregistré.");
+});
+$("a-moreico").addEventListener("click", () => openIconPicker("acct"));
+document.addEventListener("keydown", e => { if (e.key !== "Escape") return; if (!$("icsheet").hidden) { $("icsheet").hidden = true; return } if (!$("acsheet").hidden) closeAcct() });
 
 /* ---------- Budget prévu : enveloppes, moyennes, budget collé ---------- */
 let planExcl = true, planUndo = null;
@@ -1653,13 +2288,15 @@ function renderPlan() {
   const b = S.budget, A = envAverages();
   if (document.activeElement !== $("p-income")) $("p-income").value = fmtIn(b.income);
   $("p-excl").checked = planExcl;
-  $("s-envs").innerHTML = b.envelopes.map(e => { const avg = A.avg(e.id), r = roundBudget(avg), save = e.kind === "save";
+  const envRowHtml = e => { const avg = A.avg(e.id), r = roundBudget(avg), save = e.kind === "save";
     return `<div class="erow" data-eid="${esc(e.id)}">
-      <div class="full" style="display:flex;gap:8px;align-items:center"><button type="button" class="icopick" data-eico aria-label="Changer le logo de ${esc(e.name)}"><span class="gic" style="--c:${save ? "var(--c-sav)" : "var(--c-exp)"}">${ico(envIcon(e))}</span></button><input data-ek="name" type="text" value="${esc(e.name)}" aria-label="Nom de l'enveloppe" placeholder="Nom" style="flex:1;min-width:0"></div>
+      <div class="full" style="display:flex;gap:8px;align-items:center"><button type="button" class="icopick" data-eico aria-label="Changer le logo et la couleur de ${esc(e.name)}" style="--ec:${envColor(e)}"><span class="gic" style="--c:${save ? "var(--c-sav)" : "var(--c-exp)"}">${ico(envIcon(e))}</span></button><input data-ek="name" type="text" value="${esc(e.name)}" aria-label="Nom de l'enveloppe" placeholder="Nom" style="flex:1;min-width:0"></div>
       <label><span class="cap">Prévu par cycle (€)</span><input class="n" data-ek="planned" type="text" inputmode="decimal" value="${fmtIn(e.planned)}" placeholder="0" aria-label="Montant prévu pour ${esc(e.name)}"></label>
       <label><span class="cap">Type</span><select data-ek="kind" aria-label="Type de ${esc(e.name)}"><option value="spend"${!save ? " selected" : ""}>Dépense</option><option value="save"${save ? " selected" : ""}>Épargne</option></select></label>
       <button class="del" type="button" data-edel aria-label="Supprimer l'enveloppe ${esc(e.name)}" style="align-self:end">✕</button>
-      <div class="full prow2"><span><span class="tdot ${save ? "t-sav" : "t-exp"}"></span>${A.n ? `Moyenne : ${fmtEUR(avg)} / cycle` : "Pas encore de cycle terminé"}</span>${A.n && avg > 0 && r !== (+e.planned || 0) ? `<button class="linkbtn" type="button" data-euse="${r}">Mettre ${fmtEUR(r).replace(",00", "")}</button>` : ""}</div></div>`; }).join("") || `<div class="notice">Aucune enveloppe.</div>`;
+      <div class="full prow2"><span><span class="tdot ${save ? "t-sav" : "t-exp"}"></span>${A.n ? `Moyenne : ${fmtEUR(avg)} / cycle` : "Pas encore de cycle terminé"}</span>${A.n && avg > 0 && r !== (+e.planned || 0) ? `<button class="linkbtn" type="button" data-euse="${r}">Mettre ${fmtEUR(r).replace(",00", "")}</button>` : ""}</div></div>`; };
+  const spendE = b.envelopes.filter(e => e.kind !== "save"), saveE = b.envelopes.filter(e => e.kind === "save");
+  $("s-envs").innerHTML = (spendE.map(envRowHtml).join("") + (saveE.length ? `<div class="subhead">Épargne &amp; placements</div>` + saveE.map(envRowHtml).join("") : "")) || `<div class="notice">Aucune enveloppe.</div>`;
   $("p-fill").hidden = !A.n;
   updatePlanTotals(); renderGsPending();
 }
@@ -2925,8 +3562,85 @@ $("country").addEventListener("change", e => { S.invest.country = e.target.value
 $("method").addEventListener("click", e => { const m = e.target.closest("button")?.dataset.m; if (!m) return; S.invest.method = m; commit(false); renderConj() });
 $("mrefresh").addEventListener("click", () => refreshMacro());
 
-/* ---------- Réglages ---------- */
+/* ---------- Réglages : liste de rubriques, chacune sur sa page ---------- */
+const SET_SECS = [
+  { id: "sync", t: "Synchronisation", i: "cloud", s: () => sync.status === "off" ? "Données sur cet appareil uniquement" : (PILL[sync.status] || PILL.off)[0] },
+  { id: "theme", t: "Apparence", i: "sun", s: () => ({ light: "Thème clair", dark: "Thème sombre" })[ls.get("fin.theme")] || "Automatique (suit l'appareil)" },
+  { id: "perso", t: "Personnalisation", i: "palette", s: () => pzDirty() ? "Modifications non enregistrées" : "Ordre de l'accueil, du menu et des enveloppes" },
+  { id: "cycle", t: "Cycle de paie", i: "calendar", s: () => `Paie le ${S.budget.payday} · revenu habituel ${fmtEUR(+S.budget.income || 0)}` },
+  { id: "inc", t: "Catégories d'entrées", i: "euro", s: () => `${S.budget.incomeCats.length} catégories : remboursements, ventes, primes…` },
+  { id: "gs", t: "Google Sheets privé", i: "doc", s: () => gsReady() ? "Tableau relié" : "Tableau rempli par Claude, non relié" },
+  { id: "quotes", t: "Cours en direct", i: "trend", s: () => S.invest.quotesUrl ? "Lien des cours enregistré" : "Non configuré" },
+  { id: "invest", t: "Portefeuille", i: "chart", s: "Noms des classes du rééquilibrage" },
+  { id: "hist", t: "Importer un historique", i: "receipt", s: "Anciennes dépenses depuis Excel ou CSV" },
+  { id: "backup", t: "Sauvegarde & données", i: "safe", s: "Exporter, importer, tout effacer" },
+  { id: "about", t: "À propos", i: "star", s: () => `Version ${APP_VERSION}` }
+];
+let setSec = null, setFromList = false;
+const secOf = anchor => $(anchor)?.closest("[data-sec]")?.dataset.sec || null;
+function renderSetNav() {
+  $("set-home").hidden = !!setSec; $("set-head").hidden = !setSec;
+  document.querySelectorAll("#v-reglages [data-sec]").forEach(p => { p.hidden = p.dataset.sec !== setSec });
+  if (!setSec) $("set-home").innerHTML = SET_SECS.map(x => `<button type="button" data-secopen="${x.id}"><span class="gic" style="--c:var(--accent)">${ico(x.i)}</span><span><b>${esc(x.t)}</b><small>${esc(typeof x.s === "function" ? x.s() : x.s)}</small></span><span class="chev" aria-hidden="true">›</span></button>`).join("");
+  else { const x = SET_SECS.find(y => y.id === setSec); $("set-title").textContent = x ? x.t : ""; $("vtitle").textContent = x ? x.t : "Réglages" }
+}
+$("set-home").addEventListener("click", e => { const b = e.target.closest("[data-secopen]"); if (b) { setFromList = true; location.hash = "reglages/" + b.dataset.secopen } });
+$("set-back").addEventListener("click", () => { if (setFromList) { setFromList = false; history.back() } else { history.replaceState(null, "", "#reglages"); show("reglages") } });
+
+// Personnalisation : brouillon modifié avec ▲ ▼ et 👁, appliqué seulement avec « Enregistrer »
+let pz = null;
+const pzFrom = () => ({ ...JSON.parse(JSON.stringify(S.ui)), envOrder: S.budget.envelopes.map(e => e.id) });
+const pzDirty = () => !!pz && JSON.stringify(pz) !== JSON.stringify(pzFrom());
+const EYE = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+const EYE_OFF = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18M10.6 5.6c.5-.1.9-.1 1.4-.1 6 0 9.5 6.5 9.5 6.5a17 17 0 0 1-2.6 3.4M6.6 6.6C4 8.3 2.5 12 2.5 12S6 18.5 12 18.5c1.7 0 3.2-.5 4.5-1.2M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
+const HOME_NAMES = { summary: "Résumé du budget", envs: "Enveloppes", savs: "Épargne & placements", movs: "Mouvements" };
+const HOME_ICONS = { summary: "wallet", envs: "cart", savs: "piggy", movs: "repeat" };
+function renderPerso() {
+  if (!pz) pz = pzFrom();
+  const ids = S.budget.envelopes.map(e => e.id); pz.envOrder = pz.envOrder.filter(id => ids.includes(id)).concat(ids.filter(id => !pz.envOrder.includes(id)));
+  const rows = (list, order, hidden, name, icon, mode) => order.map((id, i) => { const off = hidden.includes(id), nm = name(id);
+    return `<div class="prow${off ? " off" : ""}" data-pl="${list}" data-pid="${esc(id)}"><span class="nm">${icon(id)}<span>${esc(nm)}</span></span><span class="ctl">`
+      + `<button type="button" data-pmv="-1" aria-label="Monter ${esc(nm)}"${i === 0 ? " disabled" : ""}>▲</button><button type="button" data-pmv="1" aria-label="Descendre ${esc(nm)}"${i === order.length - 1 ? " disabled" : ""}>▼</button>`
+      + (mode(id) === "toggle" ? `<button type="button" data-phide aria-pressed="${!off}" aria-label="${off ? "Afficher" : "Masquer"} ${esc(nm)}">${off ? EYE_OFF : EYE}</button>` : mode(id) === "lock" ? `<span class="lock">fixe</span>` : "")
+      + `</span></div>`; }).join("");
+  const navIcon = v => $("dnav").querySelector(`[data-view="${v}"] svg`)?.outerHTML || "";
+  $("pz-home").innerHTML = rows("home", pz.homeOrder, pz.homeHidden, id => HOME_NAMES[id], id => ico(HOME_ICONS[id]), () => "toggle");
+  $("pz-menu").innerHTML = rows("menu", pz.menuOrder, pz.menuHidden, id => TITLES[id], navIcon, id => id === "budget" ? "lock" : "toggle")
+    + `<div class="prow"><span class="nm">${navIcon("reglages")}<span>Réglages</span></span><span class="ctl"><span class="lock">en bas</span></span></div>`;
+  $("pz-env").innerHTML = rows("env", pz.envOrder, [], id => envById(id)?.name || "?", id => { const e = envById(id); return `<span class="eic" style="--c:${envColor(e)};margin:0">${ico(envIcon(e))}</span>` }, () => "none")
+    || `<div class="notice">Aucune enveloppe.</div>`;
+  const dirty = pzDirty(); $("pz-dirty").hidden = !dirty; $("pz-save").disabled = !dirty; $("pz-cancel").disabled = !dirty;
+}
+$("set-perso").addEventListener("click", e => {
+  const r = e.target.closest("[data-pid]"); if (!r || !pz) return;
+  const list = r.dataset.pl, id = r.dataset.pid, key = { home: "homeOrder", menu: "menuOrder", env: "envOrder" }[list], hk = { home: "homeHidden", menu: "menuHidden" }[list];
+  const mv = e.target.closest("[data-pmv]");
+  if (mv) {
+    const arr = pz[key], k = arr.indexOf(id), j = k + +mv.dataset.pmv; if (j < 0 || j >= arr.length) return;
+    [arr[k], arr[j]] = [arr[j], arr[k]]; renderPerso();
+    const again = $("set-perso").querySelector(`[data-pl="${list}"][data-pid="${CSS.escape(id)}"] [data-pmv="${mv.dataset.pmv}"]`);
+    (again && !again.disabled ? again : $("set-perso").querySelector(`[data-pl="${list}"][data-pid="${CSS.escape(id)}"] [data-pmv]:not(:disabled)`))?.focus();
+    return;
+  }
+  if (e.target.closest("[data-phide]") && hk) { const h = pz[hk]; pz[hk] = h.includes(id) ? h.filter(x => x !== id) : [...h, id]; renderPerso(); $("set-perso").querySelector(`[data-pl="${list}"][data-pid="${CSS.escape(id)}"] [data-phide]`)?.focus() }
+});
+$("pz-save").addEventListener("click", () => {
+  if (!pzDirty()) return;
+  S.ui = normUi(pz);
+  const byId = Object.fromEntries(S.budget.envelopes.map(e => [e.id, e]));
+  S.budget.envelopes = pz.envOrder.map(id => byId[id]).filter(Boolean).concat(S.budget.envelopes.filter(e => !pz.envOrder.includes(e.id)));
+  pz = null; commit(); toast("Personnalisation enregistrée.");
+});
+$("pz-cancel").addEventListener("click", () => { if (!pzDirty()) return; pz = null; renderSettings(); toast("Modifications annulées.") });
+$("pz-reset").addEventListener("click", () => {
+  if (!pz) pz = pzFrom();
+  pz = { ...normUi({}), envOrder: pz.envOrder }; renderPerso();
+  toast(pzDirty() ? "Ordre d'origine rétabli : touchez « Enregistrer » pour l'appliquer." : "C'est déjà l'ordre d'origine.");
+});
+
 function renderSettings() {
+  renderSetNav();
+  if (setSec === "perso") renderPerso();
   const b = S.budget;
   if (document.activeElement !== $("s-payday")) $("s-payday").value = b.payday;
   if (document.activeElement !== $("s-income")) $("s-income").value = fmtIn(b.income);
@@ -3208,7 +3922,13 @@ document.addEventListener("visibilitychange", () => {
 });
 if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) navigator.serviceWorker.register("./sw.js").catch(() => {});
 // Au retour sur l'appli (ex. le lendemain), on recale le cycle affiché sur la date du jour.
-document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && view === "budget" && $("sheet").hidden) { const c = cycleOf(new Date()); if (c.key !== viewCycle.key && isCurrent(shiftCycle(viewCycle, 1))) { viewCycle = c; renderBudget() } } });
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState !== "visible" || view !== "budget" || !$("sheet").hidden) return;
+  const t = midnight(new Date()); let redo = false;
+  if (+viewDate === +lastToday && +t !== +lastToday) { viewDate = t; redo = true }
+  const c = cycleOf(new Date()); if (c.key !== viewCycle.key && isCurrent(shiftCycle(viewCycle, 1))) { viewCycle = c; redo = true }
+  if (redo) renderBudget();
+});
 </script>
 </body>
 </html>
