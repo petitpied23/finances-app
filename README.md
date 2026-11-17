@@ -185,19 +185,36 @@ Un tableau de votre Google Drive, avec quatre onglets, que Claude remplit à par
 | Portefeuille | Symbole, Quantité, Montant investi, Classe, ISIN, Nom | Quantités et coût des lignes du même symbole ou ISIN ; une valeur absente est ajoutée dans la classe indiquée. |
 | Soldes | Compte, Solde, Date, Couleur, Icône, Remarque, Nature | « Compte courant » (ou CCP) met à jour le solde réel du compte courant ; « Degiro », la couleur du portefeuille ; les autres lignes, les comptes du même nom (créés s'ils manquent), avec leur nature, couleur et logo. Un solde plus ancien que celui saisi dans l'appli est ignoré. |
 
-L'appli lit le tableau avec votre compte Google, en **lecture seule**. Il n'est pas publié et reste visible par vous seul. Les cours, eux, viennent toujours du tableau « Cours en direct ».
+L'appli lit ces quatre onglets avec votre compte Google et n'y écrit jamais. Le tableau n'est pas publié et reste visible par vous seul. Les cours, eux, viennent toujours du tableau « Cours en direct ».
+
+*Copie des données de l'appli (pour que Claude voie vos saisies)*
+
+L'appli recopie aussi ses propres données dans cinq onglets qu'elle crée et réécrit entièrement à chaque envoi :
+
+| Onglet | Contenu |
+|---|---|
+| Appli · Infos | Date et appareil du dernier envoi, version, cycle en cours, jour de paie, revenu habituel |
+| Appli · Mouvements | Tous les mouvements (dépenses, entrées, virements), du plus récent au plus ancien, avec enveloppe, catégorie, comptes, début du cycle et origine (Appli, Tableau (Claude), Import bancaire) |
+| Appli · Budget | Budget du cycle en cours : prévu, dépensé, remboursé et reste par enveloppe, puis les totaux |
+| Appli · Comptes | Compte courant (estimé), comptes d'épargne avec objectif, marge libre DEGIRO, valeur du portefeuille |
+| Appli · Portefeuille | Chaque ligne : quantité, montant investi, valeur, cours, plus-value |
+
+- L'envoi est automatique quelques secondes après chaque changement, tant que la connexion Google est active (environ une heure après **↻ Google Sheets**).
+- Ensuite, un **point orange** sur **↻ Google Sheets** signale des changements pas encore envoyés : touchez-le avant d'écrire à Claude, il récupère et envoie.
+- Inutile de modifier ces onglets à la main : ils sont réécrits au prochain envoi.
+- À désactiver dans **Réglages** → **Google Sheets privé** → **Copier mes données dans le tableau**.
 
 *Mise en place (une seule fois)*
 1. Sur <https://console.cloud.google.com>, choisissez le projet de votre Firebase (menu en haut de la page).
 2. **API et services** → **Bibliothèque** → **Google Sheets API** → **Activer**.
 3. **Google Auth Platform** (ou **Écran de consentement OAuth**) → **Commencer** : nom de l'appli, votre e-mail, public **Externe** → Créer. Puis **Audience** → **Utilisateurs test** → ajoutez votre adresse Gmail.
 4. **Clients** → **Créer un client** → type **Application Web** → **Origines JavaScript autorisées** : l'adresse de l'appli sans le chemin (par exemple `https://votre-nom.github.io`) → **Créer**. Copiez l'**ID client**.
-5. Dans l'appli : **Réglages** → **Google Sheets privé** → collez l'ID client et le lien du tableau → **Se connecter et récupérer**. Choisissez le compte Google qui possède le tableau. Google affiche « Google n'a pas validé cette application » : c'est normal pour une appli personnelle, touchez **Continuer**.
+5. Dans l'appli : **Réglages** → **Google Sheets privé** → collez l'ID client et le lien du tableau → **Se connecter et synchroniser**. Choisissez le compte Google qui possède le tableau. Google affiche « Google n'a pas validé cette application » : c'est normal pour une appli personnelle, touchez **Continuer**.
 
 *Au quotidien*
-- Le bouton **↻ Google Sheets** (Accueil, en face de « Mouvements ») récupère les nouveautés. La connexion dure environ une heure ; pendant ce temps, l'appli vérifie aussi toute seule toutes les 5 minutes.
+- Le bouton **↻ Google Sheets** (Accueil, en face de « Mouvements ») récupère les nouveautés et envoie vos données. La connexion dure environ une heure ; pendant ce temps, l'appli vérifie aussi toute seule toutes les 5 minutes.
 - Une récupération sur un seul appareil suffit : les autres reçoivent les données par la synchronisation Firebase. Si la fenêtre de connexion Google ne s'ouvre pas sur le téléphone, faites-le depuis le PC.
-- Rien n'est jamais écrit dans le tableau par l'appli.
+- L'appli n'écrit que dans les onglets « Appli · … », jamais dans ceux que remplit Claude.
 
 **Sauvegarde**
 Réglages → **Exporter** crée un fichier `.json`. Gardez-en une copie de temps en temps, même avec la synchronisation.
@@ -216,7 +233,7 @@ Réglages → **Exporter** crée un fichier `.json`. Gardez-en une copie de temp
 
 ## Mettre à jour l'appli
 
-1. Dans GitHub : **Add file** → **Upload files** → déposez les fichiers modifiés (versions 1.2 à 1.8 : `index.html`, et `README.md` si vous voulez le guide à jour ; version 1.1 : `index.html`, `sw.js` et `README.md`) → **Commit changes**. GitHub remplace les anciens fichiers du même nom.
+1. Dans GitHub : **Add file** → **Upload files** → déposez les fichiers modifiés (versions 1.2 à 1.9 : `index.html`, et `README.md` si vous voulez le guide à jour ; version 1.1 : `index.html`, `sw.js` et `README.md`) → **Commit changes**. GitHub remplace les anciens fichiers du même nom.
 2. Attendez une minute, puis dans l'appli : **Réglages** → **Recharger l'appli**. La version affichée en bas des Réglages doit changer.
 3. Si vous changez aussi les icônes ou le manifeste, augmentez le numéro `CACHE` en haut de `sw.js` (`finances-v3`, etc.).
 
@@ -224,6 +241,7 @@ Vos données ne sont pas touchées par une mise à jour.
 
 ## Historique des versions
 
+- **1.9** : l'appli recopie ses données (mouvements, budget du cycle, comptes, portefeuille) dans des onglets « Appli · … » du Google Sheets privé, pour que Claude voie vos saisies ; envoi automatique tant que la connexion Google est active, point orange quand des changements restent à envoyer. La connexion Google demande désormais l'accès en modification.
 - **1.8** : période Jour / Semaine / Cycle / Plusieurs cycles dans l'Accueil (budget du jour), trois barres revenus / dépenses / épargne, bloc Épargne & placements, mouvements par date ou par enveloppe ; répartition des dépenses en camembert ou barres dans le Bilan ; plus de 100 logos avec recherche et couleur par enveloppe ; appui long pour réorganiser les logos ; fenêtre de saisie au glissé (fermer, changer de type) ; Réglages en rubriques avec page Personnalisation ; boutons plus grands.
 - **1.7** : saisie en grille de logos, virements entre comptes, comptes classés par nature avec camembert, couleurs et logos des comptes, marge libre DEGIRO, alerte disponible / compte courant, menu au glissé, thème clair / sombre.
 - **1.6** : « Disponible à dépenser » (objectif d'épargne déduit) à la place de « Reste sur le cycle » ; solde du compte courant (solde réel + mouvements saisis depuis) dans l'Accueil, les Comptes et le patrimoine ; onglet Soldes dans le Google Sheets privé.

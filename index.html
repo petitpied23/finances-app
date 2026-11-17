@@ -75,6 +75,7 @@ button { cursor: pointer }
 .btn:disabled { opacity: .55; cursor: default }
 .btn svg { width: 18px; height: 18px }
 .linkbtn { border: 0; background: none; color: var(--accent); font-weight: 600; padding: 4px 0 }
+#gs-quick.pending::after { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--warn, #d9822b); margin-left: 6px; vertical-align: middle }
 .notice { font-size: .82rem; color: var(--muted) }
 .notice.err { color: var(--down) }
 .pill { font-size: .78rem; font-weight: 600; padding: 4px 10px; border-radius: 99px; background: var(--bg); color: var(--muted); white-space: nowrap; border: 0 }
@@ -741,12 +742,17 @@ details.tbl td.calc { padding: 6px 5px }
 
   <div class="panel stack" id="set-gs" data-sec="gs" hidden>
     <h2>Google Sheets privé</h2>
-    <div class="notice">Un tableau de votre Google Drive que Claude remplit à partir de vos captures : mouvements, budget prévu, quantités du portefeuille. L'appli le lit avec votre compte Google, en lecture seule ; il n'est pas publié. Une seule récupération suffit : les autres appareils reçoivent les données par la synchronisation.</div>
+    <div class="notice">Un tableau de votre Google Drive que Claude remplit à partir de vos captures : mouvements, budget prévu, quantités du portefeuille. L'appli le lit avec votre compte Google ; il n'est pas publié. Une seule récupération suffit : les autres appareils reçoivent les données par la synchronisation.</div>
     <label class="field"><span class="small muted">Identifiant client Google (OAuth)</span><input id="gs-client" type="text" autocomplete="off" spellcheck="false" autocapitalize="off" placeholder="123456789-abc….apps.googleusercontent.com"></label>
     <label class="field"><span class="small muted">Lien du tableau</span><input id="gs-sheet" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://docs.google.com/spreadsheets/d/…/edit"></label>
-    <div class="actions" style="justify-content:flex-start"><button class="btn primary" type="button" id="gs-fetch" data-gsfetch>Se connecter et récupérer</button><a class="btn" id="gs-open" target="_blank" rel="noopener" hidden>Ouvrir le tableau</a></div>
+    <div class="actions" style="justify-content:flex-start"><button class="btn primary" type="button" id="gs-fetch" data-gsfetch>Se connecter et synchroniser</button><a class="btn" id="gs-open" target="_blank" rel="noopener" hidden>Ouvrir le tableau</a></div>
     <div class="notice" id="gs-msg" aria-live="polite"></div>
     <div id="gs-pending" class="stack" hidden></div>
+    <div class="switchrow">
+      <div><div style="font-weight:600">Copier mes données dans le tableau</div><div class="notice">Pour que Claude voie vos saisies, l'appli recopie vos mouvements, le budget du cycle, vos comptes et votre portefeuille dans des onglets « Appli · … ». L'envoi est automatique pendant environ une heure après « ↻ Google Sheets ». Ensuite, un point orange sur ce bouton de l'Accueil signale des changements à envoyer.</div></div>
+      <button id="gs-write" class="switch" role="switch" aria-checked="true" aria-label="Copier mes données dans le tableau" type="button"></button>
+    </div>
+    <div class="notice" id="gs-wmsg" aria-live="polite"></div>
     <details class="tbl"><summary>Créer l'identifiant client Google (une seule fois)</summary>
       <ol class="steps notice" style="margin-top:8px">
         <li>Sur <code>console.cloud.google.com</code>, choisissez le projet de votre Firebase (en haut de la page).</li>
@@ -901,7 +907,7 @@ details.tbl td.calc { padding: 6px 5px }
 
 <script>
 "use strict";
-const APP_VERSION = "1.8.0";
+const APP_VERSION = "1.9.0";
 const FB_VERSION = "10.12.2"; // SDK Firebase chargé depuis gstatic uniquement si la synchronisation est configurée
 const LS = { state: "fin.state", fb: "fin.firebase", dev: "fin.device", link: "fin.linked", lastSync: "fin.lastsync" };
 const CLASSES = [{ id: "stocks", c: "#2346d8" }, { id: "bonds", c: "#7a4fd0" }, { id: "gold", c: "#c99a0a" }, { id: "cash", c: "#138a5b" }];
@@ -1282,8 +1288,9 @@ function defaultState() {
       country: "FRA", method: "trend",  // conjoncture : pays et méthode choisis
       freeCash: null, look: { color: "#222222", icon: "chart" }
     },
-    // Google Sheets privé (rempli par Claude) : identifiant client OAuth, lien du tableau, empreintes du dernier budget / portefeuille appliqués
-    gs: { clientId: "", sheet: "", budgetHash: "", portHash: "", soldHash: "" },
+    // Google Sheets privé (rempli par Claude) : identifiant client OAuth, lien du tableau, empreintes du dernier budget / portefeuille appliqués ;
+    // write : copier les données de l'appli dans le tableau ; wHash / wAt / wDev : empreinte, date et appareil du dernier envoi
+    gs: { clientId: "", sheet: "", budgetHash: "", portHash: "", soldHash: "", write: true, wHash: "", wAt: 0, wDev: "" },
     ui: normUi({})   // ordre et blocs masqués de l'accueil et du menu
   };
 }
@@ -1323,11 +1330,13 @@ function commit(rerender = true) {
   S.updatedAt = Date.now(); save(); sync.push();
   if (rerender) renderView();
   scheduleHistory();
+  try { gsSchedule() } catch {}   // copie dans le Google Sheets privé (pas encore prête pendant le démarrage)
 }
 // Données reçues d'un autre appareil : on les applique sans les renvoyer.
 let renderLater = false;
 function applyRemote(remote) {
   S = remote; save(); sync.cancelPush();
+  try { gsSchedule() } catch {}   // si cet appareil est connecté à Google, il recopie les changements faits sur l'autre
   const a = document.activeElement;
   if (a && a.matches?.("input, textarea, select") && !$("sheet").contains(a)) { renderLater = true; return }
   renderView();
@@ -1635,7 +1644,7 @@ function renderBudget() {
   const trs = st.tr.filter(t => !envFilter || trEnv(t) === envFilter).map(t => ({ k: "tr", o: t }));
   const list = [...exps, ...incs, ...trs].sort((a, b) => b.o.date.localeCompare(a.o.date) || (b.o.at || 0) - (a.o.at || 0));
   $("expcount").textContent = list.length ? `· ${list.length}` : "";
-  $("expclear").hidden = !envFilter; $("gs-quick").hidden = !gsReady();
+  $("expclear").hidden = !envFilter; renderGsQuick();
   document.querySelectorAll("#m-sort [data-ms]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.ms === PF.movSort)));
   const movRow = ({ k, o }) => {
     const d = parseYmd(o.date), day = `<span class="d">${pad(d.getDate())}/${pad(d.getMonth() + 1)}</span>`;
@@ -3126,10 +3135,11 @@ $("impprev").addEventListener("click", e => {
 });
 
 /* ---------- Google Sheets privé (rempli par Claude) ---------- */
-// L'appli lit le tableau avec le compte Google de l'utilisateur (Google Identity Services, lecture seule).
-// Onglets reconnus : Mouvements (ID, Date, Type, Montant, Enveloppe, Catégorie, Libellé), Budget (Enveloppe, Prévu, Type),
-// Portefeuille (Symbole, Quantité, Montant investi, Classe, ISIN, Nom). Rien n'est écrit dans le tableau.
-const GS_SCOPE = "https://www.googleapis.com/auth/spreadsheets.readonly", LS_GSAT = "fin.gsat";
+// L'appli lit le tableau avec le compte Google de l'utilisateur (Google Identity Services).
+// Onglets lus (remplis par Claude) : Mouvements (ID, Date, Type, Montant, Enveloppe, Catégorie, Libellé), Budget (Enveloppe, Prévu, Type),
+// Portefeuille (Symbole, Quantité, Montant investi, Classe, ISIN, Nom), Soldes. L'appli n'y écrit jamais.
+// Onglets écrits (copie des données de l'appli, pour que Claude voie les saisies) : « Appli · … », voir plus bas.
+const GS_SCOPE = "https://www.googleapis.com/auth/spreadsheets", LS_GSAT = "fin.gsat";
 let gsToken = null, gsTokenExp = 0, gsClient = null, gsClientId = "", gsBusy = false, gsLoad = null, gsPending = null, gsBudgetNote = "", gsLast = +ls.get(LS_GSAT) || 0;
 const sheetIdOf = v => { const t = String(v || "").trim(), m = t.match(/\/spreadsheets\/d\/([a-zA-Z0-9_-]{20,})/); return m ? m[1] : (/^[a-zA-Z0-9_-]{25,}$/.test(t) ? t : "") };
 const gsReady = () => !!(S.gs.clientId && sheetIdOf(S.gs.sheet));
@@ -3149,7 +3159,7 @@ function gsConnectAndFetch() {
   if (gsTokenOk()) { gsFetch(false); return }
   if (!window.google?.accounts?.oauth2) {
     gsMsg("Chargement de la connexion Google…");
-    loadGis().then(() => { gsMsg("Prêt : touchez à nouveau « Se connecter et récupérer »."); toast("Connexion Google prête : touchez à nouveau.") }, () => gsMsg("Impossible de charger la connexion Google : vérifiez le réseau.", true));
+    loadGis().then(() => { gsMsg("Prêt : touchez à nouveau « Se connecter et synchroniser »."); toast("Connexion Google prête : touchez à nouveau.") }, () => gsMsg("Impossible de charger la connexion Google : vérifiez le réseau.", true));
     return;
   }
   const id = S.gs.clientId.trim();
@@ -3164,7 +3174,7 @@ function gsConnectAndFetch() {
 }
 function gsOnToken(r) {
   if (r.error) { gsMsg(r.error === "access_denied" ? "Accès refusé dans la fenêtre Google." : "Connexion Google impossible (" + r.error + "). Vérifiez l'identifiant client et que votre adresse est « utilisateur test ».", true); return }
-  if (!google.accounts.oauth2.hasGrantedAllScopes(r, GS_SCOPE)) { gsMsg("La lecture des tableaux n'a pas été autorisée : reconnectez-vous et cochez l'accès à Google Sheets.", true); return }
+  if (!google.accounts.oauth2.hasGrantedAllScopes(r, GS_SCOPE)) { gsMsg("L'accès aux tableaux n'a pas été autorisé : reconnectez-vous et cochez l'accès à Google Sheets (consulter et modifier).", true); return }
   gsToken = r.access_token; gsTokenExp = Date.now() + (+r.expires_in || 3600) * 1000;
   gsFetch(false);
 }
@@ -3175,7 +3185,7 @@ function gsOnTokenErr(e) {
 async function gsGet(path) {
   const r = await fetch("https://sheets.googleapis.com/v4/spreadsheets/" + path, { headers: { Authorization: "Bearer " + gsToken } });
   if (r.ok) return r.json();
-  if (r.status === 401) { gsToken = null; throw new Error("Connexion Google expirée : touchez « Récupérer » pour vous reconnecter.") }
+  if (r.status === 401) { gsToken = null; throw new Error("Connexion Google expirée : touchez « ↻ Google Sheets » pour vous reconnecter.") }
   if (r.status === 403) throw new Error("Accès refusé : vérifiez que l'API Google Sheets est activée et que ce tableau est dans le Drive du compte connecté.");
   if (r.status === 404) throw new Error("Tableau introuvable : vérifiez le lien dans Réglages.");
   throw new Error("Lecture du tableau impossible (erreur " + r.status + ").");
@@ -3195,6 +3205,7 @@ async function gsFetch(auto) {
     const vals = {}; want.forEach(([k], i) => { vals[k] = data.valueRanges?.[i]?.values || [] });
     const res = gsApply(vals);
     gsLast = Date.now(); ls.set(LS_GSAT, String(gsLast));
+    const sent = gsWriteOn() ? await gsPush(!auto) : false;    // puis copie des données de l'appli dans les onglets « Appli · … »
     const parts = [];
     if (res.add || res.upd) parts.push(`${res.add} mouvement${res.add > 1 ? "s" : ""} ajouté${res.add > 1 ? "s" : ""}${res.upd ? `, ${res.upd} modifié${res.upd > 1 ? "s" : ""}` : ""}`);
     if (res.budget) parts.push("budget mis à jour");
@@ -3202,11 +3213,12 @@ async function gsFetch(auto) {
     if (res.sold) parts.push(`${res.sold} solde${res.sold > 1 ? "s" : ""} de compte à jour`);
     if (res.envNew.length) parts.push(`enveloppe${res.envNew.length > 1 ? "s" : ""} créée${res.envNew.length > 1 ? "s" : ""} : ${res.envNew.join(", ")}`);
     const when = new Date(gsLast).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
-    gsMsg(`Récupéré à ${when} : ${parts.length ? parts.join(" · ") : "rien de nouveau"}.${res.bad ? ` ${res.bad} ligne${res.bad > 1 ? "s" : ""} ignorée${res.bad > 1 ? "s" : ""} (date ou montant illisible).` : ""}${gsPending ? " Un budget attend votre accord (page Budget)." : ""}`);
-    if (parts.length || !auto) toast(parts.length ? "Google Sheets : " + parts.join(" · ") + "." : "Google Sheets : rien de nouveau.");
+    const wNote = !gsWriteOn() ? "" : sent ? " Vos données ont été copiées dans le tableau." : gswErr ? " Copie dans le tableau impossible : " + gswErr : "";
+    gsMsg(`Récupéré à ${when} : ${parts.length ? parts.join(" · ") : "rien de nouveau"}.${res.bad ? ` ${res.bad} ligne${res.bad > 1 ? "s" : ""} ignorée${res.bad > 1 ? "s" : ""} (date ou montant illisible).` : ""}${gsPending ? " Un budget attend votre accord (page Budget)." : ""}${wNote}`, !!gswErr && !sent);
+    if (parts.length || !auto) toast((parts.length ? "Google Sheets : " + parts.join(" · ") + "." : "Google Sheets : rien de nouveau.") + (sent ? " Données envoyées." : ""));
     if (gsPending && !auto) toast("Budget reçu de Google Sheets : validez-le dans la page Budget.");
   } catch (e) { gsMsg(e.message || "Lecture du tableau impossible.", true); if (!auto) toast(e.message || "Lecture du tableau impossible.") }
-  finally { gsBusy = false; document.querySelectorAll("[data-gsfetch]").forEach(b => b.disabled = false); renderGsPending() }
+  finally { gsBusy = false; document.querySelectorAll("[data-gsfetch]").forEach(b => b.disabled = false); renderGsPending(); renderGsQuick() }
 }
 // Colonnes repérées par leur titre (première ligne), sinon dans l'ordre par défaut
 function gsCols(rows, spec) {
@@ -3364,12 +3376,142 @@ function renderGsSettings() {
   if (document.activeElement !== $("gs-client")) $("gs-client").value = S.gs.clientId || "";
   if (document.activeElement !== $("gs-sheet")) $("gs-sheet").value = S.gs.sheet || "";
   const id = sheetIdOf(S.gs.sheet); $("gs-open").hidden = !id; if (id) $("gs-open").href = `https://docs.google.com/spreadsheets/d/${id}/edit`;
-  $("gs-fetch").textContent = gsTokenOk() ? "Récupérer maintenant" : "Se connecter et récupérer";
+  $("gs-fetch").textContent = gsTokenOk() ? "Synchroniser maintenant" : "Se connecter et synchroniser";
   if (!$("gs-msg").textContent && gsLast) gsMsg("Dernière récupération " + fmtWhen(gsLast) + ".");
-  renderGsPending();
+  renderGsPending(); renderGsWrite();
 }
 setInterval(() => { if (document.visibilityState === "visible" && gsTokenOk()) gsFetch(true) }, 5 * 60e3);
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && gsTokenOk() && Date.now() - gsLast > 60e3) gsFetch(true) });
+
+/* ---------- Copie des données de l'appli dans le tableau (pour que Claude voie les saisies) ---------- */
+// Onglets « Appli · … » réécrits entièrement à chaque envoi ; les onglets remplis par Claude ne sont jamais modifiés.
+// Envoi automatique quelques secondes après chaque changement tant que la connexion Google est active (environ 1 h après « ↻ Google Sheets »).
+// Sinon le bouton « ↻ Google Sheets » de l'Accueil affiche un point : le toucher récupère et envoie.
+const GSW_TABS = { in: "Appli · Infos", mv: "Appli · Mouvements", bu: "Appli · Budget", co: "Appli · Comptes", pf: "Appli · Portefeuille" };
+const GSW_MAX = 5000;   // mouvements recopiés au plus (les plus récents)
+let gswTimer = null, gswBusy = false, gswAgain = false, gswErr = "", gswMemo = { s: null, at: -1, h: "" };
+const gsWriteOn = () => S.gs.write !== false;
+// Empreinte des données saisies (pas des valeurs calculées comme les cours) : sert à savoir s'il reste quelque chose à envoyer.
+function gsDataHash() {
+  if (gswMemo.s === S && gswMemo.at === S.updatedAt) return gswMemo.h;
+  const h = hashStr(JSON.stringify([S.budget, S.invest.portfolio, S.invest.freeCash, S.invest.classNames]));
+  gswMemo = { s: S, at: S.updatedAt, h }; return h;
+}
+const gsUnsent = () => gsReady() && gsWriteOn() && gsDataHash() !== S.gs.wHash;
+function renderGsQuick() {
+  const b = $("gs-quick"), on = gsUnsent();
+  b.hidden = !gsReady(); b.classList.toggle("pending", on);
+  b.title = on ? "Des changements n'ont pas encore été copiés dans le tableau : touchez pour récupérer et envoyer." : "Récupérer le tableau et y copier vos données";
+  b.setAttribute("aria-label", on ? "Google Sheets : changements à envoyer" : "Google Sheets : récupérer et envoyer");
+}
+// Appelé après chaque changement (commit) et à la réception des données d'un autre appareil
+function gsSchedule() {
+  clearTimeout(gswTimer); gswTimer = null;
+  if (view === "budget") renderGsQuick();
+  if (!gsReady() || !gsWriteOn() || !gsTokenOk()) return;
+  gswTimer = setTimeout(() => gsPush(false), 4000);
+}
+const deviceName = () => /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) ? "Téléphone" : "Ordinateur";
+const stamp = t => { const d = new Date(t); return `${ymd(d)} ${pad(d.getHours())}:${pad(d.getMinutes())}` };
+function gswRows() {
+  const B = S.budget, today = new Date(), cur = cycleOf(today), envName = id => envById(id)?.name || "";
+  const acc = id => acctById(id)?.name || (id ? "Compte supprimé" : ""), src = x => x.gs ? "Tableau (Claude)" : x.imp ? "Import bancaire" : "Appli";
+  const cstart = {}, cyc = d => cstart[d] ||= (/^\d{4}-\d{2}-\d{2}$/.test(d) ? ymd(cycleOf(parseYmd(d)).start) : "");
+  const mv = [];
+  B.expenses.forEach(x => mv.push([x.date, "Dépense", round2(+x.amount || 0), envName(x.env) || "Sans enveloppe", "", x.label || "", "", "", cyc(x.date), src(x), x.at ? stamp(x.at) : "", x.id]));
+  B.incomes.forEach(x => mv.push([x.date, "Entrée", round2(+x.amount || 0), envName(refundEnv(x)), incCat(x.cat)?.name || "", x.label || "", "", "", cyc(x.date), src(x), x.at ? stamp(x.at) : "", x.id]));
+  B.transfers.forEach(x => mv.push([x.date, "Virement", round2(+x.amount || 0), envName(trFlow(x)?.env), "", x.label || "", acc(x.from), acc(x.to), cyc(x.date), "Appli", x.at ? stamp(x.at) : "", x.id]));
+  mv.sort((a, b) => String(b[0]).localeCompare(String(a[0])) || String(b[10]).localeCompare(String(a[10])));
+  const total = mv.length, capped = total > GSW_MAX;
+  const mvRows = [["Date", "Type", "Montant", "Enveloppe", "Catégorie", "Libellé", "De", "Vers", "Début du cycle", "Origine", "Saisi le", "ID"], ...mv.slice(0, GSW_MAX)];
+
+  // Budget du cycle en cours, enveloppe par enveloppe
+  const st = cycleStats(cur), bu = [["Enveloppe", "Type", "Prévu", "Dépensé", "Remboursé", "Net", "Reste"]];
+  const ids = B.envelopes.map(e => e.id), others = [...new Set([...Object.keys(st.spentBy), ...Object.keys(st.refundBy)])].filter(id => !ids.includes(id));
+  const line = (name, kind, planned, id) => { const sp = round2(st.spentBy[id] || 0), rf = round2(st.refundBy[id] || 0), net = round2(sp - rf); bu.push([name, kind, planned, sp, rf, net, planned === "" ? "" : round2(planned - net)]) };
+  B.envelopes.forEach(e => line(e.name, e.kind === "save" ? "Épargne" : "Dépense", round2(+e.planned || 0), e.id));
+  others.forEach(id => line(id ? "Enveloppe supprimée" : "Sans enveloppe", "Dépense", "", id));
+  const plannedSpend = B.envelopes.filter(e => e.kind !== "save").reduce((t, e) => t + (+e.planned || 0), 0), plannedSave = B.envelopes.filter(e => e.kind === "save").reduce((t, e) => t + (+e.planned || 0), 0);
+  bu.push([], ["Cycle", `${ymd(cur.start)} → ${ymd(cur.end)}`], ["Revenu du cycle", "", round2(cycleIncome(cur))], ["Entrées en plus (ventes, primes…)", "", round2(st.extra)],
+    ["Prévu en dépenses", "", round2(plannedSpend)], ["Prévu en épargne", "", round2(plannedSave)], ["Sorti au total (net des remboursements)", "", round2(st.out)], ["Dont épargne", "", round2(st.saved)]);
+
+  // Comptes
+  const cc = ccpEstimate(), co = [["Compte", "Nature", "Solde", "Date du solde", "Objectif", "Note"]];
+  co.push(B.ccp ? ["Compte courant", "Compte courant", cc.value, ymd(today), "", `Estimé : solde relevé de ${fmtEUR(+B.ccp.balance || 0)} le ${B.ccp.date}, plus les mouvements et salaires depuis`]
+    : ["Compte courant", "Compte courant", "", "", "", "Aucun solde relevé dans l'appli"]);
+  B.savings.forEach(a => co.push([a.name, natureOf(a.kind).name, round2(+a.balance || 0), a.date || "", +a.goal > 0 ? round2(+a.goal) : "", ""]));
+  co.push(["DEGIRO (marge libre)", "Comptes titres & PEA", round2(freeCash()), S.invest.freeCash?.date || "", "", "Non investie"]);
+  co.push(["Portefeuille (titres)", "Comptes titres & PEA", round2(grandTotal()), ymd(today), "", quotes.at ? `Cours en direct du ${stamp(quotes.at)}` : "Valeurs saisies ou importées"]);
+
+  // Portefeuille, ligne par ligne
+  const pf = [["Classe", "Nom", "Symbole", "ISIN", "Quantité", "Montant investi", "Valeur", "Cours (€)", "Plus-value", "Valeur d'après"]];
+  CLASSES.forEach(c => P()[c.id].forEach(a => {
+    const q = live(a), v = round2(val(a)), cost = +a.cost > 0 ? round2(+a.cost) : "";
+    pf.push([cname(c.id), a.name || "", a.sym || "", a.isin || "", +a.units || 0, cost, v, q ? Math.round(q.eur * 1e4) / 1e4 : "", cost === "" ? "" : round2(v - cost), q ? "Cours en direct" : "Valeur saisie ou importée"]);
+  }));
+
+  const inf = [["Info", "Valeur"], ["Envoyé le", stamp(Date.now())], ["Depuis", deviceName()], ["Version de l'appli", APP_VERSION],
+    ["Dernière modification dans l'appli", S.updatedAt ? stamp(S.updatedAt) : ""], ["Cycle en cours", `${ymd(cur.start)} → ${ymd(cur.end)}`],
+    ["Jour de paie", B.payday + (B.shiftWeekend ? " (avancé au vendredi si week-end)" : "")], ["Revenu habituel", round2(+B.income || 0)],
+    ["Mouvements dans l'appli", capped ? `${total} (les ${GSW_MAX} plus récents sont recopiés)` : total],
+    ["À savoir", "Ces onglets « Appli · … » sont réécrits par l'appli à chaque envoi : les modifier à la main ne sert à rien. Pour ajouter des données, utilisez les onglets Mouvements, Budget, Portefeuille et Soldes."]];
+  return { in: inf, mv: mvRows, bu, co, pf };
+}
+async function gsApi(path, body) {
+  const r = await fetch("https://sheets.googleapis.com/v4/spreadsheets/" + path, { method: "POST", headers: { Authorization: "Bearer " + gsToken, "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  if (r.ok) return r.json();
+  if (r.status === 401) { gsToken = null; throw new Error("connexion Google expirée, touchez « ↻ Google Sheets » pour vous reconnecter.") }
+  if (r.status === 403) throw new Error("modification refusée par Google. Reconnectez-vous et autorisez l'appli à modifier vos tableaux Google Sheets.");
+  if (r.status === 404) throw new Error("tableau introuvable, vérifiez le lien dans Réglages.");
+  throw new Error("erreur " + r.status + ".");
+}
+// force : envoyer même si rien n'a changé depuis le dernier envoi (toucher « ↻ Google Sheets »)
+async function gsPush(force) {
+  clearTimeout(gswTimer); gswTimer = null;
+  if (!gsReady() || !gsWriteOn() || !gsTokenOk()) return false;
+  const h = gsDataHash();
+  if (!force && h === S.gs.wHash) return false;
+  if (gswBusy) { gswAgain = true; return false }
+  gswBusy = true;
+  try {
+    const id = sheetIdOf(S.gs.sheet), R = gswRows(), q = t => `'${t.replace(/'/g, "''")}'`;
+    const meta = await gsGet(id + "?fields=sheets.properties(sheetId,title,gridProperties(rowCount,columnCount))");
+    const props = (meta.sheets || []).map(x => x.properties), used = new Set(props.map(p => p.sheetId)), reqs = [];
+    Object.entries(GSW_TABS).forEach(([k, title]) => {
+      const rows = R[k], needR = rows.length + 20, needC = Math.max(...rows.map(r => r.length)), p = props.find(x => x.title === title);
+      if (!p) {
+        let sid; do sid = 1e8 + Math.floor(Math.random() * 1e9); while (used.has(sid)); used.add(sid);
+        reqs.push({ addSheet: { properties: { sheetId: sid, title, gridProperties: { rowCount: Math.max(200, needR), columnCount: Math.max(12, needC), frozenRowCount: 1 }, tabColor: { red: 0.55, green: 0.6, blue: 0.65 } } } },
+          { repeatCell: { range: { sheetId: sid, startRowIndex: 0, endRowIndex: 1 }, cell: { userEnteredFormat: { textFormat: { bold: true } } }, fields: "userEnteredFormat.textFormat.bold" } });
+      } else {
+        const g = p.gridProperties || {};
+        if ((g.rowCount || 0) < needR || (g.columnCount || 0) < needC)
+          reqs.push({ updateSheetProperties: { properties: { sheetId: p.sheetId, gridProperties: { rowCount: Math.max(needR, g.rowCount || 0), columnCount: Math.max(needC, g.columnCount || 0) } }, fields: "gridProperties(rowCount,columnCount)" } });
+      }
+    });
+    if (reqs.length) await gsApi(id + ":batchUpdate", { requests: reqs });
+    await gsApi(id + "/values:batchClear", { ranges: Object.values(GSW_TABS).map(q) });
+    await gsApi(id + "/values:batchUpdate", { valueInputOption: "RAW", data: Object.entries(GSW_TABS).map(([k, t]) => ({ range: q(t) + "!A1", values: R[k] })) });
+    // Mémorisé dans les données synchronisées (sans changer la date de modification) : l'autre appareil sait que c'est déjà envoyé.
+    S.gs.wHash = h; S.gs.wAt = Date.now(); S.gs.wDev = deviceName(); gswErr = ""; save(); sync.push();
+    return true;
+  } catch (e) { gswErr = e.message || "erreur inconnue."; return false }
+  finally {
+    gswBusy = false; renderGsQuick(); if (view === "reglages") renderGsWrite();
+    if (gswAgain) { gswAgain = false; gsSchedule() }
+  }
+}
+// Quand l'appli passe en arrière-plan, on n'attend pas les quelques secondes de délai
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden" && gswTimer) gsPush(false) });
+function renderGsWrite() {
+  $("gs-write").setAttribute("aria-checked", String(gsWriteOn()));
+  const t = S.gs.wAt, m = $("gs-wmsg");
+  m.textContent = !gsWriteOn() ? "Désactivé : Claude ne voit que ce qu'il a lui-même mis dans le tableau."
+    : (t ? `Dernier envoi ${fmtWhen(t)}${S.gs.wDev ? " depuis " + (S.gs.wDev === "Téléphone" ? "le téléphone" : "l'ordinateur") : ""}.` : "Rien d'envoyé pour l'instant.")
+      + (gsUnsent() ? " Des changements restent à envoyer." : "") + (gswErr ? " Dernier essai : " + gswErr : "");
+  m.className = "notice" + (gswErr ? " err" : "");
+}
+$("gs-write").addEventListener("click", () => { S.gs.write = !gsWriteOn(); commit(false); renderGsWrite(); if (gsWriteOn()) gsPush(true) });
 
 /* ---------- Cours en direct (Google Sheets publié + taux BCE) ---------- */
 // Le tableau contient au minimum les colonnes « Symbole » et « Cours » (=GOOGLEFINANCE(A2)) ; « Devise » et « ISIN » sont facultatives.
