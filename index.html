@@ -461,6 +461,62 @@ details.tbl td.calc { padding: 6px 5px }
 .robar { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: .84rem; color: var(--accent); font-weight: 600 }
 .robar .btn { min-height: 38px; padding: 6px 16px }
 @media (prefers-reduced-motion: reduce) { .igrid.reorder .gi, .slide-l > *, .slide-r > * { animation: none } }
+/* ---------- 1.10 : charges, recherche, objectifs, calendrier, tri par appui long, explications repliées ---------- */
+.shhead { display: flex; align-items: center; gap: 10px; min-height: 28px }
+.shhead .linkbtn { padding: 4px 0; font-size: .95rem; flex: none }
+.seg5 { grid-template-columns: repeat(4, 1fr) 1.6fr }
+.iconbtn.sm { width: 36px; height: 36px; border-radius: 10px; color: var(--accent) }
+.iconbtn.sm svg { width: 20px; height: 20px }
+.msearch { display: flex; gap: 12px; align-items: center; margin-top: 10px }
+.msearch input { flex: 1; min-width: 0; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--fg) }
+.ccprow.warn b { color: var(--warn) !important }
+.chghead { border-bottom: 0; padding: 2px 2px 4px }
+.chghead .chev { display: inline-block; transition: transform .15s; color: var(--muted); margin-left: 4px; font-weight: 400 }
+.chghead[aria-expanded="true"] .chev { transform: rotate(90deg) }
+.chgbody { border-top: 1px solid var(--line); margin-top: 8px }
+.chg { display: grid; grid-template-columns: 46px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--line) }
+.chg .cbox { width: 34px; height: 34px; border-radius: 10px; border: 2px solid var(--line); background: var(--surface); display: grid; place-items: center; color: transparent; font-weight: 800; font-size: 1rem; justify-self: center; padding: 0 }
+.chg.paid .cbox { background: var(--up); border-color: var(--up); color: #fff }
+.chg.late .cbox { border-color: var(--warn) }
+.chg .cmain { border: 0; background: none; text-align: left; padding: 6px 0; min-width: 0; color: var(--fg) }
+.chg .cmain b { display: block; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.chg .cmain small { display: block; font-size: .76rem; color: var(--muted) }
+.chg.paid .cmain small { color: var(--up) }
+.chg.late .cmain small, .chg.late .num { color: var(--warn) }
+.chg .num { font-weight: 600; font-size: .9rem; text-align: right }
+.chgfoot { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding-top: 4px }
+.goal { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; padding: 12px 2px; border: 0; border-bottom: 1px solid var(--line); background: none; text-align: left; width: 100%; color: var(--fg) }
+.goal .bar { grid-column: 1 / -1 }
+.glaccts { display: flex; flex-direction: column }
+.glaccts .chk { padding: 7px 0; border-bottom: 1px solid var(--line) }
+.glaccts .chk:last-child { border-bottom: 0 }
+.glaccts .chk input { width: 20px; height: 20px; accent-color: var(--accent); flex: none }
+.glaccts .chk .num { margin-left: auto; font-size: .85rem; color: var(--muted) }
+.calnav { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; text-align: center; gap: 8px }
+.calnav .arrow { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; height: 42px; font-size: 1.3rem; color: var(--fg) }
+.calnav b { text-transform: capitalize }
+.calgrid { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 2px }
+.calgrid .wd { text-align: center; font-size: .72rem; color: var(--muted); font-weight: 600; padding: 4px 0 }
+.calgrid button { border: 0; background: none; height: 42px; font-family: var(--mono); font-size: .92rem; color: var(--fg); padding: 0 }
+.calgrid button.out { color: var(--muted); opacity: .5 }
+.calgrid button.today { font-weight: 700; text-decoration: underline; text-underline-offset: 3px }
+.calgrid button.in { background: color-mix(in srgb, var(--accent) 16%, transparent) }
+.calgrid button.a, .calgrid button.b { background: var(--accent); color: var(--accent-fg); opacity: 1 }
+.calgrid button.a { border-radius: 10px 0 0 10px }
+.calgrid button.b { border-radius: 0 10px 10px 0 }
+.calgrid button.a.b { border-radius: 10px }
+.calsel { text-align: center; font-size: .9rem; min-height: 1.4em }
+.lsrow { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none }
+.lsdrag { position: relative; z-index: 5; background: var(--surface) !important; box-shadow: 0 10px 28px rgb(0 0 0 / .28); border-radius: 12px; transition: none !important }
+.grip { border: 0; background: none; color: var(--muted); width: 30px; min-height: 40px; padding: 0; font-size: 1.15rem; line-height: 1; cursor: grab; touch-action: none; flex: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none }
+.info { display: none !important }
+.showinfo .info { display: block !important }
+.infobtn { border: 1px solid var(--line); background: var(--surface); color: var(--muted); width: 30px; height: 30px; border-radius: 50%; font-size: .85rem; font-weight: 700; font-family: var(--body); flex: none; display: inline-grid; place-items: center; padding: 0; font-style: italic }
+.showinfo .infobtn { color: var(--accent); border-color: var(--accent) }
+.infohead { display: flex; align-items: center; justify-content: space-between; gap: 10px }
+.panel.infoabs, .sheetcard.infoabs { position: relative }
+.infobtn.abs { position: absolute; top: 12px; right: 12px }
+.years .exp { grid-template-columns: 4.7em minmax(0, 1fr) auto }
 </style>
 </head>
 <body>
@@ -495,7 +551,7 @@ details.tbl td.calc { padding: 6px 5px }
 <section id="v-budget" class="wrap" hidden>
   <div class="panel periodbox">
     <div class="seg seg4" id="p-mode" role="group" aria-label="Période affichée"><button type="button" data-pm="day" aria-pressed="false">Jour</button><button type="button" data-pm="week" aria-pressed="false">Semaine</button><button type="button" data-pm="cycle" aria-pressed="true">Cycle</button><button type="button" data-pm="multi" aria-pressed="false">Plusieurs</button></div>
-    <div class="seg seg4 sm" id="p-multi" role="group" aria-label="Nombre de cycles" hidden><button type="button" data-pn="2" aria-pressed="false">2 cycles</button><button type="button" data-pn="3" aria-pressed="true">3 cycles</button><button type="button" data-pn="6" aria-pressed="false">6 cycles</button><button type="button" data-pn="12" aria-pressed="false">12 cycles</button></div>
+    <div class="seg seg5 sm" id="p-multi" role="group" aria-label="Nombre de cycles" hidden><button type="button" data-pn="2" aria-pressed="false">2</button><button type="button" data-pn="3" aria-pressed="true">3</button><button type="button" data-pn="6" aria-pressed="false">6</button><button type="button" data-pn="12" aria-pressed="false">12</button><button type="button" data-pn="range" aria-pressed="false">Dates…</button></div>
     <div class="cyclenav">
       <button class="arrow" type="button" id="cprev" aria-label="Période précédente">‹</button>
       <div><b id="clabel"></b><div class="small muted"><span id="csub"></span> <button class="linkbtn small" type="button" id="cnow" hidden>Revenir au cycle en cours</button></div></div>
@@ -512,11 +568,14 @@ details.tbl td.calc { padding: 6px 5px }
       <div class="tb"><span class="eyebrow">Épargne</span><span class="bar" aria-hidden="true"><i class="t-sav" id="b-savbar"></i></span><span class="v" id="b-saved">0,00 €</span><span class="small muted" id="b-savenote"></span></div>
     </div>
     <div class="small" id="b-pace" style="font-weight:600"></div>
-    <div class="small muted" id="b-calc"></div>
-    <div class="warnbox" id="b-alert" hidden></div>
     <button type="button" class="ccprow" id="b-ccp"></button>
-    <label class="incrow" id="b-incbox"><span class="small muted">Revenu de ce cycle</span><input id="b-income" type="text" inputmode="decimal" autocomplete="off" placeholder="0" aria-label="Revenu de ce cycle"><span class="small muted" id="b-incnote"></span></label>
-    <div class="notice" id="b-incdetail" hidden></div>
+    <label class="incrow" id="b-incbox"><span class="small muted">Revenu du cycle</span><input id="b-income" type="text" inputmode="decimal" autocomplete="off" placeholder="0" aria-label="Revenu du cycle"><span class="small muted" id="b-incnote"></span></label>
+    <div class="small muted" id="b-incdetail" hidden></div>
+  </div>
+
+  <div class="panel" data-block="charges" id="b-charges">
+    <button type="button" class="env chghead" id="chg-head" aria-expanded="false" aria-controls="chg-body"></button>
+    <div id="chg-body" class="chgbody" hidden></div>
   </div>
 
   <div class="panel" data-block="envs">
@@ -528,10 +587,12 @@ details.tbl td.calc { padding: 6px 5px }
   <div class="panel" data-block="savs" id="b-savs">
     <div class="clshead"><h2>Épargne &amp; placements</h2><button class="linkbtn" type="button" data-goto="comptes">Mes comptes</button></div>
     <div id="savlist"></div>
+    <div id="goallist"></div>
   </div>
 
   <div class="panel" data-block="movs">
-    <div class="clshead"><h2>Mouvements <span class="small muted" id="expcount"></span></h2><span style="display:flex;gap:14px"><button class="linkbtn" type="button" id="expclear" hidden>Tout afficher</button><button class="linkbtn" type="button" id="gs-quick" data-gsfetch hidden>↻ Google Sheets</button></span></div>
+    <div class="clshead"><h2>Mouvements <span class="small muted" id="expcount"></span></h2><span style="display:flex;gap:14px;align-items:center"><button class="linkbtn" type="button" id="expclear" hidden>Tout afficher</button><button class="linkbtn" type="button" id="gs-quick" data-gsfetch hidden>↻ Google Sheets</button><button class="iconbtn sm" type="button" id="m-sbtn" aria-label="Rechercher dans les mouvements" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg></button></span></div>
+    <div class="msearch" id="m-sbox" hidden><input id="m-q" type="search" enterkeyhint="search" autocomplete="off" placeholder="Libellé, montant, date…" aria-label="Rechercher un mouvement"><button class="linkbtn" type="button" id="m-sclose">Fermer</button></div>
     <div class="seg sm" id="m-sort" role="group" aria-label="Classer les mouvements" style="margin:10px 0 4px"><button type="button" data-ms="date" aria-pressed="true">Par date</button><button type="button" data-ms="env" aria-pressed="false">Par enveloppe</button></div>
     <div id="explist"></div>
   </div>
@@ -539,16 +600,22 @@ details.tbl td.calc { padding: 6px 5px }
 
 <!-- ============ BILAN ============ -->
 <section id="v-bilan" class="wrap" hidden>
-  <div class="panel stack">
-    <label class="field"><span class="eyebrow">Période</span><select id="bl-period"></select></label>
-    <div class="stats" id="bl-stats"></div>
+  <div class="panel periodbox">
+    <div class="seg seg4" id="bl-mode" role="group" aria-label="Période du bilan"><button type="button" data-bm="day" aria-pressed="false">Jour</button><button type="button" data-bm="week" aria-pressed="false">Semaine</button><button type="button" data-bm="cycle" aria-pressed="false">Cycle</button><button type="button" data-bm="multi" aria-pressed="true">Plusieurs</button></div>
+    <div class="seg seg5 sm" id="bl-multi" role="group" aria-label="Nombre de cycles"><button type="button" data-bn="3" aria-pressed="false">3</button><button type="button" data-bn="6" aria-pressed="false">6</button><button type="button" data-bn="12" aria-pressed="true">12</button><button type="button" data-bn="all" aria-pressed="false">Tout</button><button type="button" data-bn="range" aria-pressed="false">Dates…</button></div>
+    <div class="cyclenav">
+      <button class="arrow" type="button" id="bl-prev" aria-label="Période précédente">‹</button>
+      <div><b id="bl-label"></b><div class="small muted" id="bl-sub"></div></div>
+      <button class="arrow" type="button" id="bl-next" aria-label="Période suivante">›</button>
+    </div>
   </div>
-  <div class="panel total">
-    <div class="clshead"><h2>Par cycle</h2></div>
+  <div class="panel"><div class="stats" id="bl-stats"></div></div>
+  <div class="panel total" id="bl-chartbox">
+    <div class="clshead"><h2 id="bl-ctitle">Par cycle</h2></div>
     <div class="vlegend" id="bl-legend"><span><span class="tdot t-rev"></span>Revenus</span><span><span class="tdot t-exp"></span>Dépenses</span><span><span class="tdot t-sav"></span>Épargne</span></div>
     <div class="bchart" id="bl-chart"></div>
     <div class="notice" id="bl-chartnote"></div>
-    <details class="tbl" id="bl-tblbox" hidden><summary>Voir les chiffres par cycle</summary><div class="tablewrap"><table id="bl-tbl"></table></div></details>
+    <details class="tbl" id="bl-tblbox" hidden><summary>Chiffres</summary><div class="tablewrap"><table id="bl-tbl"></table></div></details>
   </div>
   <div class="panel stack" id="bl-mix">
     <div class="clshead"><h2>Répartition des dépenses</h2></div>
@@ -558,7 +625,6 @@ details.tbl td.calc { padding: 6px 5px }
   </div>
   <div class="panel"><div class="clshead"><h2>Par enveloppe</h2></div><div id="bl-env"></div></div>
   <div class="panel"><div class="clshead"><h2>Entrées</h2></div><div id="bl-inc"></div></div>
-  <div class="notice">Un cycle va d'une paie à la suivante. Touchez une barre pour voir les montants exacts. Pour importer vos anciennes dépenses : Réglages › Importer un historique.</div>
 </section>
 
 <!-- ============ COMPTES ============ -->
@@ -568,10 +634,10 @@ details.tbl td.calc { padding: 6px 5px }
     <div class="seg" id="c-mode" role="group" aria-label="Répartition du patrimoine"><button type="button" data-cm="nature" aria-pressed="true">Par nature</button><button type="button" data-cm="acct" aria-pressed="false">Par compte</button></div>
     <div class="donutwrap"><div class="donut" id="c-donut"></div><div class="dlegend" id="c-legend"></div></div>
     <div class="small muted" id="c-donutnote"></div>
+    <div class="notice info">Toucher un compte : solde, nature, couleur, logo. Rester appuyé : changer l'ordre. Compte courant estimé = dernier solde relevé + salaires et entrées − dépenses et virements saisis depuis.</div>
   </div>
   <div id="c-groups" class="stack" style="gap:16px"></div>
   <div><button class="btn" type="button" id="c-add">+ Ajouter un compte</button></div>
-  <div class="notice">Touchez un compte pour modifier son solde, sa nature, sa couleur ou son logo. Le compte courant est estimé entre deux mises à jour : dernier solde réel + salaires et entrées − dépenses et virements saisis depuis.</div>
 </section>
 
 <!-- ============ BUDGET PRÉVU ============ -->
@@ -590,8 +656,8 @@ details.tbl td.calc { padding: 6px 5px }
 
   <div class="panel stack" id="set-env">
     <div class="clshead"><h2>Enveloppes</h2><span class="small muted num" id="s-envtotal"></span></div>
-    <div class="notice">Montant prévu par cycle. Sous chaque enveloppe : ce que vous y avez mis en moyenne sur les derniers cycles. Le type « Épargne » sert aux virements vers l'épargne ou les placements : ils comptent dans les sorties, mais pas dans le reste à dépenser par jour.</div>
-    <label class="chk"><input type="checkbox" id="p-excl" checked> Ignorer les dépenses exceptionnelles (900 € et plus) dans les moyennes</label>
+    <div class="notice info">Montant prévu par cycle, et moyenne des derniers cycles. Type « Épargne » : virements vers l'épargne ou les placements (comptés dans les sorties, pas dans le budget par jour). Poignée ⠿ : changer l'ordre.</div>
+    <label class="chk"><input type="checkbox" id="p-excl" checked> Moyennes sans les dépenses de 900 € et plus</label>
     <div id="s-envs"></div>
     <div class="actions" style="justify-content:flex-start">
       <button class="btn" type="button" id="s-envadd">+ Ajouter une enveloppe</button>
@@ -602,9 +668,9 @@ details.tbl td.calc { padding: 6px 5px }
 
   <div class="panel stack" id="p-paste">
     <h2>Coller un budget</h2>
-    <div class="notice">Collez ici le budget mis au point avec Claude, une enveloppe par ligne (ex. <code>Courses : 230 €</code>). Les montants des enveloppes reconnues sont remplacés ; les nouvelles enveloppes sont créées.</div>
+    <div class="notice info">Une enveloppe par ligne (ex. <code>Courses : 230 €</code>). Enveloppes reconnues : montant remplacé ; nouvelles : créées.</div>
     <label class="field"><span class="small muted">Budget à appliquer</span><textarea id="p-text" spellcheck="false" placeholder="Courses : 230 €&#10;Restaurants : 150 €&#10;Carburant : 120 €&#10;Livret A : 300 €"></textarea></label>
-    <label class="chk"><input type="checkbox" id="p-zero"> Mettre à 0 les enveloppes absentes du texte</label>
+    <label class="chk"><input type="checkbox" id="p-zero"> Absentes du texte → 0</label>
     <div class="actions" style="justify-content:flex-start"><button class="btn primary" type="button" id="p-apply">Appliquer</button></div>
     <div class="notice" id="p-msg" aria-live="polite"></div>
   </div>
@@ -620,10 +686,10 @@ details.tbl td.calc { padding: 6px 5px }
     <div class="legend" id="legend"></div>
   </div>
   <div class="panel stack" id="fc-panel">
-    <div class="bigline"><div><div class="eyebrow">Marge libre DEGIRO</div><div class="small muted">Argent sur DEGIRO pas encore investi</div></div>
+    <div class="bigline"><div><div class="eyebrow">Marge libre DEGIRO</div><div class="small muted">Non investie</div></div>
       <input id="fc-amount" class="n" type="text" inputmode="decimal" autocomplete="off" placeholder="0" aria-label="Marge libre DEGIRO en euros" style="max-width:9em"></div>
     <div class="totrow" style="font-weight:500"><span>Total avec la marge libre</span><span class="num" id="fc-total">0,00 €</span></div>
-    <div class="small muted" id="fc-note">Comptée dans le patrimoine, pas dans la performance. Mise à jour par l'import DEGIRO, le tableau privé ou ici.</div>
+    <div class="small muted" id="fc-note">Dans le patrimoine / hors performance</div>
   </div>
   <div class="panel total">
     <div class="clshead">
@@ -641,7 +707,7 @@ details.tbl td.calc { padding: 6px 5px }
     <div id="rbrows" class="rb"></div>
     <div class="scale" aria-hidden="true"><span>0 %</span><span>25 %</span><span>50 %</span></div>
     <label class="field" for="band">
-      <span class="small muted">Rééquilibrer quand une classe s'écarte de plus de <b id="bandv">5</b> points de 25 %</span>
+      <span class="small muted">Seuil de rééquilibrage : ± <b id="bandv">5</b> points</span>
       <input type="range" id="band" min="1" max="15" step="1" value="5">
     </label>
     <div class="notice" id="rbnote"></div>
@@ -649,7 +715,7 @@ details.tbl td.calc { padding: 6px 5px }
     <div class="apport">
       <label class="field" for="apport">
         <span style="font-weight:600">Rééquilibrer avec un nouvel apport</span>
-        <span class="small muted">Montant que vous allez investir : il est réparti pour vous rapprocher des 25 %, sans rien vendre.</span>
+        <span class="small muted">Réparti vers les 25 %, sans vendre</span>
         <input id="apport" class="n" type="text" inputmode="decimal" placeholder="Ex. 500" autocomplete="off" style="text-align:left">
       </label>
       <div><button class="linkbtn small" type="button" id="ap-fc" hidden></button></div>
@@ -666,8 +732,8 @@ details.tbl td.calc { padding: 6px 5px }
   <div class="panel stack">
     <div class="switchrow" style="flex-wrap:wrap">
       <div style="min-width:0;flex:1">
-        <div style="font-weight:600">Importer depuis DEGIRO</div>
-        <div class="notice" id="impnote">Sur le site DEGIRO : Portefeuille › Exporter › CSV. Pour le montant investi et les plus-values, ajoutez l'export Transactions (CSV) sur une période qui part de l'ouverture du compte. Choisissez les deux fichiers ensemble ou l'un après l'autre : ils sont lus sur votre appareil.</div>
+        <div style="font-weight:600;display:flex;align-items:center;gap:8px">Import DEGIRO <button type="button" class="infobtn" aria-label="Explications" aria-expanded="false">i</button></div>
+        <div class="notice info" id="impnote">Sur le site DEGIRO : Portefeuille › Exporter › CSV. Pour le montant investi et les plus-values, ajoutez l'export Transactions (CSV) sur une période qui part de l'ouverture du compte. Choisissez les deux fichiers ensemble ou l'un après l'autre : ils sont lus sur votre appareil.</div>
       </div>
       <label class="btn" for="impfile">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"/><path d="m7 9 5-5 5 5"/><path d="M5 15v3.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V15"/></svg>
@@ -715,11 +781,11 @@ details.tbl td.calc { padding: 6px 5px }
   <div id="set-head" class="sethead" hidden><button type="button" class="linkbtn" id="set-back">‹ Réglages</button><h2 id="set-title"></h2></div>
 
   <div class="panel stack" data-sec="perso" id="set-perso" hidden>
-    <div class="notice">Changez l'ordre avec ▲ ▼ et masquez ce qui ne vous sert pas. Rien ne change tant que vous n'avez pas touché « Enregistrer ».</div>
+    <div class="notice info">▲ ▼ : ordre / 👁 : masquer. Rien ne change avant « Enregistrer ».</div>
     <h3 class="eyebrow">Accueil</h3><div class="plist" id="pz-home"></div>
     <h3 class="eyebrow">Menu</h3><div class="plist" id="pz-menu"></div>
     <h3 class="eyebrow">Enveloppes</h3><div class="plist" id="pz-env"></div>
-    <div class="notice">Le logo et la couleur d'une enveloppe se changent dans Budget (touchez son logo) ; ceux d'un compte dans Comptes.</div>
+    <div class="notice info">Logo et couleur : enveloppes dans Budget, comptes dans Comptes.</div>
   </div>
   <div class="panel actions perso-bar" data-sec="perso" hidden>
     <span class="pz-dirty" id="pz-dirty" hidden>Modifications non enregistrées</span>
@@ -737,19 +803,19 @@ details.tbl td.calc { padding: 6px 5px }
   <div class="panel stack" id="set-theme" data-sec="theme" hidden>
     <h2>Apparence</h2>
     <div class="seg" id="t-theme" role="group" aria-label="Thème" style="grid-template-columns:repeat(3,1fr)"><button type="button" data-th="auto">Automatique</button><button type="button" data-th="light">Clair</button><button type="button" data-th="dark">Sombre</button></div>
-    <div class="small muted">« Automatique » suit le réglage clair / sombre de l'appareil. Ce choix est propre à chaque appareil.</div>
+    <div class="small muted info">« Automatique » suit l'appareil. Réglage propre à chaque appareil.</div>
   </div>
 
   <div class="panel stack" id="set-gs" data-sec="gs" hidden>
     <h2>Google Sheets privé</h2>
-    <div class="notice">Un tableau de votre Google Drive que Claude remplit à partir de vos captures : mouvements, budget prévu, quantités du portefeuille. L'appli le lit avec votre compte Google ; il n'est pas publié. Une seule récupération suffit : les autres appareils reçoivent les données par la synchronisation.</div>
+    <div class="notice info">Tableau privé de votre Google Drive, rempli par Claude (mouvements, budget, portefeuille, soldes). Lu avec votre compte Google, jamais publié. Une récupération suffit : l'autre appareil reçoit tout par la synchronisation.</div>
     <label class="field"><span class="small muted">Identifiant client Google (OAuth)</span><input id="gs-client" type="text" autocomplete="off" spellcheck="false" autocapitalize="off" placeholder="123456789-abc….apps.googleusercontent.com"></label>
     <label class="field"><span class="small muted">Lien du tableau</span><input id="gs-sheet" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://docs.google.com/spreadsheets/d/…/edit"></label>
     <div class="actions" style="justify-content:flex-start"><button class="btn primary" type="button" id="gs-fetch" data-gsfetch>Se connecter et synchroniser</button><a class="btn" id="gs-open" target="_blank" rel="noopener" hidden>Ouvrir le tableau</a></div>
     <div class="notice" id="gs-msg" aria-live="polite"></div>
     <div id="gs-pending" class="stack" hidden></div>
     <div class="switchrow">
-      <div><div style="font-weight:600">Copier mes données dans le tableau</div><div class="notice">Pour que Claude voie vos saisies, l'appli recopie vos mouvements, le budget du cycle, vos comptes et votre portefeuille dans des onglets « Appli · … ». L'envoi est automatique pendant environ une heure après « ↻ Google Sheets ». Ensuite, un point orange sur ce bouton de l'Accueil signale des changements à envoyer.</div></div>
+      <div><div style="font-weight:600">Copier mes données dans le tableau</div><div class="notice info">Onglets « Appli · … » : mouvements, budget du cycle, charges, comptes, portefeuille. Envoi automatique pendant 1 h après « ↻ Google Sheets » ; ensuite, point orange = changements à envoyer.</div></div>
       <button id="gs-write" class="switch" role="switch" aria-checked="true" aria-label="Copier mes données dans le tableau" type="button"></button>
     </div>
     <div class="notice" id="gs-wmsg" aria-live="polite"></div>
@@ -772,22 +838,22 @@ details.tbl td.calc { padding: 6px 5px }
       <label class="field"><span class="small muted">Revenu habituel (€)</span><input id="s-income" class="n" type="text" inputmode="decimal" placeholder="0" style="text-align:left"></label>
     </div>
     <div class="switchrow">
-      <div><div style="font-weight:600">Paie avancée si week-end</div><div class="notice">Si le jour de paie tombe un samedi ou un dimanche, le cycle commence le vendredi d'avant.</div></div>
+      <div><div style="font-weight:600">Paie avancée si week-end</div><div class="notice info">Samedi ou dimanche → le vendredi d'avant.</div></div>
       <button id="s-shift" class="switch" role="switch" aria-checked="true" aria-label="Paie avancée si week-end" type="button"></button>
     </div>
   </div>
 
   <div class="panel stack" id="set-inc" data-sec="inc" hidden>
     <h2>Catégories d'entrées</h2>
-    <div class="notice">Pour savoir d'où vient l'argent qui rentre en plus du salaire. « Déduire par défaut » préremplit l'enveloppe à créditer (ex. mutuelle → Santé).</div>
+    <div class="notice info">Origine de l'argent en plus du salaire. « Déduire de » : enveloppe créditée par défaut (ex. mutuelle → Santé). Poignée ⠿ : changer l'ordre.</div>
     <div id="s-incs"></div>
     <div><button class="btn" type="button" id="s-incadd">+ Ajouter une catégorie</button></div>
   </div>
 
   <div class="panel stack" id="set-quotes" data-sec="quotes" hidden>
     <h2>Cours en direct</h2>
-    <div class="notice">Les cours viennent d'un Google Sheets à vous (fonction GOOGLEFINANCE : toutes les places, différé d'environ 20 minutes), puis sont convertis en euros au taux du jour de la BCE.</div>
-    <ol class="steps notice">
+    <div class="notice info">Cours GOOGLEFINANCE d'un Google Sheets publié (différé d'environ 20 min), convertis en euros au taux BCE du jour.</div>
+    <ol class="steps notice info">
       <li>Dans la rubrique Portefeuille, indiquez la <b>quantité</b> et le <b>symbole</b> de chaque ligne (ex. <code>NASDAQ:AAPL</code>, <code>EPA:MC</code>, <code>WSE:PKO</code> — le symbole s'affiche sur google.com/finance).</li>
       <li>Touchez « Copier les lignes », ouvrez un nouveau Google Sheets (<code>sheets.new</code>), cliquez sur la case A1 et collez.</li>
       <li>Dans Google Sheets : Fichier › Partager › Publier sur le Web › choisissez la feuille et le format CSV › Publier. Copiez le lien et collez-le ci-dessous.</li>
@@ -796,18 +862,18 @@ details.tbl td.calc { padding: 6px 5px }
     <label class="field" id="q-tsvbox" hidden><span class="small muted">Si la copie automatique ne marche pas, sélectionnez ce texte et copiez-le :</span><textarea id="q-tsv" readonly spellcheck="false"></textarea></label>
     <label class="field"><span class="small muted">Lien du tableau publié (CSV)</span><input id="q-url" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://docs.google.com/spreadsheets/d/e/…/pub?output=csv"></label>
     <div class="notice" id="q-msg" aria-live="polite"></div>
-    <div class="notice">Nouvelle ligne plus tard : ajoutez son symbole, puis recopiez les lignes et recollez-les en A1 du même tableau (le lien publié ne change pas).</div>
+    <div class="notice info">Nouvelle ligne : ajouter son symbole, recopier les lignes, recoller en A1 (même lien).</div>
   </div>
 
   <div class="panel stack" id="set-invest" data-sec="invest" hidden>
     <h2>Investissements</h2>
-    <div class="notice">Nom des quatre classes du rééquilibrage.</div>
+    <div class="notice info">Nom des quatre classes du rééquilibrage.</div>
     <div class="row2" id="s-classes"></div>
   </div>
 
   <div class="panel stack" id="set-hist" data-sec="hist" hidden>
     <h2>Importer un historique</h2>
-    <div class="notice">Fichier Excel (.xlsx, .xls), LibreOffice (.ods) ou CSV : export d'une autre appli de budget, tableau de dépenses ou relevé bancaire. Les mouvements sont ajoutés à ceux de l'appli sans rien écraser ; vous vérifiez tout avant de valider, et l'import peut être annulé.</div>
+    <div class="notice info">Excel, LibreOffice ou CSV (autre appli de budget, tableau, relevé bancaire). Ajout sans rien écraser, vérification avant de valider, annulable.</div>
     <div><label class="btn" for="hx-file">Choisir le fichier<input type="file" id="hx-file" class="vh" accept=".xlsx,.xls,.ods,.csv,text/csv"></label></div>
     <div id="hx-box" class="stack" hidden></div>
     <div class="notice" id="hx-msg" aria-live="polite"></div>
@@ -816,7 +882,7 @@ details.tbl td.calc { padding: 6px 5px }
 
   <div class="panel stack" id="set-backup" data-sec="backup" hidden>
     <h2>Sauvegarde</h2>
-    <div class="notice">Exportez régulièrement une copie de vos données (fichier .json), surtout sans synchronisation.</div>
+    <div class="notice info">Copie de vos données en fichier .json, à faire de temps en temps.</div>
     <div class="actions" style="justify-content:flex-start">
       <button class="btn" type="button" id="bk-export">Exporter</button>
       <label class="btn" for="bk-file">Importer<input type="file" id="bk-file" class="vh" accept=".json,application/json"></label>
@@ -878,13 +944,13 @@ details.tbl td.calc { padding: 6px 5px }
   <div class="sheetbg" data-close></div>
   <form class="sheetcard" id="expform" novalidate>
     <div class="seg" id="f-kind" role="group" aria-label="Type de mouvement"><button type="button" data-k="exp" aria-pressed="true">Dépense</button><button type="button" data-k="inc" aria-pressed="false">Entrée</button><button type="button" data-k="tr" aria-pressed="false">Virement</button></div>
-    <h2 id="sheettitle">Nouvelle dépense</h2>
+    <div class="shhead"><button type="button" class="linkbtn" id="f-back" hidden></button><h2 id="sheettitle">Nouvelle dépense</h2></div>
     <label class="field"><span class="small muted">Montant (€)</span><input id="f-amount" class="n" type="text" inputmode="decimal" autocomplete="off" placeholder="0,00" style="text-align:left;font-size:1.4rem"></label>
     <div id="f-expbox" class="field"><span class="small muted">Enveloppe</span><div class="igrid" id="g-env" role="group" aria-label="Enveloppe"></div><select id="f-env" hidden></select></div>
     <div id="f-incbox" class="stack" hidden>
-      <div class="field"><span class="small muted">D'où vient cet argent ?</span><div class="igrid" id="g-cat" role="group" aria-label="Origine de l'argent"></div><select id="f-cat" hidden></select></div>
+      <div class="field"><span class="small muted">Origine</span><div class="igrid" id="g-cat" role="group" aria-label="Origine de l'argent"></div><select id="f-cat" hidden></select></div>
       <label class="field"><span class="small muted">Effet sur le budget</span><select id="f-renv"></select></label>
-      <div class="notice">« Déduire » sert aux remboursements d'une dépense (mutuelle, ami qui rembourse un resto…) : l'enveloppe concernée retrouve ce montant. Sinon, l'argent s'ajoute au reste du cycle.</div>
+
     </div>
     <div id="f-trbox" class="stack" hidden>
       <div class="field"><span class="small muted">Depuis</span><div class="igrid" id="g-from" role="group" aria-label="Compte de départ"></div></div>
@@ -903,11 +969,63 @@ details.tbl td.calc { padding: 6px 5px }
   </form>
 </div>
 
+<!-- Charge : cocher (montant modifiable) ou modifier la charge -->
+<div id="chsheet" class="sheet" hidden>
+  <div class="sheetbg" data-chclose></div>
+  <form class="sheetcard" id="chform" novalidate>
+    <h2 id="chtitle">Charge</h2>
+    <label class="field" id="ch-namebox"><span class="small muted">Nom</span><input id="ch-name" type="text" autocomplete="off" placeholder="Ex. Loyer"></label>
+    <div class="stats">
+      <label class="stat"><span class="eyebrow">Montant (€)</span><input id="ch-amount" type="text" inputmode="decimal" autocomplete="off" placeholder="0,00"></label>
+      <label class="stat" id="ch-daybox"><span class="eyebrow">Jour prévu</span><input id="ch-day" type="number" min="1" max="31" inputmode="numeric" placeholder="—"></label>
+      <label class="stat" id="ch-datebox"><span class="eyebrow">Payée le</span><input id="ch-date" type="date"></label>
+    </div>
+    <div class="notice err" id="ch-err"></div>
+    <div class="actions">
+      <button type="button" class="btn danger" id="ch-del" hidden>Supprimer</button>
+      <button type="button" class="btn" data-chclose>Annuler</button>
+      <button type="submit" class="btn primary" id="ch-ok">Valider</button>
+    </div>
+  </form>
+</div>
+
+<!-- Objectif d'épargne daté -->
+<div id="glsheet" class="sheet" hidden>
+  <div class="sheetbg" data-glclose></div>
+  <form class="sheetcard" id="glform" novalidate>
+    <h2 id="gltitle">Objectif</h2>
+    <label class="field"><span class="small muted">Nom</span><input id="gl-name" type="text" autocomplete="off" placeholder="Ex. Apport appartement"></label>
+    <div class="stats">
+      <label class="stat"><span class="eyebrow">Montant visé (€)</span><input id="gl-target" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+      <label class="stat"><span class="eyebrow">Pour le</span><input id="gl-due" type="date"></label>
+    </div>
+    <div class="field"><span class="small muted">Comptes qui l'alimentent</span><div id="gl-accts" class="glaccts"></div></div>
+    <label class="field"><span class="small muted">En plus, hors comptes (€)</span><input id="gl-extra" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+    <div class="notice err" id="gl-err"></div>
+    <div class="actions">
+      <button type="button" class="btn danger" id="gl-del" hidden>Supprimer</button>
+      <button type="button" class="btn" data-glclose>Annuler</button>
+      <button type="submit" class="btn primary">Enregistrer</button>
+    </div>
+  </form>
+</div>
+
+<!-- Calendrier : choisir une période (premier jour puis dernier jour) -->
+<div id="calsheet" class="sheet" hidden>
+  <div class="sheetbg" data-calclose></div>
+  <div class="sheetcard">
+    <div class="calnav"><button type="button" class="arrow" id="cal-prev" aria-label="Mois précédent">‹</button><b id="cal-month"></b><button type="button" class="arrow" id="cal-next" aria-label="Mois suivant">›</button></div>
+    <div class="calgrid" id="cal-grid" role="grid" aria-label="Jours"></div>
+    <div class="calsel num" id="cal-sel" aria-live="polite"></div>
+    <div class="actions"><button type="button" class="btn" data-calclose>Annuler</button><button type="button" class="btn primary" id="cal-ok">Valider</button></div>
+  </div>
+</div>
+
 <div id="toast" class="toast" role="status" hidden></div>
 
 <script>
 "use strict";
-const APP_VERSION = "1.9.0";
+const APP_VERSION = "1.10.0";
 const FB_VERSION = "10.12.2"; // SDK Firebase chargé depuis gstatic uniquement si la synchronisation est configurée
 const LS = { state: "fin.state", fb: "fin.firebase", dev: "fin.device", link: "fin.linked", lastSync: "fin.lastsync" };
 const CLASSES = [{ id: "stocks", c: "#2346d8" }, { id: "bonds", c: "#7a4fd0" }, { id: "gold", c: "#c99a0a" }, { id: "cash", c: "#138a5b" }];
@@ -1246,11 +1364,13 @@ const ICON_KW = {
 const ENV_COLORS = ["#2A78D6", "#FF8A3D", "#22C7C9", "#F2CF2E", "#E030BE", "#1BAF7A", "#6250D6", "#FF4D5A"], OTHER_COLOR = "#A0A7AF";
 const envColor = e => okColor(e?.color) ? e.color : ENV_COLORS[Math.max(0, S.budget.envelopes.indexOf(e)) % ENV_COLORS.length];
 // Personnalisation (Réglages › Personnalisation)
-const HOME_IDS = ["summary", "envs", "savs", "movs"], MENU_IDS = ["budget", "bilan", "comptes", "plan", "invest", "conj"];
+const HOME_IDS = ["summary", "charges", "envs", "savs", "movs"], MENU_IDS = ["budget", "bilan", "comptes", "plan", "invest", "conj"];
 function normUi(u) {
   u = u && typeof u === "object" ? u : {};
   const ord = (a, all) => { const x = (Array.isArray(a) ? a : []).filter((v, i, arr) => all.includes(v) && arr.indexOf(v) === i); return x.concat(all.filter(v => !x.includes(v))) };
   const hid = (a, all) => [...new Set((Array.isArray(a) ? a : []).filter(v => all.includes(v)))];
+  // 1.10 : le bloc Charges arrive juste après le résumé dans un ordre déjà personnalisé
+  if (Array.isArray(u.homeOrder) && u.homeOrder.length && !u.homeOrder.includes("charges")) { const o = u.homeOrder.slice(), k = o.indexOf("summary"); o.splice(k + 1, 0, "charges"); u = { ...u, homeOrder: o } }
   return { homeOrder: ord(u.homeOrder, HOME_IDS), homeHidden: hid(u.homeHidden, HOME_IDS), menuOrder: ord(u.menuOrder, MENU_IDS), menuHidden: hid(u.menuHidden, MENU_IDS).filter(v => v !== "budget") };
 }
 
@@ -1269,6 +1389,9 @@ function defaultState() {
       savings: [{ id: "reserve", name: "Réserve de sécurité", balance: 0, goal: 0 }, { id: "livreta", name: "Livret A", balance: 0, goal: 0 }],
       incomes: [],     // { id, date, amount, cat, env, label, at } : remboursements, ventes, primes…
       transfers: [],   // { id, date, amount, from, to, label, at } : virements entre comptes
+      charges: [],     // { id, name, amount, day } : charges à cocher chaque cycle (loyer, abonnements…) ; cochée = dépense { charge: id } dans l'enveloppe des charges
+      chargesEnv: "",  // enveloppe des charges (ancienne « Paiement régulier »)
+      goals: [],       // { id, name, target, due: "AAAA-MM-JJ", accts: [ids], extra } : objectifs d'épargne datés, indépendants des comptes
       ccp: null, ccpLook: { color: "#9BB58E", icon: "cash" },
       incomeCats: [
         { id: "mutuelle", name: "Remboursement mutuelle / santé", env: "sante" },
@@ -1309,6 +1432,18 @@ function normalize(s) {
   if (!b.cycles || typeof b.cycles !== "object") b.cycles = {};
   if (!b.ccp || typeof b.ccp !== "object" || !b.ccp.date) b.ccp = null;
   if (!Array.isArray(b.transfers)) b.transfers = [];                  // { id, date, amount, from, to, label, at } : virements entre comptes
+  if (!Array.isArray(b.charges)) b.charges = [];
+  b.charges = b.charges.filter(c => c && c.id).map(c => ({ ...c, name: String(c.name || "Charge"), amount: round2(Math.max(0, +c.amount || 0)), day: Math.min(31, Math.max(0, Math.round(+c.day) || 0)) }));
+  if (!Array.isArray(b.goals)) b.goals = [];
+  b.goals = b.goals.filter(g => g && g.id).map(g => ({ ...g, accts: Array.isArray(g.accts) ? g.accts : [], target: Math.max(0, +g.target || 0), extra: +g.extra || 0 }));
+  // 1.10 : l'enveloppe « Paiement régulier » devient « Charges » (l'ancien nom reste reconnu à l'import) ; créée si besoin
+  if (!b.envelopes.some(e => e.id === b.chargesEnv)) {
+    const old = b.envelopes.find(e => e.kind !== "save" && /paiements? r[eé]guliers?|^charges?$/.test(foldTxt(e.name)));
+    if (old) { if (!/^charges?$/.test(foldTxt(old.name))) { old.aka = [...new Set([...(old.aka || []), old.name])]; old.name = "Charges" } if (!ICONS[old.icon]) old.icon = "repeat"; b.chargesEnv = old.id }
+    else { const id = b.envelopes.some(e => e.id === "charges") ? "charges-" + b.envelopes.length : "charges"; b.envelopes.unshift({ id, name: "Charges", planned: 0, kind: "spend", icon: "repeat", color: ENV_COLORS[b.envelopes.length % ENV_COLORS.length] }); b.chargesEnv = id }
+  }
+  const chEnv = b.envelopes.find(e => e.id === b.chargesEnv);
+  if (chEnv && b.charges.length) chEnv.planned = round2(b.charges.reduce((t, c) => t + c.amount, 0));
   b.ccpLook = { color: KIND_COLOR.courant, icon: "cash", ...(b.ccpLook && typeof b.ccpLook === "object" ? b.ccpLook : {}) };
   b.savings.forEach(a => { if (!NATURES.some(n => n.id === a.kind) || a.kind === "courant") a.kind = guessKind(a.name) === "courant" ? "epargne" : guessKind(a.name); if (!okColor(a.color)) a.color = KIND_COLOR[a.kind]; if (!ICONS[a.icon]) a.icon = KIND_ICON[a.kind] });   // { balance, date: "AAAA-MM-JJ", at } : dernier solde réel du compte courant
   b.payday = Math.min(31, Math.max(1, Math.round(+b.payday) || 25));
@@ -1327,10 +1462,16 @@ let S = (() => { try { const j = JSON.parse(ls.get(LS.state)); if (j && j.v) ret
 function save() { if (!ls.set(LS.state, JSON.stringify(S))) toast("Stockage de l'appareil plein : exportez une sauvegarde.") }
 // Toute modification passe par commit : horodatage, sauvegarde locale, envoi en ligne si synchronisé.
 function commit(rerender = true) {
+  syncChargesPlanned();
   S.updatedAt = Date.now(); save(); sync.push();
   if (rerender) renderView();
   scheduleHistory();
   try { gsSchedule() } catch {}   // copie dans le Google Sheets privé (pas encore prête pendant le démarrage)
+}
+// Tant qu'il y a des charges, le prévu de leur enveloppe est leur somme
+function syncChargesPlanned() {
+  const b = S.budget, e = b.envelopes.find(x => x.id === b.chargesEnv);
+  if (e && b.charges.length) e.planned = round2(b.charges.reduce((t, c) => t + (+c.amount || 0), 0));
 }
 // Données reçues d'un autre appareil : on les applique sans les renvoyer.
 let renderLater = false;
@@ -1368,9 +1509,13 @@ function renderView() {
   renderSync();
 }
 // Changer de rubrique en passant par l'adresse (#bilan…), pour que le bouton Retour du téléphone fonctionne
+// iPhone : changer d'onglet sans remplir l'historique. Sinon le geste « retour » d'iOS (glisser depuis le bord gauche)
+// fait glisser une image de la page précédente en même temps que le menu ou la fenêtre de saisie.
+const IOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+function setHash(h, anchor) { if (IOS) { history.replaceState(null, "", "#" + h); show(h, anchor) } else { pendingAnchor = anchor || null; location.hash = h } }
 function go(v, anchor) {
   if (v === "reglages" && anchor) { const sc = secOf(anchor); if (sc) v = "reglages/" + sc }
-  if (location.hash.slice(1) === v) show(v, anchor); else { pendingAnchor = anchor || null; location.hash = v }
+  if (location.hash.slice(1) === v) show(v, anchor); else setHash(v, anchor)
 }
 // Menu : ordre et rubriques masquées choisis dans Réglages › Personnalisation (Accueil et Réglages restent toujours là)
 function applyMenu() {
@@ -1438,7 +1583,7 @@ function fmtWhen(t) {
 function updateDrawer() {
   const sv = savTotal(), inv = investTotal(), cc = ccpEstimate();
   $("d-total").textContent = fmtEUR(sv + inv + (cc ? cc.value : 0));
-  $("d-detail").textContent = (cc ? `Courant ${fmtEUR(cc.value)} · ` : "") + `Épargne ${fmtEUR(sv)} · Placements ${fmtEUR(inv)}`;
+  $("d-detail").textContent = (cc ? `Courant ${fmtEUR(cc.value)} / ` : "") + `Épargne ${fmtEUR(sv)} / Placements ${fmtEUR(inv)}`;
   const st = sync.status, [txt] = PILL[st] || PILL.off;
   $("d-sync").textContent = st === "off" ? "Données sur cet appareil" : txt;
   $("d-synctime").textContent = sync.lastOk ? "Dernière synchronisation " + fmtWhen(sync.lastOk) : (st === "off" ? "Synchronisation non configurée" : "");
@@ -1488,7 +1633,8 @@ function cycleStats(c) {
 const PREFS_KEY = "fin.prefs";
 let PF = (() => { const d = { period: "cycle", multi: 3, movSort: "date", mix: "pie" }; try { return { ...d, ...JSON.parse(ls.get(PREFS_KEY) || "{}") } } catch { return d } })();
 if (!["day", "week", "cycle", "multi"].includes(PF.period)) PF.period = "cycle";
-if (![2, 3, 6, 12].includes(+PF.multi)) PF.multi = 3;
+if (PF.multi === "range" ? !(PF.range && /^\d{4}-\d{2}-\d{2}$/.test(PF.range.a) && /^\d{4}-\d{2}-\d{2}$/.test(PF.range.b)) : ![2, 3, 6, 12].includes(+PF.multi)) PF.multi = 3;
+if (PF.multi !== "range") PF.multi = +PF.multi;
 const savePrefs = () => ls.set(PREFS_KEY, JSON.stringify(PF));   // choix d'affichage propres à cet appareil
 const midnight = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
 const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
@@ -1499,6 +1645,7 @@ function periodInfo() {
   const today = midnight(new Date()), m = PF.period;
   if (m === "day") return { m, a: viewDate, b: viewDate, now: +viewDate === +today };
   if (m === "week") { const a = mondayOf(viewDate), b = addDays(a, 6); return { m, a, b, now: today >= a && today <= b } }
+  if (m === "multi" && PF.multi === "range") { const a = parseYmd(PF.range.a), b = parseYmd(PF.range.b); return { m: "range", a, b, days: dayDiff(a, b) + 1, now: today >= a && today <= b } }
   if (m === "multi") { const n = +PF.multi, cs = Array.from({ length: n }, (_, i) => shiftCycle(viewCycle, i - n + 1)); return { m, a: cs[0].start, b: viewCycle.end, cs, now: isCurrent(viewCycle) } }
   return { m, a: viewCycle.start, b: viewCycle.end, cs: [viewCycle], now: isCurrent(viewCycle) };
 }
@@ -1509,7 +1656,8 @@ function periodLabel(pi) {
     return [t.charAt(0).toUpperCase() + t.slice(1), k === 0 ? "Aujourd'hui" : k === -1 ? "Hier" : k === 1 ? "Demain" : k < 0 ? "Jour passé" : "Jour à venir"];
   }
   if (pi.m === "week") return [`Semaine du ${fmtDay(pi.a)} au ${fmtDay(pi.b)}`, pi.now ? "Cette semaine" : pi.b < today ? "Semaine passée" : "Semaine à venir"];
-  if (pi.m === "multi") return [`${fmtDay(pi.a)}${pi.a.getFullYear() !== pi.b.getFullYear() ? yr(pi.a) : ""} → ${fmtDay(pi.b)}${yr(pi.b)}`, `${pi.cs.length} cycles` + (pi.now ? " jusqu'au cycle en cours" : pi.b < today ? " terminés" : "")];
+  if (pi.m === "range") return [`${fmtDay(pi.a)}${pi.a.getFullYear() !== pi.b.getFullYear() ? yr(pi.a) : ""} → ${fmtDay(pi.b)}${yr(pi.b)}`, `${pi.days} jour${pi.days > 1 ? "s" : ""}`];
+  if (pi.m === "multi") return [`${fmtDay(pi.a)}${pi.a.getFullYear() !== pi.b.getFullYear() ? yr(pi.a) : ""} → ${fmtDay(pi.b)}${yr(pi.b)}`, `${pi.cs.length} cycles` + (pi.now ? " / en cours" : pi.b < today ? " / terminés" : "")];
   const c = viewCycle; return [`${fmtDay(c.start)} → ${fmtDay(c.end)}${yr(c.end)}`, pi.now ? "Cycle en cours" : (c.start > today ? "Cycle à venir" : "Cycle terminé")];
 }
 function setPeriod(m) {
@@ -1523,6 +1671,7 @@ function setPeriod(m) {
 function shiftPeriod(dir) {
   if (PF.period === "day") viewDate = addDays(viewDate, dir);
   else if (PF.period === "week") viewDate = addDays(viewDate, 7 * dir);
+  else if (PF.period === "multi" && PF.multi === "range") { const a = parseYmd(PF.range.a), b = parseYmd(PF.range.b), n = (dayDiff(a, b) + 1) * dir; PF.range = { a: ymd(addDays(a, n)), b: ymd(addDays(b, n)) }; savePrefs() }
   else viewCycle = shiftCycle(viewCycle, dir * (PF.period === "multi" ? +PF.multi : 1));
   renderBudget();
 }
@@ -1544,20 +1693,34 @@ function periodBudget(a, b) {
   }
   return { total: round2(total), first, factor };
 }
+const CYCLE_DAYS = 30.44;   // durée moyenne d'un cycle, pour ramener un budget à une période de dates choisies
 function periodSummary(pi) {
   const envs = S.budget.envelopes, savePlan = savePlanned(), plannedSpend = envs.filter(e => e.kind !== "save").reduce((s, e) => s + (+e.planned || 0), 0);
   const st = cycleStats({ start: pi.a, end: pi.b }), spend = round2(st.out - st.saved), today = midnight(new Date());
   const pct = (sp, room) => room > 0 ? Math.min(100, Math.max(0, sp / room * 100)) : (sp > 0 ? 100 : 0);
+  const of = v => v > 0.005 ? `/ ${fmtEUR(v)}` : "", ok = '<span style="color:var(--c-sav)">✓</span> ';
+  const savedOf = goal => goal > 0.005 ? (st.saved >= goal - 0.005 ? ok : "") + `/ ${fmtEUR(goal)}` : "";
+  const extraNote = st.extra ? `dont ${fmtEUR(st.extra)} d'entrées` : "";
+  const noIncome = "Revenu à indiquer (Budget)";
   if (pi.m === "day" || pi.m === "week") {
     const pb = periodBudget(pi.a, pi.b), room = pb.total + st.extra, left = round2(room - spend), day = pi.m === "day", f = pb.first;
     return { st, spend, factor: pb.factor, left, pct: pct(spend, room),
       title: pi.a > today ? (day ? "Budget prévu ce jour" : "Budget prévu sur la semaine") : day ? (pi.now ? "Reste pour aujourd'hui" : "Reste ce jour-là") : (pi.now ? "Reste cette semaine" : "Reste sur la semaine"),
-      calc: `${fmtEUR(pb.total)} de budget${st.extra ? ` + ${fmtEUR(st.extra)} d'entrées` : ""} − ${fmtEUR(spend)} dépensés`,
-      pace: !cycleIncome(cycleOf(pi.a)) && !S.budget.income ? "Indiquez votre revenu habituel dans Budget pour calculer un budget par jour."
-        : f ? `${fmtEUR(Math.max(0, f.dispo))} encore disponibles ÷ ${f.days} jour${f.days > 1 ? "s" : ""} jusqu'à la paie = ${fmtEUR(f.rate)} par jour` + (f.dispo < 0 ? " · objectif d'épargne compromis" : "") : "",
-      pstat: true, revLbl: "Budget", rev: round2(room), revNote: st.extra ? `dont ${fmtEUR(st.extra)} d'entrées` : day ? "reste ÷ jours restants" : `≈ ${fmtEUR(pb.total / 7)} par jour`,
-      outTarget: room, savTarget: round2(savePlan * pb.factor),
-      outNote: `sur ${fmtEUR(room)}`, savedNote: savePlan ? `objectif ${fmtEUR(savePlan * pb.factor)} (prorata)` : "virements" };
+      pace: !cycleIncome(cycleOf(pi.a)) && !S.budget.income ? noIncome
+        : f ? `${f.days} j avant la paie / ${fmtEUR(f.rate)} par jour` + (f.dispo < 0 ? " / épargne compromise" : "") : "",
+      pstat: true, revLbl: "Budget", rev: round2(room), revNote: extraNote || (day ? "" : `${fmtEUR(pb.total / 7)} / jour`),
+      outTarget: room, savTarget: round2(savePlan * pb.factor), outNote: of(room), savedNote: savedOf(savePlan * pb.factor) };
+  }
+  if (pi.m === "range") {
+    // Dates choisies : salaires des paies tombées dans la période, budget prévu au prorata des jours
+    let sal = 0; for (let c = cycleOf(pi.a); c.start <= pi.b; c = shiftCycle(c, 1)) if (c.start >= pi.a) sal += cycleIncome(c);
+    const factor = pi.days / CYCLE_DAYS, income = sal + st.extra, left = round2(income - spend - st.saved);
+    return { st, spend, factor, left, pct: pct(spend, income - st.saved),
+      title: pi.b < today ? "Restant sur la période" : "Disponible sur la période",
+      pace: `${pi.days} j / ${fmtEUR(spend / pi.days)} de dépenses par jour`,
+      pstat: true, revLbl: "Revenus", rev: income, revNote: extraNote,
+      outTarget: plannedSpend ? plannedSpend * factor : income - st.saved, savTarget: savePlan * factor,
+      outNote: plannedSpend ? of(plannedSpend * factor) : "", savedNote: savedOf(savePlan * factor) };
   }
   if (pi.m === "multi") {
     let sal = 0, goal = 0;
@@ -1565,27 +1728,23 @@ function periodSummary(pi) {
     const n = pi.cs.length, income = sal + st.extra, left = round2(income - spend - goal), past = pi.b < today;
     return { st, spend, factor: n, left, pct: pct(spend, income - goal),
       title: past ? `Restant sur ${n} cycles` : `Disponible sur ${n} cycles`,
-      calc: income || spend ? `${fmtEUR(income)} de revenus − ${fmtEUR(spend)} de dépenses − ${fmtEUR(goal)} d'épargne` : "",
-      pace: `En moyenne ${fmtEUR(spend / n)} de dépenses et ${fmtEUR(st.saved / n)} d'épargne par cycle`,
-      pstat: true, revLbl: "Revenus", rev: income, revNote: st.extra ? `dont ${fmtEUR(st.extra)} d'entrées` : `salaires de ${n} cycles`,
+      pace: `Moyenne : ${fmtEUR(spend / n)} de dépenses / cycle`,
+      pstat: true, revLbl: "Revenus", rev: income, revNote: extraNote,
       outTarget: plannedSpend ? plannedSpend * n : income - goal, savTarget: savePlan * n,
-      outNote: plannedSpend ? `sur ${fmtEUR(plannedSpend * n)} prévus` : "hors épargne",
-      savedNote: savePlan ? (st.saved >= savePlan * n - 0.005 ? `<span style="color:var(--c-sav)">✓</span> objectif de ${fmtEUR(savePlan * n)} atteint` : `objectif ${fmtEUR(savePlan * n)}`) : "virements vers l'épargne" };
+      outNote: plannedSpend ? of(plannedSpend * n) : "", savedNote: savedOf(savePlan * n) };
   }
   // Un cycle : revenus du cycle − dépenses − objectif d'épargne (ou ce qui a déjà été viré, si c'est plus)
   const c = viewCycle, salary = cycleIncome(c), cur = pi.now, past = c.end < new Date() && !cur;
   const income = salary + st.extra, saveGoal = past ? st.saved : Math.max(savePlan, st.saved), toSave = Math.max(0, savePlan - st.saved), left = round2(income - spend - saveGoal);
   let pace = "";
-  if (!salary && !S.budget.income) pace = "Indiquez votre revenu habituel dans Budget (ou le revenu de ce cycle ci-dessous).";
-  else if (cur) { const days = dayDiff(new Date(), c.end) + 1; pace = `${days} jour${days > 1 ? "s" : ""} jusqu'à la paie` + (left > 0 ? ` · environ ${fmtEUR(left / days)} par jour` : left < 0 ? " · objectif d'épargne compromis" : "") }
-  else pace = past ? (left >= 0 ? "Cycle terminé." : "Cycle terminé en dépassement.") : "Cycle à venir.";
+  if (!salary && !S.budget.income) pace = noIncome;
+  else if (cur) { const days = dayDiff(new Date(), c.end) + 1; pace = `${days} j avant la paie` + (left > 0 ? ` / ${fmtEUR(left / days)} par jour` : left < 0 ? " / épargne compromise" : "") }
+  else pace = past ? (left >= 0 ? "Cycle terminé" : "Cycle terminé / dépassé") : "Cycle à venir";
   return { st, spend, factor: 1, left, pct: pct(spend, income - saveGoal), cur, toSave,
     title: past ? "Restant en fin de cycle" : "Disponible à dépenser",
-    calc: income || spend ? `${fmtEUR(income)} de revenus − ${fmtEUR(spend)} de dépenses − ${fmtEUR(saveGoal)} ${past ? "virés vers l'épargne" : "d'objectif d'épargne"}` : "",
-    pace, pstat: null, revLbl: "Revenus", rev: income, revNote: st.extra ? `dont ${fmtEUR(st.extra)} d'entrées` : (typeof S.budget.cycles[c.key]?.income === "number" ? "revenu propre à ce cycle" : "salaire du cycle"),
+    pace, pstat: null, revLbl: "Revenus", rev: income, revNote: extraNote,
     outTarget: plannedSpend || income - saveGoal, savTarget: savePlan,
-    outNote: plannedSpend ? `sur ${fmtEUR(plannedSpend)} prévus` : "hors épargne",
-    savedNote: savePlan ? (st.saved >= savePlan - 0.005 ? `<span style="color:var(--c-sav)">✓</span> objectif de ${fmtEUR(savePlan)} atteint` : `objectif ${fmtEUR(savePlan)} · reste ${fmtEUR(toSave)}`) : "virements vers l'épargne" };
+    outNote: of(plannedSpend), savedNote: savedOf(savePlan) };
 }
 // Ordre et blocs masqués de l'accueil (Réglages › Personnalisation)
 function applyHome() {
@@ -1599,17 +1758,19 @@ function renderBudget() {
   const pi = periodInfo(), [lbl, sub] = periodLabel(pi), cyc = PF.period === "cycle";
   document.querySelectorAll("#p-mode [data-pm]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.pm === PF.period)));
   $("p-multi").hidden = PF.period !== "multi";
-  document.querySelectorAll("#p-multi [data-pn]").forEach(b => b.setAttribute("aria-pressed", String(+b.dataset.pn === +PF.multi)));
+  document.querySelectorAll("#p-multi [data-pn]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.pn === String(PF.multi))));
   $("clabel").textContent = lbl; $("csub").textContent = sub;
-  $("cnow").hidden = pi.now;
+  $("cnow").hidden = pi.now || pi.m === "range";
   $("cnow").textContent = PF.period === "day" ? "Revenir à aujourd'hui" : PF.period === "week" ? "Revenir à cette semaine" : "Revenir au cycle en cours";
   if (cyc) {
     const c = viewCycle, custom = S.budget.cycles[c.key]?.income;
     if (document.activeElement !== $("b-income")) $("b-income").value = typeof custom === "number" ? fmtIn(custom) : "";
     $("b-income").placeholder = fmtIn(S.budget.income) || "0";
-    $("b-incnote").textContent = typeof custom === "number" ? "propre à ce cycle" : "revenu habituel";
+    $("b-incnote").textContent = typeof custom === "number" ? "modifié" : "habituel";
   }
-  const sm = updateSummary(pi), st = sm.st, f = sm.factor, envs = S.budget.envelopes;
+  const sm = updateSummary(pi), st = sm.st, f = sm.factor, chBlock = chargesBlockOn();
+  const envs = S.budget.envelopes.filter(e => !(chBlock && e.id === S.budget.chargesEnv));   // les charges ont leur propre rubrique en vue Cycle
+  renderCharges(); renderGoals();
   const orphan = Object.keys(st.spentBy).filter(id => !envById(id)).reduce((s, id) => s + st.spentBy[id], 0);
   // Dépense : barre orange, hachurée en rouge si l'enveloppe est dépassée. Épargne : barre bleue, et mettre plus que prévu est une bonne nouvelle.
   const envRow = (id, name, sp, refund, pl, kind, icon) => {
@@ -1619,10 +1780,9 @@ function renderBudget() {
     const ok = '<span style="color:var(--c-sav)">✓</span> ';
     const right = save
       ? (pl > 0 ? (rest > 0.005 ? "reste " + fmtEUR(rest) : rest < -0.005 ? ok + "+" + fmtEUR(-rest) : ok + "atteint") : (net > 0 ? ok + fmtEUR(net) : "—"))
-      : (pl > 0 || net ? (rest >= 0 ? "reste " + fmtEUR(rest) : "⚠ dépassé de " + fmtEUR(-rest)) : "—");
-    const note = save && pl > 0 ? (rest > 0.005 ? " · à épargner" : rest < -0.005 ? " · objectif dépassé" : " · objectif atteint") : "";
-    return `<button type="button" class="env${envFilter === id ? " on" : ""}" data-env="${esc(id)}">
-      <span><b><span class="eic" style="--c:${save ? "var(--c-sav)" : "var(--c-exp)"}">${ico(icon)}</span>${esc(name)}</b><br><span class="small muted num">${fmtEUR(net)} / ${fmtEUR(pl)}${refund ? ` · dont ${fmtEUR(refund)} remboursés` : ""}</span><span class="small muted">${note}</span></span>
+      : (pl > 0 || net ? (rest >= 0 ? "reste " + fmtEUR(rest) : "⚠ +" + fmtEUR(-rest)) : "—");
+    return `<button type="button" class="env lsrow${envFilter === id ? " on" : ""}" data-env="${esc(id)}">
+      <span><b><span class="eic" style="--c:${save ? "var(--c-sav)" : "var(--c-exp)"}">${ico(icon)}</span>${esc(name)}</b><br><span class="small muted num">${fmtEUR(net)} / ${fmtEUR(pl)}${refund ? ` / ${fmtEUR(refund)} remboursés` : ""}</span></span>
       <span class="num small" style="font-weight:600;text-align:right;color:${over ? "var(--down)" : "var(--fg)"}">${right}</span>
       <span class="bar"><i class="${over ? "over" : save ? "t-sav" : "t-exp"}" style="width:${pct}%"></i></span></button>`;
   };
@@ -1630,24 +1790,29 @@ function renderBudget() {
   const visible = e => +e.planned || st.spentBy[e.id] || st.refundBy[e.id] || envFilter === e.id;
   const spendE = envs.filter(e => e.kind !== "save"), saveE = envs.filter(e => e.kind === "save"), shown = spendE.filter(visible), hidden = spendE.length - shown.length;
   $("env-pnote").hidden = f === 1;
-  $("env-pnote").textContent = PF.period === "multi" ? `Budget prévu × ${PF.multi} cycles.` : "Budget prévu ramené à la période, au prorata des jours du cycle.";
-  $("envlist").innerHTML = (spendE.length ? shown.map(row).join("") : `<div class="notice">Aucune enveloppe de dépenses : ajoutez-en dans <button class="linkbtn small" type="button" data-goto="plan">Budget</button>.</div>`)
+  $("env-pnote").textContent = PF.period === "multi" && PF.multi !== "range" ? `Prévu × ${PF.multi} cycles` : "Prévu au prorata de la période";
+  $("envlist").innerHTML = (spendE.length ? shown.map(row).join("") : `<div class="notice">Aucune enveloppe / <button class="linkbtn small" type="button" data-goto="plan">Budget</button></div>`)
     + (orphan ? envRow("__none", "Sans enveloppe", orphan, 0, 0, "spend", "dots") : "")
-    + (hidden ? `<div class="notice" style="padding-top:8px">${hidden} enveloppe${hidden > 1 ? "s" : ""} sans budget ni mouvement sur cette période ${hidden > 1 ? "sont masquées" : "est masquée"}.</div>` : "");
+    + (hidden ? `<div class="notice" style="padding-top:8px">+ ${hidden} vide${hidden > 1 ? "s" : ""} masquée${hidden > 1 ? "s" : ""}</div>` : "");
   const savShown = saveE.filter(visible);
   $("savlist").innerHTML = savShown.length ? savShown.map(row).join("")
-    : `<div class="notice">${saveE.length ? "Rien de prévu ni de viré sur cette période." : "Pour suivre ici vos virements vers l'épargne, créez une enveloppe de type « Épargne » dans Budget."}</div>`;
+    : `<div class="notice">${saveE.length ? "Rien sur la période" : `Aucune enveloppe d'épargne / <button class="linkbtn small" type="button" data-goto="plan">Budget</button>`}</div>`;
 
   // Mouvements de la période : dépenses, entrées et virements mélangés
   const exps = st.ex.filter(e => !envFilter || (envFilter === "__none" ? !envById(e.env) : e.env === envFilter)).map(e => ({ k: "exp", o: e }));
   const incs = st.inc.filter(i => !envFilter || refundEnv(i) === envFilter).map(i => ({ k: "inc", o: i }));
   const trs = st.tr.filter(t => !envFilter || trEnv(t) === envFilter).map(t => ({ k: "tr", o: t }));
-  const list = [...exps, ...incs, ...trs].sort((a, b) => b.o.date.localeCompare(a.o.date) || (b.o.at || 0) - (a.o.at || 0));
-  $("expcount").textContent = list.length ? `· ${list.length}` : "";
-  $("expclear").hidden = !envFilter; renderGsQuick();
+  const searching = !!mQ.trim(), thisYear = new Date().getFullYear();
+  let list = searching ? searchMovs(mQ) : [...exps, ...incs, ...trs];
+  list.sort((a, b) => b.o.date.localeCompare(a.o.date) || (b.o.at || 0) - (a.o.at || 0));
+  const total = list.length; if (searching) list = list.slice(0, 300);
+  $("expcount").textContent = total ? `· ${total}` : "";
+  $("expclear").hidden = !envFilter || searching; renderGsQuick();
+  $("m-sort").hidden = searching; $("m-sbox").hidden = !mSearchOpen; $("m-sbtn").setAttribute("aria-expanded", String(mSearchOpen));
+  $("explist").classList.toggle("years", searching);
   document.querySelectorAll("#m-sort [data-ms]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.ms === PF.movSort)));
   const movRow = ({ k, o }) => {
-    const d = parseYmd(o.date), day = `<span class="d">${pad(d.getDate())}/${pad(d.getMonth() + 1)}</span>`;
+    const d = parseYmd(o.date), day = `<span class="d">${pad(d.getDate())}/${pad(d.getMonth() + 1)}${searching && d.getFullYear() !== thisYear ? "/" + String(d.getFullYear()).slice(2) : ""}</span>`;
     if (k === "tr") {
       const fr = acctById(o.from), to = acctById(o.to);
       return `<button type="button" class="exp" data-tr="${esc(o.id)}">${day}
@@ -1657,7 +1822,7 @@ function renderBudget() {
     if (k === "inc") {
       const cat = incCat(o.cat), env = envById(refundEnv(o));
       return `<button type="button" class="exp" data-inc="${esc(o.id)}">${day}
-        <span class="l"><b><span class="tdot t-rev"></span>${esc(o.label || cat?.name || "Entrée")}</b><small>${esc(cat?.name || "Entrée")}${env ? " · déduit de " + esc(env.name) : ""}</small></span>
+        <span class="l"><b><span class="tdot t-rev"></span>${esc(o.label || cat?.name || "Entrée")}</b><small>${esc(cat?.name || "Entrée")}${env ? " / " + esc(env.name) : ""}</small></span>
         <span class="num" style="font-weight:600">+${fmtEUR(o.amount)}</span></button>`;
     }
     const en = envById(o.env);
@@ -1666,7 +1831,7 @@ function renderBudget() {
       <span class="num" style="font-weight:600">${o.amount < 0 ? "+" + fmtEUR(-o.amount) : fmtEUR(o.amount)}</span></button>`;
   };
   let html = "";
-  if (list.length && PF.movSort === "env") {
+  if (list.length && PF.movSort === "env" && !searching) {
     // Regroupés par enveloppe, dans l'ordre des enveloppes ; entrées et virements sans effet sur le budget à la fin
     const gkey = ({ k, o }) => k === "exp" ? (envById(o.env) ? o.env : "__none") : k === "inc" ? (refundEnv(o) || "__inc") : (trEnv(o) || "__tr");
     const val = ({ k, o }, g) => k === "inc" ? (g === "__inc" ? +o.amount : -o.amount) : k === "tr" ? (g === "__tr" ? +o.amount : (trFlow(o)?.amount || 0)) : +o.amount;
@@ -1678,8 +1843,22 @@ function renderBudget() {
       return `<div class="mgroup"><span><span class="eic" style="--c:${col}">${ico(icon)}</span>${esc(name)} <span class="muted" style="font-weight:500">· ${items.length}</span></span><span class="num">${g === "__inc" ? "+" : ""}${fmtEUR(tot)}</span></div>` + items.map(movRow).join("");
     }).join("");
   } else html = list.map(movRow).join("");
-  $("explist").innerHTML = html || `<div class="notice">${envFilter ? "Aucun mouvement dans cette enveloppe sur cette période." : "Aucun mouvement sur cette période. Touchez + pour ajouter une dépense, une entrée ou un virement."}</div>`;
+  $("explist").innerHTML = (html || `<div class="notice">${searching ? "Aucun résultat" : "Aucun mouvement"}</div>`) + (searching && total > list.length ? `<div class="notice" style="padding-top:8px">${list.length} plus récents sur ${total}</div>` : "");
 }
+// Recherche dans tous les mouvements : libellé, enveloppe, catégorie, comptes, montant (42, 42,5, 1234) et date (12/11, nov, 2026-11)
+let mQ = "", mSearchOpen = false;
+function searchMovs(q) {
+  const toks = fold(q).replace(/(\d)\.(\d)/g, "$1,$2").split(" ").filter(Boolean), B = S.budget;
+  const hay = ({ k, o }) => {
+    const d = parseYmd(o.date), a = Math.abs(+o.amount || 0);
+    const who = k === "exp" ? (envById(o.env)?.name || "") : k === "inc" ? `${incCat(o.cat)?.name || ""} ${envById(refundEnv(o))?.name || ""}` : `${acctById(o.from)?.name || ""} ${acctById(o.to)?.name || ""} virement`;
+    return fold(`${o.label || ""} ${who} ${fmtEUR(a)} ${String(round2(a)).replace(".", ",")} ${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${d.toLocaleDateString("fr-FR", { month: "long" })} ${o.date}`);
+  };
+  return [...B.expenses.map(o => ({ k: "exp", o })), ...B.incomes.map(o => ({ k: "inc", o })), ...B.transfers.map(o => ({ k: "tr", o }))].filter(x => { const h = hay(x); return toks.every(t => h.includes(t)) });
+}
+$("m-sbtn").addEventListener("click", () => { mSearchOpen = !mSearchOpen; if (!mSearchOpen) mQ = ""; renderBudget(); if (mSearchOpen) setTimeout(() => $("m-q").focus(), 30) });
+$("m-sclose").addEventListener("click", () => { mSearchOpen = false; mQ = ""; $("m-q").value = ""; renderBudget() });
+$("m-q").addEventListener("input", e => { mQ = e.target.value; renderBudget() });
 // Solde estimé du compte courant : dernier solde réel + salaires et entrées − dépenses (virements d'épargne compris) saisis depuis
 function ccpEstimate() {
   const a = S.budget.ccp; if (!a) return null;
@@ -1697,7 +1876,7 @@ function updateSummary(pi = periodInfo()) {
   const s = periodSummary(pi), st = s.st, cyc = pi.m === "cycle";
   $("b-lefttitle").textContent = s.title;
   $("b-left").textContent = fmtEUR(s.left); $("b-left").style.color = s.left < 0 ? "var(--down)" : "";
-  $("b-calc").textContent = s.calc; $("b-pace").textContent = s.pace;
+  $("b-pace").textContent = s.pace;
   $("b-incbox").hidden = !!s.pstat;
   // Trois barres : revenus (vert, pleine), dépenses (orange, rouge une fois le budget atteint), épargne (bleu, jusqu'à l'objectif)
   const fill = (v, t) => t > 0.005 ? Math.min(100, Math.max(0, v / t * 100)) : (v > 0.005 ? 100 : 0);
@@ -1708,17 +1887,16 @@ function updateSummary(pi = periodInfo()) {
   $("b-savbar").style.width = fill(st.saved, s.savTarget) + "%";
   // Compte courant (solde réel le plus récent + mouvements depuis)
   const cc = ccpEstimate(), toSave = cyc && s.cur ? s.toSave : 0;
-  // Alerte : le disponible du cycle dépasse ce qui est vraiment libre sur le compte courant
-  const free = cc ? round2(cc.value - toSave) : null, warn = cyc && s.cur && cc && s.left > free + 1;
-  $("b-alert").hidden = !warn;
-  if (warn) $("b-alert").textContent = `⚠ C'est plus que ce qu'il y a vraiment sur ton compte courant (${fmtEUR(free)} libres après l'épargne à virer). Il manque peut-être un mouvement, ou le solde enregistré n'est plus à jour.`;
+  // ⚠ en orange : le disponible du cycle dépasse ce qui est vraiment libre sur le compte courant
+  const free = cc ? round2(cc.value - toSave) : null, warn = !!(cyc && s.cur && cc && s.left > free + 1);
+  $("b-ccp").classList.toggle("warn", warn);
   $("b-ccp").innerHTML = cc
-    ? `<span><span class="small muted">Sur le compte courant</span>${toSave > 0 ? `<small>dont ${fmtEUR(toSave)} encore à virer vers l'épargne : ${fmtEUR(cc.value - toSave)} vraiment libres</small>` : `<small>estimé depuis le solde du ${fmtDay(parseYmd(S.budget.ccp.date))}</small>`}</span><b${cc.value < 0 ? ' style="color:var(--down)"' : ""}>${fmtEUR(cc.value)}</b>`
-    : `<span><span class="small muted">Compte courant</span><small>Indiquez le solde de votre banque pour le suivre ici</small></span><b style="font-family:var(--body);font-size:.85rem;color:var(--accent)">Ajouter ›</b>`;
-  $("b-out").textContent = fmtEUR(s.spend); $("b-outnote").textContent = s.outNote;
+    ? `<span><span class="small muted">Compte courant</span><small>${[toSave > 0 ? `dont ${fmtEUR(toSave)} à virer` : `estimé / relevé du ${fmtDay(parseYmd(S.budget.ccp.date))}`, warn ? `${fmtEUR(free)} libres` : ""].filter(Boolean).join(" / ")}</small></span><b${cc.value < 0 ? ' style="color:var(--down)"' : ""}>${warn ? "⚠ " : ""}${fmtEUR(cc.value)}</b>`
+    : `<span><span class="small muted">Compte courant</span><small>Solde à indiquer</small></span><b style="font-family:var(--body);font-size:.85rem;color:var(--accent)">Ajouter ›</b>`;
+  $("b-out").textContent = fmtEUR(s.spend); $("b-outnote").textContent = s.outNote; $("b-revnote").hidden = !s.revNote; $("b-outnote").hidden = !s.outNote; $("b-savenote").hidden = !s.savedNote;
   $("b-saved").textContent = fmtEUR(st.saved); $("b-savenote").innerHTML = s.savedNote;
   const cats = Object.entries(st.byCat).sort((a, b) => b[1] - a[1]);
-  $("b-incdetail").textContent = cats.length ? "Entrées : " + cats.map(([id, v]) => `${incCat(id)?.name || "Autre"} ${fmtEUR(v)}`).join(" · ") + (st.refunds ? ` (dont ${fmtEUR(st.refunds)} déduits des enveloppes)` : "") : "";
+  $("b-incdetail").textContent = cats.length ? "Entrées / " + cats.map(([id, v]) => `${incCat(id)?.name || "Autre"} ${fmtEUR(v)}`).join(" / ") : "";
   $("b-incdetail").hidden = !cats.length;
   return s;
 }
@@ -1727,12 +1905,17 @@ $("cprev").addEventListener("click", () => shiftPeriod(-1));
 $("cnext").addEventListener("click", () => shiftPeriod(1));
 $("cnow").addEventListener("click", () => { viewDate = midnight(new Date()); viewCycle = cycleOf(new Date()); renderBudget() });
 $("p-mode").addEventListener("click", e => { const b = e.target.closest("[data-pm]"); if (b) setPeriod(b.dataset.pm) });
-$("p-multi").addEventListener("click", e => { const b = e.target.closest("[data-pn]"); if (!b) return; PF.multi = +b.dataset.pn; savePrefs(); renderBudget() });
+$("p-multi").addEventListener("click", e => {
+  const b = e.target.closest("[data-pn]"); if (!b) return;
+  if (b.dataset.pn !== "range") { PF.multi = +b.dataset.pn; savePrefs(); renderBudget(); return }
+  const r = PF.multi === "range" ? PF.range : null;
+  openCal(r ? parseYmd(r.a) : viewCycle.start, r ? parseYmd(r.b) : viewCycle.end, (a, z) => { PF.multi = "range"; PF.range = { a: ymd(a), b: ymd(z) }; savePrefs(); envFilter = null; renderBudget() });
+});
 $("m-sort").addEventListener("click", e => { const b = e.target.closest("[data-ms]"); if (!b) return; PF.movSort = b.dataset.ms; savePrefs(); renderBudget() });
 $("b-income").addEventListener("input", e => {
   const v = e.target.value.trim();
   if (v === "") delete S.budget.cycles[viewCycle.key]; else S.budget.cycles[viewCycle.key] = { income: parseNum(v) };
-  $("b-incnote").textContent = v === "" ? "revenu habituel" : "propre à ce cycle";
+  $("b-incnote").textContent = v === "" ? "habituel" : "modifié";
   commit(false); updateSummary();
 });
 const envClick = e => { const b = e.target.closest("[data-env]"); if (!b) return; envFilter = envFilter === b.dataset.env ? null : b.dataset.env; renderBudget() };
@@ -1745,8 +1928,201 @@ $("explist").addEventListener("click", e => {
   const t = e.target.closest("[data-tr]"); if (t) openSheet("tr", S.budget.transfers.find(o => o.id === t.dataset.tr));
 });
 
+/* ---------- Charges à cocher (loyer, abonnements…) ---------- */
+// Une charge cochée = une dépense { charge: id } datée du jour, dans l'enveloppe des charges. Elle ne compte dans le disponible qu'une fois cochée.
+// Tout repart décoché au cycle suivant. Une dépense de l'enveloppe dont le libellé contient le nom d'une charge la coche aussi (import, tableau de Claude).
+let chOpen = false, chEdit = null;
+const chargesEnvObj = () => envById(S.budget.chargesEnv);
+const chargesBlockOn = () => PF.period === "cycle" && !S.ui.homeHidden.includes("charges");
+const dmIso = iso => { const d = parseYmd(iso); return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}` };
+const dmDate = d => `${pad(d.getDate())}/${pad(d.getMonth() + 1)}`;
+function ensureChargesEnv() {
+  const B = S.budget; if (envById(B.chargesEnv)) return;
+  const id = envById("charges") ? rid() : "charges";
+  B.envelopes.unshift({ id, name: "Charges", planned: 0, kind: "spend", icon: "repeat", color: ENV_COLORS[B.envelopes.length % ENV_COLORS.length] }); B.chargesEnv = id;
+}
+// Date prévue d'une charge dans un cycle : le jour indiqué, dans le mois où il tombe à l'intérieur du cycle
+function chargeDue(ch, c) {
+  const d = +ch.day; if (!d) return null;
+  for (let k = 0; k < 2; k++) {
+    const y = c.start.getFullYear(), m = c.start.getMonth() + k, x = new Date(y, m, Math.min(d, new Date(y, m + 1, 0).getDate()));
+    if (x >= midnight(c.start) && x <= c.end) return x;
+  }
+  return null;
+}
+function chargeStatus(c) {
+  const B = S.budget, envId = B.chargesEnv, ids = new Set(B.charges.map(ch => ch.id));
+  const ex = cycleExpenses(c).filter(e => e.env === envId || ids.has(e.charge)), used = new Set(), paid = {};
+  B.charges.forEach(ch => { const e = ex.find(x => x.charge === ch.id && !used.has(x)); if (e) { paid[ch.id] = e; used.add(e) } });
+  B.charges.forEach(ch => {
+    if (paid[ch.id]) return; const n = fold(ch.name); if (n.length < 3) return;
+    const e = ex.find(x => !used.has(x) && !ids.has(x.charge) && x.env === envId && fold(x.label).includes(n)); if (e) { paid[ch.id] = e; used.add(e) }
+  });
+  const st = cycleStats(c), net = round2((st.spentBy[envId] || 0) - (st.refundBy[envId] || 0));
+  const planned = round2(B.charges.length ? B.charges.reduce((t, ch) => t + (+ch.amount || 0), 0) : (+chargesEnvObj()?.planned || 0));
+  return { paid, others: ex.filter(x => !used.has(x) && x.env === envId), net, planned, count: Object.keys(paid).length };
+}
+function renderCharges() {
+  const box = $("b-charges"), on = chargesBlockOn();
+  if (!on) { box.hidden = true; return }
+  box.hidden = false;
+  const B = S.budget, c = viewCycle, s = chargeStatus(c), today = midnight(new Date()), env = chargesEnvObj(), n = B.charges.length;
+  const dueLate = ch => { const d = chargeDue(ch, c); return !s.paid[ch.id] && d && d < today };
+  const late = B.charges.filter(dueLate).length, rest = round2(s.planned - s.net);
+  const over = s.planned > 0 ? s.net > s.planned + 0.005 : s.net > 0.005, pct = s.planned > 0 ? Math.min(100, Math.max(0, s.net / s.planned * 100)) : (s.net > 0 ? 100 : 0);
+  $("chg-head").setAttribute("aria-expanded", String(chOpen));
+  $("chg-head").innerHTML = `<span><b><span class="eic" style="--c:var(--c-exp)">${ico(env ? envIcon(env) : "repeat")}</span>Charges<span class="chev" aria-hidden="true">›</span></b><br><span class="small muted num">${fmtEUR(s.net)} / ${fmtEUR(s.planned)}${n ? ` / ${s.count}/${n}` : ""}${late ? ` / <span style="color:var(--warn)">${late} en retard</span>` : ""}</span></span>
+    <span class="num small" style="font-weight:600;text-align:right;color:${over ? "var(--down)" : "var(--fg)"}">${s.planned > 0 || s.net ? (rest >= 0 ? "reste " + fmtEUR(rest) : "⚠ +" + fmtEUR(-rest)) : "—"}</span>
+    <span class="bar"><i class="${over ? "over" : "t-exp"}" style="width:${pct}%"></i></span>`;
+  $("chg-body").hidden = !chOpen;
+  if (!chOpen) return;
+  const rows = B.charges.map(ch => {
+    const e = s.paid[ch.id], due = chargeDue(ch, c), isLate = dueLate(ch);
+    const sub = e ? `payée le ${dmIso(e.date)}` : due ? `le ${dmDate(due)}${isLate ? " / en retard" : ""}` : "à payer";
+    return `<div class="chg lsrow${e ? " paid" : ""}${isLate ? " late" : ""}" data-ch="${esc(ch.id)}"><button type="button" class="cbox" data-chk aria-pressed="${!!e}" aria-label="${esc(ch.name)} : ${e ? "payée" : "à cocher"}">✓</button>
+      <button type="button" class="cmain" data-chedit><b>${esc(ch.name)}</b><small>${sub}</small></button><span class="num">${fmtEUR(e ? +e.amount : ch.amount)}</span></div>`;
+  }).join("");
+  const others = s.others.map(x => `<div class="chg paid"><span></span><button type="button" class="cmain" data-chexp="${esc(x.id)}"><b>${esc(x.label || "Autre dépense")}</b><small>payée le ${dmIso(x.date)}</small></button><span class="num">${fmtEUR(x.amount)}</span></div>`).join("");
+  $("chg-body").innerHTML = `<div id="chg-list">${rows}</div>` + (n ? "" : `<div class="notice" style="padding:10px 0">Aucune charge</div>`) + others
+    + `<div class="chgfoot"><button type="button" class="linkbtn" data-chadd>+ Ajouter une charge</button></div>`;
+}
+function openCharge(mode, id) {
+  const B = S.budget, ch = id ? B.charges.find(x => x.id === id) : null; if (mode === "check" && !ch) return;
+  const c = viewCycle, e = ch ? chargeStatus(c).paid[ch.id] : null, check = mode === "check";
+  chEdit = { mode, id: ch?.id || null, exp: e?.id || null };
+  $("chtitle").textContent = check ? ch.name : ch ? "Modifier la charge" : "Nouvelle charge";
+  $("ch-namebox").hidden = check; $("ch-daybox").hidden = check; $("ch-datebox").hidden = !check;
+  $("ch-name").value = ch?.name || "";
+  $("ch-amount").value = check ? fmtIn(e ? e.amount : ch.amount) : (ch ? fmtIn(ch.amount) : "");
+  $("ch-day").value = ch?.day || "";
+  $("ch-date").value = e ? e.date : isCurrent(c) ? ymd(new Date()) : ymd(chargeDue(ch || {}, c) || c.start);
+  const del = $("ch-del"); delete del.dataset.confirm;
+  del.hidden = check ? !e : !ch; del.textContent = check ? "Décocher" : "Supprimer";
+  $("ch-ok").textContent = check ? (e ? "Enregistrer" : "Cocher") : "Enregistrer";
+  $("ch-err").textContent = ""; $("chsheet").hidden = false;
+  setTimeout(() => { const f = check || ch ? $("ch-amount") : $("ch-name"); f.focus(); if (check) f.select?.() }, 60);
+}
+const closeCharge = () => { $("chsheet").hidden = true; chEdit = null };
+$("chsheet").addEventListener("click", e => { if (e.target.closest("[data-chclose]")) closeCharge() });
+$("chform").addEventListener("submit", e => {
+  e.preventDefault(); const B = S.budget, t = chEdit; if (!t) return;
+  const amount = round2(parseNum($("ch-amount").value));
+  if (t.mode === "check") {
+    const ch = B.charges.find(x => x.id === t.id); if (!ch) { closeCharge(); return }
+    if (!(amount > 0)) { $("ch-err").textContent = "Montant ?"; $("ch-amount").focus(); return }
+    const date = /^\d{4}-\d{2}-\d{2}$/.test($("ch-date").value) ? $("ch-date").value : ymd(new Date());
+    const ex = t.exp && B.expenses.find(x => x.id === t.exp);
+    if (ex) Object.assign(ex, { amount, date, charge: ch.id });
+    else B.expenses.push({ id: rid(), date, amount, env: B.chargesEnv, label: ch.name, charge: ch.id, at: Date.now() });
+    closeCharge(); commit(); toast(`${ch.name} / ${fmtEUR(amount)}`); return;
+  }
+  const name = $("ch-name").value.trim(); if (!name) { $("ch-err").textContent = "Nom ?"; $("ch-name").focus(); return }
+  const day = Math.min(31, Math.max(0, Math.round(+$("ch-day").value) || 0)), ch = t.id && B.charges.find(x => x.id === t.id);
+  if (ch) Object.assign(ch, { name, amount: Math.max(0, amount), day }); else B.charges.push({ id: rid(), name, amount: Math.max(0, amount), day });
+  ensureChargesEnv(); chOpen = true; closeCharge(); commit(); toast(ch ? "Charge modifiée" : "Charge ajoutée");
+});
+$("ch-del").addEventListener("click", e => {
+  const b = e.currentTarget, B = S.budget, t = chEdit; if (!t) return;
+  if (!b.dataset.confirm) { b.dataset.confirm = "1"; b.textContent = t.mode === "check" ? "Confirmer" : "Confirmer la suppression"; return }
+  if (t.mode === "check") { B.expenses = B.expenses.filter(x => x.id !== t.exp); closeCharge(); commit(); toast("Décochée"); return }
+  B.charges = B.charges.filter(x => x.id !== t.id); closeCharge(); commit(); toast("Charge supprimée");
+});
+$("b-charges").addEventListener("click", e => {
+  if (e.target.closest("#chg-head")) { chOpen = !chOpen; renderCharges(); return }
+  if (e.target.closest("[data-chadd]")) { openCharge("edit", null); return }
+  const x = e.target.closest("[data-chexp]"); if (x) { const o = S.budget.expenses.find(v => v.id === x.dataset.chexp); if (o) openSheet("exp", o); return }
+  const row = e.target.closest("[data-ch]"); if (!row) return;
+  if (e.target.closest("[data-chk]")) openCharge("check", row.dataset.ch); else if (e.target.closest("[data-chedit]")) openCharge("edit", row.dataset.ch);
+});
+sheetGestures("chsheet", closeCharge);
+
+/* ---------- Objectifs d'épargne datés (indépendants des comptes) ---------- */
+let glEdit = null;
+const fmtMonthYear = iso => parseYmd(iso).toLocaleDateString("fr-FR", { month: "short", year: "numeric" });
+function goalProgress(g) { return round2(acctValues().filter(a => g.accts.includes(a.id)).reduce((t, a) => t + a.value, 0) + (+g.extra || 0)) }
+// Paies restantes d'ici l'échéance (au moins 1 si l'échéance n'est pas passée)
+function cyclesLeft(due) {
+  const d = parseYmd(due), today = midnight(new Date()); if (!(d >= today)) return 0;
+  let n = 0; for (let c = shiftCycle(cycleOf(today), 1); c.start <= d && n < 600; c = shiftCycle(c, 1)) n++;
+  return Math.max(1, n);
+}
+function renderGoals() {
+  const G = S.budget.goals;
+  $("goallist").innerHTML = (G.length ? `<div class="subhead">Objectifs</div>` : "") + G.map(g => {
+    const have = goalProgress(g), pct = g.target > 0 ? Math.min(100, Math.max(0, have / g.target * 100)) : 0, left = round2(g.target - have), n = g.due ? cyclesLeft(g.due) : 0, done = g.target > 0 && left <= 0.005;
+    const per = done ? '<span style="color:var(--c-sav)">✓ atteint</span>' : !g.due ? "" : n ? `${fmtEUR(left / n)} / cycle` : '<span style="color:var(--warn)">échéance passée</span>';
+    return `<button type="button" class="goal" data-goal="${esc(g.id)}"><span><b><span class="eic" style="--c:var(--c-sav)">${ico("flag")}</span>${esc(g.name)}</b><br><span class="small muted num">${fmtEUR(have)} / ${fmtEUR(g.target)}</span></span>
+      <span class="num small" style="font-weight:600;text-align:right">${per}<br><span class="muted" style="font-weight:500">${g.due ? fmtMonthYear(g.due) + " / " : ""}${Math.round(pct)} %</span></span>
+      <span class="bar"><i class="t-sav" style="width:${pct}%"></i></span></button>`;
+  }).join("") + `<div class="chgfoot"><button type="button" class="linkbtn" data-goaladd>+ Objectif</button></div>`;
+}
+function openGoal(id) {
+  const g = id ? S.budget.goals.find(x => x.id === id) : null; glEdit = g?.id || null;
+  $("gltitle").textContent = g ? "Modifier l'objectif" : "Nouvel objectif";
+  $("gl-name").value = g?.name || ""; $("gl-target").value = g ? fmtIn(g.target) : ""; $("gl-due").value = g?.due || ""; $("gl-extra").value = g && g.extra ? fmtIn(g.extra) : "";
+  $("gl-accts").innerHTML = acctValues().map(a => `<label class="chk"><input type="checkbox" value="${esc(a.id)}"${g?.accts.includes(a.id) ? " checked" : ""}><span class="tdot" style="background:${esc(a.color)};margin:0"></span><span>${esc(a.name)}</span><span class="num">${fmtEUR(a.value)}</span></label>`).join("");
+  const del = $("gl-del"); del.hidden = !g; delete del.dataset.confirm; del.textContent = "Supprimer";
+  $("gl-err").textContent = ""; $("glsheet").hidden = false;
+  if (!g) setTimeout(() => $("gl-name").focus(), 60);
+}
+const closeGoal = () => { $("glsheet").hidden = true; glEdit = null };
+$("glsheet").addEventListener("click", e => { if (e.target.closest("[data-glclose]")) closeGoal() });
+$("glform").addEventListener("submit", e => {
+  e.preventDefault();
+  const name = $("gl-name").value.trim(), target = round2(parseNum($("gl-target").value));
+  if (!name) { $("gl-err").textContent = "Nom ?"; $("gl-name").focus(); return }
+  if (!(target > 0)) { $("gl-err").textContent = "Montant visé ?"; $("gl-target").focus(); return }
+  const due = /^\d{4}-\d{2}-\d{2}$/.test($("gl-due").value) ? $("gl-due").value : "";
+  const accts = [...$("gl-accts").querySelectorAll("input:checked")].map(i => i.value), extra = round2(parseNum($("gl-extra").value));
+  let g = glEdit && S.budget.goals.find(x => x.id === glEdit);
+  if (g) Object.assign(g, { name, target, due, accts, extra }); else S.budget.goals.push({ id: rid(), name, target, due, accts, extra });
+  closeGoal(); commit(); toast("Objectif enregistré");
+});
+$("gl-del").addEventListener("click", e => {
+  const b = e.currentTarget; if (!b.dataset.confirm) { b.dataset.confirm = "1"; b.textContent = "Confirmer la suppression"; return }
+  S.budget.goals = S.budget.goals.filter(x => x.id !== glEdit); closeGoal(); commit(); toast("Objectif supprimé");
+});
+$("b-savs").addEventListener("click", e => {
+  if (e.target.closest("[data-goaladd]")) { openGoal(null); return }
+  const g = e.target.closest("[data-goal]"); if (g) openGoal(g.dataset.goal);
+});
+sheetGestures("glsheet", closeGoal);
+
+/* ---------- Calendrier : choisir une période (premier jour, puis dernier jour) ---------- */
+let cal = null;
+function openCal(a, b, cb) {
+  const ref = b || a || new Date();
+  cal = { a: a ? midnight(a) : null, b: b ? midnight(b) : null, m: new Date(ref.getFullYear(), ref.getMonth(), 1), cb };
+  renderCal(); $("calsheet").hidden = false;
+}
+function renderCal() {
+  const { a, b, m } = cal, today = midnight(new Date()), first = mondayOf(m), cells = [];
+  for (let i = 0; i < 42; i++) { const d = addDays(first, i); if (i % 7 === 0 && i >= 28 && d.getMonth() !== m.getMonth()) break; cells.push(d) }
+  $("cal-month").textContent = m.toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
+  $("cal-grid").innerHTML = ["L", "M", "M", "J", "V", "S", "D"].map(w => `<span class="wd">${w}</span>`).join("") + cells.map(d => {
+    const end = b || a, cls = [d.getMonth() !== m.getMonth() && "out", +d === +today && "today", a && +d === +a && "a", end && +d === +end && "b", a && b && d > a && d < b && "in"].filter(Boolean).join(" ");
+    return `<button type="button" data-cd="${ymd(d)}" class="${cls}" aria-pressed="${!!(a && d >= a && d <= (b || a))}">${d.getDate()}</button>`;
+  }).join("");
+  $("cal-sel").textContent = a ? (b ? `${fmtDay(a)} → ${fmtDay(b)} ${b.getFullYear()} / ${dayDiff(a, b) + 1} j` : `${fmtDay(a)} → …`) : "Premier jour ?";
+  $("cal-ok").disabled = !(a && b);
+}
+const closeCal = () => { $("calsheet").hidden = true; cal = null };
+$("calsheet").addEventListener("click", e => {
+  if (e.target.closest("[data-calclose]")) { closeCal(); return }
+  const d = e.target.closest("[data-cd]"); if (!d || !cal) return;
+  const x = parseYmd(d.dataset.cd);
+  if (!cal.a || cal.b) { cal.a = x; cal.b = null } else if (x < cal.a) { cal.b = cal.a; cal.a = x } else cal.b = x;
+  renderCal();
+});
+$("cal-prev").addEventListener("click", () => { cal.m = new Date(cal.m.getFullYear(), cal.m.getMonth() - 1, 1); renderCal() });
+$("cal-next").addEventListener("click", () => { cal.m = new Date(cal.m.getFullYear(), cal.m.getMonth() + 1, 1); renderCal() });
+$("cal-ok").addEventListener("click", () => { if (!cal?.a || !cal.b) return; const { a, b, cb } = cal; closeCal(); cb(a, b) });
+sheetGestures("calsheet", closeCal);
+document.addEventListener("keydown", e => { if (e.key !== "Escape") return; if (!$("calsheet").hidden) closeCal(); else if (!$("chsheet").hidden) closeCharge(); else if (!$("glsheet").hidden) closeGoal() });
+
 /* ---------- Feuille de saisie (dépense, entrée ou virement) ---------- */
 let editing = null, sheetKind = "exp", trFrom = "ccp", trTo = "", lastTo = "";
+const KINDS = ["exp", "inc", "tr"];
 function defaultDate() {
   const c = viewCycle, t = new Date();
   if (isCurrent(c)) return ymd(t);
@@ -1788,10 +2164,8 @@ function renderTrGrids() {
   $("g-from").innerHTML = gridHTML(items, trFrom);
   $("g-to").innerHTML = gridHTML(items.filter(a => a.id !== trFrom), trTo);
   const t = { from: trFrom, to: trTo, amount: 1 }, env = envById(trEnv(t)), f = acctById(trFrom)?.name, to = acctById(trTo)?.name;
-  $("f-trnote").textContent = !trTo ? "Choisissez le compte d'arrivée." : trFrom === "ccp"
-    ? `Compté comme épargne du cycle${env ? ` (enveloppe « ${env.name} »)` : ""} : le solde de ${to} augmente, celui du compte courant baisse.`
-    : trTo === "ccp" ? `Épargne reprise : réduit l'épargne du cycle${env ? ` (« ${env.name} »)` : ""} et remet l'argent sur le compte courant.`
-    : `Simple déplacement entre ${f} et ${to} : aucun effet sur le budget du cycle.`;
+  $("f-trnote").textContent = !trTo ? "Compte d'arrivée ?" : trFrom === "ccp" ? `Épargne du cycle${env ? " / " + env.name : ""}`
+    : trTo === "ccp" ? `Épargne reprise${env ? " / " + env.name : ""}` : `${f} → ${to} / sans effet sur le budget`;
 }
 function setSheetKind(k) {
   roEnd(); sheetKind = k;
@@ -1799,6 +2173,9 @@ function setSheetKind(k) {
   $("f-expbox").hidden = k !== "exp"; $("f-incbox").hidden = k !== "inc"; $("f-trbox").hidden = k !== "tr";
   const T = { exp: ["Nouvelle dépense", "Modifier la dépense"], inc: ["Nouvelle entrée d'argent", "Modifier l'entrée"], tr: ["Nouveau virement", "Modifier le virement"] }[k];
   $("sheettitle").textContent = editing ? T[1] : T[0];
+  // Retour à l'onglet précédent (Entrée → Dépense, Virement → Entrée), en plus du glissé vers la droite
+  const prev = KINDS[KINDS.indexOf(k) - 1];
+  $("f-back").hidden = !!editing || !prev; $("f-back").textContent = prev ? "‹ " + { exp: "Dépense", inc: "Entrée" }[prev] : "";
   $("f-label").placeholder = k === "inc" ? "Ex. Vente casque sur Leboncoin" : k === "tr" ? "Ex. Épargne du mois" : "Ex. Courses Saran";
   if (k === "tr") renderTrGrids();
 }
@@ -1844,7 +2221,9 @@ function sheetGestures(id, close, swipeX) {
   card.addEventListener("touchstart", e => {
     if (e.touches.length !== 1 || roState) { g = null; return }
     const t = e.touches[0], sc = e.target.closest(".igrid, .icgroups, textarea");
-    g = { x: t.clientX, y: t.clientY, mode: null, dx: 0, dy: 0, top: card.scrollTop <= 0 && !(sc && sc.scrollTop > 0), field: !!e.target.closest("input, textarea, select") };
+    // Un champ bloque le glissé seulement s'il est en cours de saisie (ou une zone de texte)
+    const f = e.target.closest("input, textarea, select");
+    g = { x: t.clientX, y: t.clientY, mode: null, dx: 0, dy: 0, top: card.scrollTop <= 0 && !(sc && sc.scrollTop > 0), field: !!f && (f === document.activeElement || f.tagName === "TEXTAREA") };
   }, { passive: true });
   card.addEventListener("touchmove", e => {
     if (!g) return; if (roState) { g = null; reset(); return }
@@ -1861,15 +2240,16 @@ function sheetGestures(id, close, swipeX) {
   const end = () => {
     if (!g) return; const { mode, dx, dy } = g; g = null; if (!mode) return;
     if (mode === "down" && dy > 90) { card.style.transform = ""; close(); return }
-    reset(); if (mode === "x" && Math.abs(dx) > 60) swipeX(dx < 0 ? 1 : -1);
+    reset(); if (mode === "x" && Math.abs(dx) > 50) swipeX(dx < 0 ? 1 : -1);
   };
   card.addEventListener("touchend", end); card.addEventListener("touchcancel", () => { g = null; reset() });
 }
-const KINDS = ["exp", "inc", "tr"];
-sheetGestures("sheet", closeSheet, dir => {
+function stepKind(dir) {
   if (editing) return; const j = KINDS.indexOf(sheetKind) + dir; if (j < 0 || j >= KINDS.length) return;
   setSheetKind(KINDS[j]); const c = $("expform"); c.classList.remove("slide-l", "slide-r"); void c.offsetWidth; c.classList.add(dir > 0 ? "slide-l" : "slide-r");
-});
+}
+sheetGestures("sheet", closeSheet, stepKind);
+$("f-back").addEventListener("click", () => stepKind(-1));
 sheetGestures("acsheet", () => closeAcct());
 sheetGestures("icsheet", () => { $("icsheet").hidden = true });
 
@@ -1892,13 +2272,18 @@ function roEnd() {
   if (!roState) return; const { grid, bar } = roState; roState = null;
   bar.remove(); grid.classList.remove("reorder"); grid.querySelectorAll(".gi").forEach(b => { b.classList.remove("fixed", "drag"); b.style.transform = "" });
 }
+// Nouvel ordre d'une liste (enveloppes, catégories, comptes, charges) ; les éléments absents de ids gardent leur place
+const ORDER_KEYS = { env: "envelopes", cat: "incomeCats", acct: "savings", chg: "charges" };
+function saveOrder(kind, ids) {
+  const key = ORDER_KEYS[kind], list = S.budget[key], byId = Object.fromEntries(list.map(x => [x.id, x])), next = list.slice();
+  ids = ids.filter(id => byId[id]);
+  list.map((x, i) => ids.includes(x.id) ? i : -1).filter(i => i >= 0).forEach((slot, k) => { next[slot] = byId[ids[k]] });
+  if (next.every((x, i) => x === list[i])) return false;
+  S.budget[key] = next; return true;
+}
 function roSave() {
   const { grid, kind } = roState, ids = [...grid.querySelectorAll(".gi")].map(b => b.dataset.v).filter(id => roMovable(kind, id));
-  const list = roList(kind), byId = Object.fromEntries(list.map(x => [x.id, x])), next = list.slice();
-  list.map((x, i) => ids.includes(x.id) ? i : -1).filter(i => i >= 0).forEach((slot, k) => { next[slot] = byId[ids[k]] });   // les éléments absents de la grille gardent leur place
-  if (next.every((x, i) => x === list[i])) return;
-  if (kind === "env") S.budget.envelopes = next; else if (kind === "cat") S.budget.incomeCats = next; else S.budget.savings = next;
-  commit();
+  if (saveOrder(kind, ids)) commit();
 }
 function roBind(grid) {
   let lp = null, drag = null;
@@ -1937,6 +2322,59 @@ function roBind(grid) {
   grid.addEventListener("contextmenu", e => { if (e.target.closest(".gi")) e.preventDefault() });
 }
 Object.keys(RO_GRIDS).forEach(id => roBind($(id)));
+
+// Appui long sur une ligne de liste (enveloppes, comptes, catégories, charges) : la ligne se soulève et suit le doigt ;
+// l'ordre est enregistré en la relâchant. Dans les listes à champs (Budget, catégories), on attrape la poignée ⠿.
+let lsDrag = null, lsLast = 0;
+function lsBind(box, o) {
+  let lp = null, scrollT = null;
+  const movable = el => !!el && box.contains(el) && el.matches(o.sel) && (!o.ok || o.ok(el));
+  const sibs = el => [...el.parentElement.children].filter(x => x !== el && movable(x) && (!o.same || o.same(x, el)));
+  const start = (el, y) => { const r = el.getBoundingClientRect(); lsDrag = { el, oy: y - r.top, box, y }; el.classList.add("lsdrag"); try { navigator.vibrate?.(15) } catch {} };
+  const place = y => {
+    const d = lsDrag, t = d.el; d.y = y; t.style.transform = "";
+    for (const x of sibs(t)) { const r = x.getBoundingClientRect(); if (y > r.top + r.height * .25 && y < r.bottom - r.height * .25) { const all = [...t.parentElement.children]; if (all.indexOf(x) > all.indexOf(t)) x.after(t); else x.before(t); break } }
+    const r = t.getBoundingClientRect(); t.style.transform = `translateY(${y - d.oy - r.top}px)`;
+  };
+  // Près du haut ou du bas de l'écran, la page défile pendant le déplacement
+  const edgeScroll = () => {
+    clearInterval(scrollT); if (!lsDrag || lsDrag.box !== box) return;
+    const y = lsDrag.y, v = y < 90 ? -10 : y > innerHeight - 90 ? 10 : 0; if (!v) return;
+    scrollT = setInterval(() => { if (!lsDrag) { clearInterval(scrollT); return } window.scrollBy(0, v); place(lsDrag.y) }, 16);
+  };
+  const finish = () => {
+    clearInterval(scrollT); if (!lsDrag || lsDrag.box !== box) return;
+    const t = lsDrag.el; lsDrag = null; lsLast = Date.now(); t.style.transform = ""; t.classList.remove("lsdrag");
+    const ids = [...t.parentElement.children].filter(movable).map(o.id);
+    if (saveOrder(o.kind, ids)) commit(); else renderView();
+  };
+  const press = (e, x, y) => {
+    const el = e.target.closest(o.sel); if (!movable(el)) return;
+    if (o.handle ? !e.target.closest(o.handle) : e.target.closest("input, select, textarea")) return;
+    lp = { x, y, timer: setTimeout(() => { lp = null; start(el, y) }, o.handle ? 220 : 450) };
+  };
+  const cancelLp = (x, y) => { if (lp && Math.hypot(x - lp.x, y - lp.y) > 8) { clearTimeout(lp.timer); lp = null } };
+  box.addEventListener("touchstart", e => { lastTouch = Date.now(); if (e.touches.length === 1) press(e, e.touches[0].clientX, e.touches[0].clientY) }, { passive: true });
+  box.addEventListener("touchmove", e => { const t = e.touches[0]; cancelLp(t.clientX, t.clientY); if (lsDrag?.box === box) { e.preventDefault(); place(t.clientY); edgeScroll() } }, { passive: false });
+  const up = () => { if (lp) { clearTimeout(lp.timer); lp = null } finish() };
+  box.addEventListener("touchend", up); box.addEventListener("touchcancel", up);
+  box.addEventListener("mousedown", e => {
+    if (e.button || Date.now() - lastTouch < 800) return; press(e, e.clientX, e.clientY);
+    const mm = ev => { cancelLp(ev.clientX, ev.clientY); if (lsDrag?.box === box) { ev.preventDefault(); place(ev.clientY) } };
+    const mu = () => { up(); document.removeEventListener("mousemove", mm); document.removeEventListener("mouseup", mu) };
+    document.addEventListener("mousemove", mm); document.addEventListener("mouseup", mu);
+  });
+  // Le toucher qui a servi à déplacer ne sélectionne rien
+  box.addEventListener("click", e => { if (Date.now() - lsLast < 450) { e.stopImmediatePropagation(); e.preventDefault() } }, true);
+  box.addEventListener("contextmenu", e => { if (e.target.closest(o.sel)) e.preventDefault() });
+}
+const envRowOk = el => !!envById(el.dataset.env);
+lsBind($("envlist"), { sel: ".env[data-env]", kind: "env", id: el => el.dataset.env, ok: envRowOk });
+lsBind($("savlist"), { sel: ".env[data-env]", kind: "env", id: el => el.dataset.env, ok: envRowOk });
+lsBind($("c-groups"), { sel: ".acct[data-acc]", kind: "acct", id: el => el.dataset.acc, ok: el => S.budget.savings.some(a => a.id === el.dataset.acc) });
+lsBind($("s-incs"), { sel: ".erow[data-icid]", kind: "cat", id: el => el.dataset.icid, handle: ".grip" });
+lsBind($("s-envs"), { sel: ".erow[data-eid]", kind: "env", id: el => el.dataset.eid, handle: ".grip", same: (a, b) => a.dataset.kind === b.dataset.kind });
+lsBind($("b-charges"), { sel: ".chg[data-ch]", kind: "chg", id: el => el.dataset.ch });
 document.addEventListener("click", e => { if (e.target.closest("[data-rodone]")) roEnd() });
 $("fab").addEventListener("click", () => openSheet("exp", null));
 $("f-kind").addEventListener("click", e => { const b = e.target.closest("[data-k]"); if (b) setSheetKind(b.dataset.k) });
@@ -1949,13 +2387,13 @@ document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("sheet"
 $("expform").addEventListener("submit", e => {
   e.preventDefault();
   let amount = round2(parseNum($("f-amount").value));
-  if (!amount) { $("f-err").textContent = "Indiquez un montant."; $("f-amount").focus(); return }
+  if (!amount) { $("f-err").textContent = "Montant ?"; $("f-amount").focus(); return }
   const date = /^\d{4}-\d{2}-\d{2}$/.test($("f-date").value) ? $("f-date").value : ymd(new Date());
   const label = $("f-label").value.trim();
   let wasEdit = false, msg;
   if (sheetKind === "tr") {
     amount = Math.abs(amount);
-    if (!trTo || trTo === trFrom) { $("f-err").textContent = "Choisissez deux comptes différents."; return }
+    if (!trTo || trTo === trFrom) { $("f-err").textContent = "Deux comptes différents"; return }
     const old = editing && S.budget.transfers.find(x => x.id === editing);
     if (old) { applyTransfer(old, -1); Object.assign(old, { amount, date, from: trFrom, to: trTo, label }); applyTransfer(old, 1); wasEdit = true }
     else { const t = { id: rid(), amount, date, from: trFrom, to: trTo, label, at: Date.now() }; S.budget.transfers.push(t); applyTransfer(t, 1) }
@@ -1990,8 +2428,12 @@ $("f-del").addEventListener("click", e => {
   closeSheet(); commit(); toast(what);
 });
 
-/* ---------- Bilan (plusieurs cycles) ---------- */
-let bPeriod = "12", blPer = [], blPin = null;
+/* ---------- Bilan : jour, semaine, cycle, plusieurs cycles ou dates choisies ---------- */
+// Revenus d'une période = salaires des paies tombées dedans + autres entrées. Épargne = revenus − dépenses sur un cycle ou plus,
+// virements vers l'épargne sur une période plus courte (jour, semaine).
+if (!["day", "week", "cycle", "multi"].includes(PF.blMode)) PF.blMode = "multi";
+if (!["3", "6", "12", "all", "range"].includes(String(PF.blN)) || (PF.blN === "range" && !(PF.blRange?.a && PF.blRange?.b))) PF.blN = 12;
+let blDate = midnight(new Date()), blPer = [], blPin = null, blUnit = "cycle";
 function allCycles() {
   // Du premier mouvement enregistré jusqu'au cycle en cours
   let first = null;
@@ -2004,50 +2446,115 @@ function allCycles() {
 }
 const fmtCycle = c => c.start.toLocaleDateString("fr-FR", { month: "short", year: "2-digit" });
 const cycleRange = c => `${fmtDay(c.start)} → ${fmtDay(c.end)} ${c.end.getFullYear()}`;
+function salariesIn(a, b) { let s = 0; for (let c = cycleOf(a); c.start <= b; c = shiftCycle(c, 1)) if (c.start >= a) s += cycleIncome(c); return s }
+function blPeriod() {
+  const m = PF.blMode;
+  if (m === "day") return { m, a: blDate, b: blDate };
+  if (m === "week") { const a = mondayOf(blDate); return { m, a, b: addDays(a, 6) } }
+  if (m === "cycle") { const c = cycleOf(blDate); return { m, a: c.start, b: c.end, c } }
+  if (PF.blN === "range") { const a = parseYmd(PF.blRange.a), b = parseYmd(PF.blRange.b); return { m: "range", a, b } }
+  if (PF.blN === "all") { const cs = allCycles(); return { m: "all", a: cs[0].start, b: cs.at(-1).end, cs } }
+  const n = +PF.blN || 12, last = cycleOf(blDate), cs = Array.from({ length: n }, (_, i) => shiftCycle(last, i - n + 1));
+  return { m: "multi", a: cs[0].start, b: last.end, cs };
+}
+// Découpage du graphique : jours (semaine, dates courtes), semaines (cycle, dates moyennes) ou cycles
+function blBuckets(P) {
+  const days = dayDiff(P.a, P.b) + 1, out = [];
+  const unit = P.m === "day" ? "none" : P.m === "week" ? "day" : P.m === "cycle" ? "week" : P.m === "range" ? (days <= 14 ? "day" : days <= 120 ? "week" : "cycle") : "cycle";
+  if (unit === "day") for (let d = P.a; d <= P.b; d = addDays(d, 1)) out.push({ a: d, b: d, k: "day" });
+  else if (unit === "week") for (let d = P.a; d <= P.b;) { const e = addDays(mondayOf(d), 6), z = e < P.b ? e : P.b; out.push({ a: d, b: z, k: "week" }); d = addDays(z, 1) }
+  else if (unit === "cycle") {
+    const cs = P.cs || (() => { const r = []; for (let c = cycleOf(P.a); c.start <= P.b && r.length < 600; c = shiftCycle(c, 1)) r.push(c); return r })();
+    cs.forEach(c => out.push({ a: c.start < P.a ? P.a : c.start, b: c.end > P.b ? P.b : c.end, k: "cycle", c }));
+  }
+  return { unit, days, list: out };
+}
+function blStats(a, b, cyc) { const st = cycleStats({ start: a, end: b }), sal = salariesIn(a, b), rev = sal + st.extra, spend = st.out - st.saved; return { st, sal, rev, spend, placed: st.saved, save: cyc ? rev - spend : st.saved } }
+const bucketKey = p => ymd(p.a);
+function bucketLabel(p) {
+  if (p.k === "cycle") return fmtCycle(p.c);
+  if (p.k === "week") return `${pad(p.a.getDate())}/${pad(p.a.getMonth() + 1)}`;
+  return blUnit === "day" && dayDiff(blPer[0].a, blPer.at(-1).a) < 7 ? p.a.toLocaleDateString("fr-FR", { weekday: "short" }).replace(".", "") + " " + p.a.getDate() : `${pad(p.a.getDate())}/${pad(p.a.getMonth() + 1)}`;
+}
+function bucketRange(p) {
+  if (p.k === "cycle") return +p.a === +p.c.start && +p.b === +p.c.end ? cycleRange(p.c) : `${fmtDay(p.a)} → ${fmtDay(p.b)} ${p.b.getFullYear()}`;
+  if (p.k === "week") return `${fmtDay(p.a)} → ${fmtDay(p.b)} ${p.b.getFullYear()}`;
+  const t = p.a.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" }); return t.charAt(0).toUpperCase() + t.slice(1);
+}
+function blLabel(P) {
+  const yr = d => ` ${d.getFullYear()}`, span = `${fmtDay(P.a)}${P.a.getFullYear() !== P.b.getFullYear() ? yr(P.a) : ""} → ${fmtDay(P.b)}${yr(P.b)}`, today = midnight(new Date());
+  if (P.m === "day") { const t = P.a.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" }), k = dayDiff(today, P.a); return [t.charAt(0).toUpperCase() + t.slice(1), k === 0 ? "Aujourd'hui" : k === -1 ? "Hier" : String(P.a.getFullYear())] }
+  if (P.m === "week") return [span, P.a <= today && today <= P.b ? "Cette semaine" : "Semaine"];
+  if (P.m === "cycle") return [cycleRange(P.c), isCurrent(P.c) ? "Cycle en cours" : "Cycle"];
+  if (P.m === "range") { const d = dayDiff(P.a, P.b) + 1; return [span, `${d} jour${d > 1 ? "s" : ""}`] }
+  return [span, `${P.cs.length} cycles`];
+}
 function renderBilan() {
-  const all = allCycles(), years = [...new Set(all.map(c => c.key.slice(0, 4)))].reverse();
-  if (bPeriod !== "12" && bPeriod !== "all" && !years.includes(bPeriod)) bPeriod = "12";
-  $("bl-period").innerHTML = `<option value="12">12 derniers cycles</option>` + years.map(y => `<option value="${y}">Cycles commencés en ${y}</option>`).join("") + `<option value="all">Tout l'historique (${all.length} cycles)</option>`;
-  $("bl-period").value = bPeriod;
-  const cycles = bPeriod === "12" ? all.slice(-12) : bPeriod === "all" ? all : all.filter(c => c.key.startsWith(bPeriod));
-  // Dépenses = sorties hors virements vers l'épargne et les placements ; épargne = revenus − dépenses
-  const per = cycles.map(c => { const st = cycleStats(c), sal = cycleIncome(c), rev = sal + st.extra, spend = st.out - st.saved; return { c, st, sal, rev, spend, save: rev - spend, placed: st.saved } });
+  const P = blPeriod(), B = blBuckets(P), cyc = B.unit === "cycle" || P.m === "cycle";
+  blUnit = B.unit;
+  document.querySelectorAll("#bl-mode [data-bm]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.bm === PF.blMode)));
+  $("bl-multi").hidden = PF.blMode !== "multi";
+  document.querySelectorAll("#bl-multi [data-bn]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.bn === String(PF.blN))));
+  const [lbl, sub] = blLabel(P); $("bl-label").textContent = lbl; $("bl-sub").textContent = sub;
+  $("bl-prev").disabled = $("bl-next").disabled = P.m === "all";
+  const T = blStats(P.a, P.b, cyc), per = B.list.map(x => ({ ...x, ...blStats(x.a, x.b, x.k === "cycle") }));
   blPer = per;
-  const n = per.length || 1, rev = per.reduce((s, p) => s + p.rev, 0), spend = per.reduce((s, p) => s + p.spend, 0), placed = per.reduce((s, p) => s + p.placed, 0), saved = rev - spend;
+  // Moyennes : par cycle quand le bilan compte des cycles, sinon par jour (rien pour un seul jour)
+  const avgU = B.unit === "cycle" ? (per.length > 1 ? { n: per.length, u: "cycle" } : null) : P.m === "day" ? null : { n: B.days, u: "jour" };
+  const avg = v => avgU ? `Moyenne : ${fmtEUR(v / avgU.n)} / ${avgU.u}` : "", avgCyc = v => B.unit === "cycle" ? avg(v) : "";
   const stat = (dot, label, v, sub, color) => `<div class="stat"><span class="eyebrow">${dot ? `<span class="tdot ${dot}"></span>` : ""}${label}</span><span class="v"${color ? ` style="color:${color}"` : ""}>${v}</span>${sub ? `<span class="small muted">${sub}</span>` : ""}</div>`;
-  $("bl-stats").innerHTML = stat("t-rev", "Revenus", fmtEUR(rev), `salaires + autres entrées · moyenne ${fmtEUR(rev / n)}`)
-    + stat("t-exp", "Dépenses", fmtEUR(spend), `moyenne ${fmtEUR(spend / n)} par cycle`)
-    + stat("t-sav", "Épargne", fmtEUR(saved), (rev > 0 ? `${(saved / rev * 100).toLocaleString("fr-FR", { maximumFractionDigits: 0 })} % des revenus · ` : "") + `dont ${fmtEUR(placed)} virés vers l'épargne et les placements`, saved < 0 ? "var(--down)" : "")
-    + stat("", "Cycles", String(per.length), per.length ? `${fmtDay(per[0].c.start)} ${per[0].c.start.getFullYear()} → ${fmtDay(per.at(-1).c.end)} ${per.at(-1).c.end.getFullYear()}` : "");
-  drawBilanChart();
-  // Tableau des chiffres (accessible et lisible sans les couleurs)
-  const has = per.length && (spend || rev);
-  $("bl-tblbox").hidden = !has;
-  $("bl-tbl").innerHTML = has ? `<thead><tr><th>Cycle</th><th class="r">Revenus</th><th class="r">Dépenses</th><th class="r">Épargne</th></tr></thead><tbody>`
-    + per.slice().reverse().map(p => `<tr><td title="${esc(cycleRange(p.c))}">${esc(fmtCycle(p.c))}</td><td class="calc">${fmtEUR(p.rev)}</td><td class="calc">${fmtEUR(p.spend)}</td><td class="calc"${p.save < 0 ? ' style="color:var(--down)"' : ""}>${fmtEUR(p.save)}</td></tr>`).join("") + "</tbody>" : "";
-  // Par enveloppe : total net, moyenne par cycle comparée au prévu
+  const rate = cyc && T.rev > 0 ? Math.round(T.save / T.rev * 100) : null, nMov = T.st.ex.length + T.st.inc.length + T.st.tr.length;
+  $("bl-stats").innerHTML = stat("t-rev", "Revenus", fmtEUR(T.rev), avgCyc(T.rev))
+    + stat("t-exp", "Dépenses", fmtEUR(T.spend), avg(T.spend))
+    + stat("t-sav", cyc ? "Épargne" : "Épargne virée", fmtEUR(T.save), avgU && B.unit === "cycle" ? avg(T.save) : (cyc && T.placed ? `Virés : ${fmtEUR(T.placed)}` : ""), T.save < 0 ? "var(--down)" : "")
+    + (rate !== null ? stat("", "Taux d'épargne", `${rate} %`, "") : stat("", "Mouvements", String(nMov), ""));
+  $("bl-chartbox").hidden = B.unit === "none";
+  $("bl-ctitle").textContent = { day: "Par jour", week: "Par semaine", cycle: "Par cycle" }[B.unit] || "";
+  document.querySelector("#bl-legend > span:last-child").lastChild.textContent = B.unit === "cycle" ? "Épargne" : "Épargne virée";
+  if (B.unit !== "none") drawBilanChart();
+  const has = per.length && (T.spend || T.rev);
+  $("bl-tblbox").hidden = !has || B.unit === "none";
+  $("bl-tbl").innerHTML = has ? `<thead><tr><th>${{ day: "Jour", week: "Semaine", cycle: "Cycle" }[B.unit] || ""}</th><th class="r">Revenus</th><th class="r">Dépenses</th><th class="r">Épargne</th></tr></thead><tbody>`
+    + per.slice().reverse().map(p => `<tr><td title="${esc(bucketRange(p))}">${esc(bucketLabel(p))}</td><td class="calc">${fmtEUR(p.rev)}</td><td class="calc">${fmtEUR(p.spend)}</td><td class="calc"${p.save < 0 ? ' style="color:var(--down)"' : ""}>${fmtEUR(p.save)}</td></tr>`).join("") + "</tbody>" : "";
+  // Par enveloppe : total net ; moyenne par cycle comparée au prévu, ou prévu ramené à la période
   const tot = {}; let orphan = 0;
-  per.forEach(p => {
-    Object.entries(p.st.spentBy).forEach(([id, v]) => { if (envById(id)) tot[id] = (tot[id] || 0) + v; else orphan += v });
-    Object.entries(p.st.refundBy).forEach(([id, v]) => { tot[id] = (tot[id] || 0) - v });
-  });
+  Object.entries(T.st.spentBy).forEach(([id, v]) => { if (envById(id)) tot[id] = (tot[id] || 0) + v; else orphan += v });
+  Object.entries(T.st.refundBy).forEach(([id, v]) => { tot[id] = (tot[id] || 0) - v });
+  const nC = B.unit === "cycle" ? per.length : 1, factor = B.unit === "cycle" || P.m === "cycle" ? 1 : B.days / CYCLE_DAYS;
   const rows = S.budget.envelopes.map(e => ({ id: e.id, name: e.name, v: tot[e.id] || 0, pl: +e.planned || 0, kind: e.kind, color: envColor(e) })).concat(orphan ? [{ id: "__none", name: "Sans enveloppe", v: orphan, pl: 0, color: OTHER_COLOR }] : [])
     .filter(r => Math.abs(r.v) > 0.004).sort((a, b) => (a.kind === "save") - (b.kind === "save") || b.v - a.v);
   const maxv = Math.max(1, ...rows.map(r => r.v));
-  $("bl-env").innerHTML = rows.length ? rows.map(r => { const save = r.kind === "save", avg = r.v / n, over = !save && r.pl > 0 && avg > r.pl + 0.005, good = save && r.pl > 0 && avg >= r.pl - 0.005;
-    return `<div class="env" style="cursor:default"><span><b>${esc(r.name)}</b>${save ? '<span class="tag">épargne</span>' : ""}<br><span class="small muted num">moyenne ${fmtEUR(avg)} / cycle${r.pl ? ` · prévu ${fmtEUR(r.pl)}` : ""}</span></span>
-      <span class="num small" style="font-weight:600;color:${over ? "var(--down)" : "var(--fg)"};text-align:right">${over ? "⚠ " : good ? '<span style="color:var(--c-sav)">✓</span> ' : ""}${fmtEUR(r.v)}<br><span class="muted" style="font-weight:500">${spend && !save ? (r.v / spend * 100).toLocaleString("fr-FR", { maximumFractionDigits: 0 }) + " % des dépenses" : ""}</span></span>
-      <span class="bar"><i class="${over ? "over" : save ? "t-sav" : "t-exp"}" style="width:${Math.max(0, r.v / maxv * 100)}%"></i></span></div>`; }).join("")
-    : `<div class="notice">Aucune dépense sur cette période.</div>`;
-  blMixRows = rows; blMixN = n; renderMix();
-  // Entrées par catégorie (+ salaires)
-  const byCat = {}; per.forEach(p => Object.entries(p.st.byCat).forEach(([id, v]) => { byCat[id] = (byCat[id] || 0) + v }));
-  const sal = per.reduce((s, p) => s + p.sal, 0), custom = per.filter(p => typeof S.budget.cycles[p.c.key]?.income === "number").length;
-  const incRows = [{ name: "Salaires (revenu des cycles)", v: sal, sub: custom < per.length ? `${per.length - custom} cycle${per.length - custom > 1 ? "s" : ""} au revenu habituel` : "montants propres à chaque cycle" }]
-    .concat(Object.entries(byCat).map(([id, v]) => ({ name: incCat(id)?.name || "Autre entrée", v })).sort((a, b) => b.v - a.v));
-  $("bl-inc").innerHTML = incRows.filter(r => r.v).map(r => `<div class="totrow" style="font-weight:500"><span><span class="tdot t-rev"></span>${esc(r.name)}${r.sub ? `<br><span class="small muted">${esc(r.sub)}</span>` : ""}</span><span class="num">${fmtEUR(r.v)}</span></div>`).join("")
-    || `<div class="notice">Aucune entrée sur cette période.</div>`;
+  $("bl-env").innerHTML = rows.length ? rows.map(r => {
+    const save = r.kind === "save", avgv = r.v / nC, ref = r.pl * factor, over = !save && r.pl > 0 && avgv > ref + 0.005, good = save && r.pl > 0 && avgv >= ref - 0.005;
+    const sub = [nC > 1 ? `Moyenne : ${fmtEUR(avgv)}` : "", r.pl ? `Prévu : ${fmtEUR(ref)}` : ""].filter(Boolean).join(" / ");
+    return `<div class="env" style="cursor:default"><span><b>${esc(r.name)}</b>${save ? '<span class="tag">épargne</span>' : ""}${sub ? `<br><span class="small muted num">${sub}</span>` : ""}</span>
+      <span class="num small" style="font-weight:600;color:${over ? "var(--down)" : "var(--fg)"};text-align:right">${over ? "⚠ " : good ? '<span style="color:var(--c-sav)">✓</span> ' : ""}${fmtEUR(r.v)}<br><span class="muted" style="font-weight:500">${T.spend && !save ? (r.v / T.spend * 100).toLocaleString("fr-FR", { maximumFractionDigits: 0 }) + " %" : ""}</span></span>
+      <span class="bar"><i class="${over ? "over" : save ? "t-sav" : "t-exp"}" style="width:${Math.max(0, r.v / maxv * 100)}%"></i></span></div>`;
+  }).join("") : `<div class="notice">Aucune dépense</div>`;
+  blMixRows = rows; blMixN = nC; renderMix();
+  // Entrées : salaires puis catégories
+  const incRows = [{ name: "Salaires", v: T.sal }].concat(Object.entries(T.st.byCat).map(([id, v]) => ({ name: incCat(id)?.name || "Autre entrée", v })).sort((a, b) => b.v - a.v));
+  $("bl-inc").innerHTML = incRows.filter(r => r.v).map(r => `<div class="totrow" style="font-weight:500"><span><span class="tdot t-rev"></span>${esc(r.name)}</span><span class="num">${fmtEUR(r.v)}</span></div>`).join("")
+    || `<div class="notice">Aucune entrée</div>`;
 }
+function blShift(dir) {
+  const m = PF.blMode;
+  if (m === "day") blDate = addDays(blDate, dir);
+  else if (m === "week") blDate = addDays(blDate, 7 * dir);
+  else if (m === "cycle") blDate = midnight(shiftCycle(cycleOf(blDate), dir).start);
+  else if (PF.blN === "range") { const a = parseYmd(PF.blRange.a), b = parseYmd(PF.blRange.b), n = (dayDiff(a, b) + 1) * dir; PF.blRange = { a: ymd(addDays(a, n)), b: ymd(addDays(b, n)) }; savePrefs() }
+  else if (PF.blN !== "all") blDate = midnight(shiftCycle(cycleOf(blDate), dir * (+PF.blN || 12)).start);
+  blPin = null; blMix = null; renderBilan();
+}
+$("bl-prev").addEventListener("click", () => blShift(-1));
+$("bl-next").addEventListener("click", () => blShift(1));
+$("bl-mode").addEventListener("click", e => { const b = e.target.closest("[data-bm]"); if (!b) return; PF.blMode = b.dataset.bm; savePrefs(); blPin = null; blMix = null; renderBilan() });
+$("bl-multi").addEventListener("click", e => {
+  const b = e.target.closest("[data-bn]"); if (!b) return;
+  if (b.dataset.bn !== "range") { PF.blN = b.dataset.bn === "all" ? "all" : +b.dataset.bn; savePrefs(); blPin = null; blMix = null; renderBilan(); return }
+  const r = PF.blN === "range" ? PF.blRange : null, c = cycleOf(blDate);
+  openCal(r ? parseYmd(r.a) : c.start, r ? parseYmd(r.b) : c.end, (a, z) => { PF.blN = "range"; PF.blRange = { a: ymd(a), b: ymd(z) }; savePrefs(); blPin = null; blMix = null; renderBilan() });
+});
 // Pas « rond » pour les graduations (1, 2, 2,5 ou 5 × 10^n)
 function niceStep(range, ticks = 4) {
   const raw = Math.max(range, 1) / ticks, p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p;
@@ -2057,7 +2564,7 @@ const fmtK = v => { const a = Math.abs(v), s = v < 0 ? "−" : ""; return s + (a
 const BL_SERIES = [["rev", "Revenus"], ["spend", "Dépenses"], ["save", "Épargne"]], BL_COLOR = { rev: "var(--c-rev)", spend: "var(--c-exp)", save: "var(--c-sav)" }, BL_DOT = { rev: "t-rev", spend: "t-exp", save: "t-sav" };
 function drawBilanChart() {
   const el = $("bl-chart"), per = blPer;
-  if (!per.length || !per.some(p => p.rev || p.spend)) { el.innerHTML = ""; $("bl-legend").hidden = true; $("bl-chartnote").textContent = "Pas encore de mouvements sur cette période."; return }
+  if (!per.length || !per.some(p => p.rev || p.spend || p.save)) { el.innerHTML = ""; $("bl-legend").hidden = true; $("bl-chartnote").textContent = "Aucun mouvement"; return }
   $("bl-legend").hidden = false;
   const avail = Math.max(260, el.clientWidth || 600), H = 220, pl = 54, pr = 8, pt = 12, pb = 28;
   const gw = Math.max(18, (avail - pl - pr) / per.length), W = Math.max(avail, Math.ceil(pl + pr + gw * per.length));
@@ -2069,24 +2576,24 @@ function drawBilanChart() {
   const bar = (x, v) => { const y1 = y(v), h = Math.abs(y0 - y1); if (h < .5) return ""; const r = Math.min(4, bw / 2, h), d = v >= 0 ? 1 : -1;
     return `M${x},${y0}V${y1 + d * r}Q${x},${y1} ${x + r},${y1}H${x + bw - r}Q${x + bw},${y1} ${x + bw},${y1 + d * r}V${y0}Z` };
   const ticks = []; for (let v = minV; v <= maxV + step / 2; v += step) ticks.push(v);
-  el.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="group" aria-label="Revenus, dépenses et épargne par cycle">
+  el.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="group" aria-label="Revenus, dépenses et épargne">
     ${ticks.map(v => `<line x1="${pl}" x2="${W - pr}" y1="${y(v)}" y2="${y(v)}" class="${v === 0 ? "base" : "grid"}"/><text x="${pl - 6}" y="${y(v) + 4}" text-anchor="end" class="ax">${fmtK(v)}</text>`).join("")}
     ${per.map((p, i) => { const gx = pl + i * gw, x0 = gx + (gw - (3 * bw + 4)) / 2;
-      return `<g data-ck="${p.c.key}" data-i="${i}" tabindex="0" role="button" aria-label="${esc(cycleRange(p.c))} : revenus ${fmtEUR(p.rev)}, dépenses ${fmtEUR(p.spend)}, épargne ${fmtEUR(p.save)}"${blPin === p.c.key ? ' class="sel"' : ""}>
+      return `<g data-ck="${bucketKey(p)}" data-i="${i}" tabindex="0" role="button" aria-label="${esc(bucketRange(p))} : revenus ${fmtEUR(p.rev)}, dépenses ${fmtEUR(p.spend)}, épargne ${fmtEUR(p.save)}"${blPin === bucketKey(p) ? ' class="sel"' : ""}>
         <rect class="hl" x="${gx + 1}" y="${pt - 6}" width="${gw - 2}" height="${H - pt - pb + 6}" rx="6"/>
         ${BL_SERIES.map(([k], j) => `<path d="${bar(x0 + j * (bw + 2), p[k])}" fill="${BL_COLOR[k]}"/>`).join("")}
-        ${i % labStep === 0 ? `<text x="${gx + gw / 2}" y="${H - 9}" text-anchor="middle" class="ax">${fmtCycle(p.c)}</text>` : ""}</g>`; }).join("")}
+        ${i % labStep === 0 ? `<text x="${gx + gw / 2}" y="${H - 9}" text-anchor="middle" class="ax">${esc(bucketLabel(p))}</text>` : ""}</g>`; }).join("")}
   </svg><div class="btip" id="bl-tip" hidden></div>`;
-  $("bl-chartnote").textContent = W > avail ? "Faites glisser le graphique pour voir les cycles plus anciens. Touchez une barre pour voir les montants." : "Touchez une barre pour voir les montants exacts.";
+  $("bl-chartnote").textContent = W > avail ? "‹ glisser" : "";
   if (W > avail) el.scrollLeft = el.scrollWidth;
-  if (blPin) { const i = per.findIndex(p => p.c.key === blPin); if (i >= 0) blTip(i, true); else blPin = null }
+  if (blPin) { const i = per.findIndex(p => bucketKey(p) === blPin); if (i >= 0) blTip(i, true); else blPin = null }
 }
 function blTip(i, pinned) {
   const el = $("bl-chart"), tip = $("bl-tip"), p = blPer[i]; if (!tip || !p) return;
-  tip.innerHTML = `<b style="font-family:var(--body);font-weight:600">${esc(cycleRange(p.c))}</b>`
+  tip.innerHTML = `<b style="font-family:var(--body);font-weight:600">${esc(bucketRange(p))}</b>`
     + BL_SERIES.map(([k, label]) => `<div class="r"><span><span class="tdot ${BL_DOT[k]}"></span>${label}</span><b>${fmtEUR(p[k])}</b></div>`).join("")
-    + (p.placed ? `<div style="opacity:.8;font-size:.76rem">dont ${fmtEUR(p.placed)} virés vers l'épargne</div>` : "")
-    + `<button class="go" type="button" data-open="${p.c.key}">Voir le cycle ›</button>`;
+    + (p.k === "cycle" && p.placed ? `<div style="opacity:.8;font-size:.76rem">Virés : ${fmtEUR(p.placed)}</div>` : "")
+    + `<button class="go" type="button" data-open="${i}">Voir ›</button>`;
   tip.hidden = false; tip.classList.toggle("pinned", !!pinned);
   const g = el.querySelector(`g[data-i="${i}"] .hl`), gx = +g.getAttribute("x"), gw = +g.getAttribute("width"), tw = 188;
   const vis0 = el.scrollLeft + 4, vis1 = el.scrollLeft + el.clientWidth - tw - 4, mid = el.scrollLeft + el.clientWidth / 2;
@@ -2096,10 +2603,14 @@ function blTip(i, pinned) {
   if (pinned) el.querySelector(`g[data-i="${i}"]`)?.classList.add("sel");
 }
 function blUnpin() { blPin = null; const t = $("bl-tip"); if (t) t.hidden = true; $("bl-chart").querySelectorAll("g.sel").forEach(x => x.classList.remove("sel")) }
-function openCycle(key) { const [y, m] = key.split("-").map(Number); viewCycle = cycleOf(payDate(y, m - 1)); envFilter = null; blPin = null; go("budget") }
-$("bl-period").addEventListener("change", e => { bPeriod = e.target.value; blPin = null; blMix = null; renderBilan() });
+// Ouvre la période d'une barre dans l'Accueil (jour, semaine ou cycle)
+function openBucket(i) {
+  const p = blPer[i]; if (!p) return;
+  if (p.k === "cycle") { PF.period = "cycle"; viewCycle = p.c } else { PF.period = p.k; viewDate = midnight(p.a); viewCycle = cycleOf(p.a) }
+  savePrefs(); envFilter = null; blPin = null; go("budget");
+}
 $("bl-chart").addEventListener("click", e => {
-  const o = e.target.closest("[data-open]"); if (o) { openCycle(o.dataset.open); return }
+  const o = e.target.closest("[data-open]"); if (o) { openBucket(+o.dataset.open); return }
   if (e.target.closest("#bl-tip")) return;
   const g = e.target.closest("[data-ck]");
   if (!g || blPin === g.dataset.ck) { blUnpin(); return }
@@ -2122,10 +2633,10 @@ const fmtDate = d => d ? `${fmtDay(parseYmd(d))} ${d.slice(0, 4)}` : "";
 // Tous les comptes avec leur valeur actuelle (compte courant estimé, portefeuille DEGIRO avec sa marge libre)
 function acctValues() {
   const cc = ccpEstimate(), L = S.budget.ccpLook;
-  const list = [{ id: "ccp", name: "Compte courant", kind: "courant", color: L.color, icon: L.icon, value: cc ? cc.value : 0, sub: cc ? `estimé depuis le solde du ${fmtDay(parseYmd(S.budget.ccp.date))}` : "Touchez pour indiquer le solde de votre banque", set: !!cc }];
+  const list = [{ id: "ccp", name: "Compte courant", kind: "courant", color: L.color, icon: L.icon, value: cc ? cc.value : 0, sub: cc ? `estimé / relevé du ${fmtDay(parseYmd(S.budget.ccp.date))}` : "Solde à indiquer", set: !!cc }];
   S.budget.savings.forEach(a => list.push({ id: a.id, name: a.name, kind: a.kind, color: a.color, icon: a.icon, value: +a.balance || 0, goal: +a.goal || 0, sub: a.date ? `solde du ${fmtDay(parseYmd(a.date))}` : "" }));
   const pv = grandTotal(), fc = freeCash();
-  if (pv || fc || allAssets().length) list.push({ id: "pf", name: "Portefeuille DEGIRO", kind: "titres", color: S.invest.look.color, icon: S.invest.look.icon, value: pv + fc, sub: `positions ${fmtEUR(pv)}${fc ? ` · marge libre ${fmtEUR(fc)}` : ""}` });
+  if (pv || fc || allAssets().length) list.push({ id: "pf", name: "Portefeuille DEGIRO", kind: "titres", color: S.invest.look.color, icon: S.invest.look.icon, value: pv + fc, sub: `positions ${fmtEUR(pv)}${fc ? ` / marge ${fmtEUR(fc)}` : ""}` });
   return list;
 }
 // Anneau (camembert) : parts dans l'ordre donné, 2 px d'écart, part choisie mise en avant
@@ -2143,7 +2654,7 @@ let blMixRows = [], blMixN = 1, blMix = null;
 function renderMix() {
   const sp = blMixRows.filter(r => r.kind !== "save" && r.v > 0.004).sort((a, b) => b.v - a.v), total = sp.reduce((t, r) => t + r.v, 0), n = blMixN;
   document.querySelectorAll("#bl-mixmode [data-mx]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.mx === PF.mix)));
-  if (!total) { $("bl-mixchart").innerHTML = `<div class="notice">Aucune dépense sur cette période.</div>`; $("bl-mixnote").textContent = ""; return }
+  if (!total) { $("bl-mixchart").innerHTML = `<div class="notice">Aucune dépense</div>`; $("bl-mixnote").textContent = ""; return }
   const parts = sp.slice(0, 7).map(r => ({ name: r.name, v: r.v, color: r.color })), rest = sp.slice(7);
   if (rest.length) parts.push({ name: `Autres (${rest.length})`, v: rest.reduce((t, r) => t + r.v, 0), color: OTHER_COLOR });
   if (blMix != null && blMix >= parts.length) blMix = null;
@@ -2156,8 +2667,8 @@ function renderMix() {
     $("bl-mixchart").innerHTML = `<div class="donutwrap"><div class="donut">${ringSVG(parts, total, { aria: "Répartition des dépenses par enveloppe", top: sel ? sel.name : "Total", val: sel ? fmtEUR(sel.v) : fmtK(total), sel: blMix })}</div>
       <div class="dlegend">${parts.map((p, i) => `<button type="button" class="lg${dim(i)}" data-mi="${i}"><span class="sw" style="background:${p.color}"></span><span class="nm">${esc(p.name)}</span><span class="vl">${fmtEUR(p.v)}<small>${pc(p.v)}</small></span></button>`).join("")}</div></div>`;
   }
-  $("bl-mixnote").textContent = sel ? `${sel.name} : ${fmtEUR(sel.v)} sur ${n} cycle${n > 1 ? "s" : ""}, soit ${fmtEUR(sel.v / n)} par cycle. Touchez à nouveau pour tout revoir.`
-    : `Total ${fmtEUR(total)} sur ${n} cycle${n > 1 ? "s" : ""}, soit ${fmtEUR(total / n)} par cycle en moyenne (hors épargne, remboursements déduits). Touchez une enveloppe pour la détailler.`;
+  const v = sel ? sel.v : total;
+  $("bl-mixnote").textContent = `${sel ? sel.name : "Total"} : ${fmtEUR(v)}` + (n > 1 ? ` / Moyenne : ${fmtEUR(v / n)} / cycle` : "");
 }
 $("bl-mixmode").addEventListener("click", e => { const b = e.target.closest("[data-mx]"); if (!b) return; PF.mix = b.dataset.mx; savePrefs(); renderMix() });
 $("bl-mixchart").addEventListener("click", e => { const b = e.target.closest("[data-mi]"); if (!b) return; const i = +b.getAttribute("data-mi"); blMix = blMix === i ? null : i; renderMix() });
@@ -2174,15 +2685,15 @@ function renderComptes() {
   $("c-donut").innerHTML = pos ? donutSVG(parts, pos) : "";
   $("c-legend").innerHTML = pos ? parts.map(p => `<div><span class="sw" style="background:${p.color}"></span><span class="nm">${esc(p.name)}</span><span class="vl">${fmtEUR(p.v)}<small>${(p.v / pos * 100).toLocaleString("fr-FR", { maximumFractionDigits: 0 })} %</small></span></div>`).join("") : `<div class="small muted">Indiquez vos soldes pour voir la répartition.</div>`;
   const neg = list.filter(a => a.value < -0.005);
-  $("c-donutnote").textContent = neg.length ? `Non représenté (solde négatif) : ${neg.map(a => a.name + " " + fmtEUR(a.value)).join(", ")}.` : "";
+  $("c-donutnote").textContent = neg.length ? `Négatif : ${neg.map(a => a.name + " " + fmtEUR(a.value)).join(" / ")}` : "";
   // Comptes groupés par nature
   $("c-groups").innerHTML = GROUP_ORDER.map(id => {
     const n = natureOf(id), items = list.filter(a => a.kind === id); if (!items.length) return "";
     const sub = items.reduce((s, a) => s + a.value, 0);
     return `<div class="panel"><div class="grphead"><h2><span class="sw" style="width:10px;height:10px;border-radius:3px;background:var(--n${n.n})"></span>${esc(n.name)}</h2><span class="num small" style="font-weight:600">${fmtEUR(sub)}</span></div>
       ${items.map(a => {
-        const g = a.goal > 0 ? `${a.value >= a.goal ? '<span style="color:var(--c-sav)">✓</span> objectif atteint' : `objectif ${fmtEUR(a.goal)} · ${Math.round(Math.max(0, a.value) / a.goal * 100)} %`}` : "";
-        return `<button type="button" class="acct" data-acc="${esc(a.id)}">${acctBadge(a.color, a.icon)}<span class="an"><b>${esc(a.name)}</b><small>${[a.sub, g].filter(Boolean).join(" · ")}</small></span><span class="av"${a.value < 0 ? ' style="color:var(--down)"' : ""}>${a.id === "ccp" && !a.set ? "—" : fmtEUR(a.value)}</span></button>`;
+        const g = a.goal > 0 ? `${a.value >= a.goal ? '<span style="color:var(--c-sav)">✓</span> objectif atteint' : `objectif ${fmtEUR(a.goal)} / ${Math.round(Math.max(0, a.value) / a.goal * 100)} %`}` : "";
+        return `<button type="button" class="acct lsrow" data-acc="${esc(a.id)}">${acctBadge(a.color, a.icon)}<span class="an"><b>${esc(a.name)}</b><small>${[a.sub, g].filter(Boolean).join(" / ")}</small></span><span class="av"${a.value < 0 ? ' style="color:var(--down)"' : ""}>${a.id === "ccp" && !a.set ? "—" : fmtEUR(a.value)}</span></button>`;
       }).join("")}</div>`;
   }).join("");
   updateDrawer();
@@ -2211,7 +2722,7 @@ function openAcct(id) {
   acColor = isCcp ? S.budget.ccpLook.color : a ? a.color : KIND_COLOR.epargne;
   acIcon = isCcp ? S.budget.ccpLook.icon : a ? a.icon : KIND_ICON.epargne;
   const cc = isCcp && ccpEstimate();
-  $("a-note").textContent = isCcp ? (cc ? `Estimation actuelle : ${fmtEUR(cc.value)} (solde réel + ${fmtEUR(cc.inc)} d'entrées et salaires − ${fmtEUR(cc.out)} de dépenses et virements depuis).` : "Recopiez le solde de votre appli bancaire : l'appli le fera évoluer avec vos mouvements.") : "";
+  $("a-note").textContent = isCcp ? (cc ? `Estimé : ${fmtEUR(cc.value)} / +${fmtEUR(cc.inc)} entrées / −${fmtEUR(cc.out)} sorties` : "Solde affiché par la banque") : "";
   $("a-err").textContent = "";
   renderAcPickers(); $("acsheet").hidden = false;
   setTimeout(() => (isCcp ? $("a-bal") : $("a-name")).focus(), 60);
@@ -2297,13 +2808,13 @@ function renderPlan() {
   const b = S.budget, A = envAverages();
   if (document.activeElement !== $("p-income")) $("p-income").value = fmtIn(b.income);
   $("p-excl").checked = planExcl;
-  const envRowHtml = e => { const avg = A.avg(e.id), r = roundBudget(avg), save = e.kind === "save";
-    return `<div class="erow" data-eid="${esc(e.id)}">
-      <div class="full" style="display:flex;gap:8px;align-items:center"><button type="button" class="icopick" data-eico aria-label="Changer le logo et la couleur de ${esc(e.name)}" style="--ec:${envColor(e)}"><span class="gic" style="--c:${save ? "var(--c-sav)" : "var(--c-exp)"}">${ico(envIcon(e))}</span></button><input data-ek="name" type="text" value="${esc(e.name)}" aria-label="Nom de l'enveloppe" placeholder="Nom" style="flex:1;min-width:0"></div>
-      <label><span class="cap">Prévu par cycle (€)</span><input class="n" data-ek="planned" type="text" inputmode="decimal" value="${fmtIn(e.planned)}" placeholder="0" aria-label="Montant prévu pour ${esc(e.name)}"></label>
+  const envRowHtml = e => { const avg = A.avg(e.id), r = roundBudget(avg), save = e.kind === "save", isCh = e.id === b.chargesEnv && b.charges.length > 0;
+    return `<div class="erow" data-eid="${esc(e.id)}" data-kind="${save ? "save" : "spend"}">
+      <div class="full" style="display:flex;gap:8px;align-items:center"><button type="button" class="grip" aria-label="Déplacer ${esc(e.name)} (rester appuyé)">⠿</button><button type="button" class="icopick" data-eico aria-label="Changer le logo et la couleur de ${esc(e.name)}" style="--ec:${envColor(e)}"><span class="gic" style="--c:${save ? "var(--c-sav)" : "var(--c-exp)"}">${ico(envIcon(e))}</span></button><input data-ek="name" type="text" value="${esc(e.name)}" aria-label="Nom de l'enveloppe" placeholder="Nom" style="flex:1;min-width:0"></div>
+      <label><span class="cap">${isCh ? "Somme des charges" : "Prévu par cycle (€)"}</span><input class="n" data-ek="planned" type="text" inputmode="decimal" value="${fmtIn(e.planned)}" placeholder="0" aria-label="Montant prévu pour ${esc(e.name)}"${isCh ? " readonly" : ""}></label>
       <label><span class="cap">Type</span><select data-ek="kind" aria-label="Type de ${esc(e.name)}"><option value="spend"${!save ? " selected" : ""}>Dépense</option><option value="save"${save ? " selected" : ""}>Épargne</option></select></label>
       <button class="del" type="button" data-edel aria-label="Supprimer l'enveloppe ${esc(e.name)}" style="align-self:end">✕</button>
-      <div class="full prow2"><span><span class="tdot ${save ? "t-sav" : "t-exp"}"></span>${A.n ? `Moyenne : ${fmtEUR(avg)} / cycle` : "Pas encore de cycle terminé"}</span>${A.n && avg > 0 && r !== (+e.planned || 0) ? `<button class="linkbtn" type="button" data-euse="${r}">Mettre ${fmtEUR(r).replace(",00", "")}</button>` : ""}</div></div>`; };
+      <div class="full prow2"><span><span class="tdot ${save ? "t-sav" : "t-exp"}"></span>${A.n ? `Moyenne : ${fmtEUR(avg)} / cycle` : "Pas de moyenne"}</span>${A.n && avg > 0 && !isCh && r !== (+e.planned || 0) ? `<button class="linkbtn" type="button" data-euse="${r}">Mettre ${fmtEUR(r).replace(",00", "")}</button>` : ""}</div></div>`; };
   const spendE = b.envelopes.filter(e => e.kind !== "save"), saveE = b.envelopes.filter(e => e.kind === "save");
   $("s-envs").innerHTML = (spendE.map(envRowHtml).join("") + (saveE.length ? `<div class="subhead">Épargne &amp; placements</div>` + saveE.map(envRowHtml).join("") : "")) || `<div class="notice">Aucune enveloppe.</div>`;
   $("p-fill").hidden = !A.n;
@@ -2313,11 +2824,11 @@ function updatePlanTotals() {
   const envs = S.budget.envelopes, inc = +S.budget.income || 0;
   const spend = envs.filter(e => e.kind !== "save").reduce((s, e) => s + (+e.planned || 0), 0), save = envs.filter(e => e.kind === "save").reduce((s, e) => s + (+e.planned || 0), 0);
   const total = spend + save, free = inc - total;
-  $("p-total").textContent = fmtEUR(total); $("p-of").textContent = inc ? `sur ${fmtEUR(inc)} de revenu` : "";
+  $("p-total").textContent = fmtEUR(total); $("p-of").textContent = inc ? `/ ${fmtEUR(inc)}` : "";
   $("p-spend").textContent = fmtEUR(spend); $("p-save").textContent = fmtEUR(save);
-  $("p-savepct").textContent = inc ? `${(save / inc * 100).toLocaleString("fr-FR", { maximumFractionDigits: 0 })} % du revenu` : "";
+  $("p-savepct").textContent = inc ? `${(save / inc * 100).toLocaleString("fr-FR", { maximumFractionDigits: 0 })} %` : "";
   $("p-free").textContent = fmtEUR(free); $("p-free").style.color = free < -0.005 ? "var(--down)" : "";
-  $("p-freenote").textContent = !inc ? "indiquez votre revenu" : free < -0.005 ? "⚠ budget supérieur au revenu" : free > 0.005 ? "à répartir ou à épargner" : "tout est réparti";
+  $("p-freenote").textContent = !inc ? "revenu à indiquer" : free < -0.005 ? "⚠ au-dessus du revenu" : free > 0.005 ? "à répartir" : "✓ tout réparti";
   $("s-envtotal").textContent = "Total " + fmtEUR(total);
 }
 const updateEnvTotal = updatePlanTotals;
@@ -2358,7 +2869,7 @@ function parseBudgetText(txt) {
 }
 function matchEnv(name) {
   const f = fold(name), envs = S.budget.envelopes;
-  return envs.find(e => fold(e.name) === f)
+  return envs.find(e => fold(e.name) === f) || envs.find(e => (e.aka || []).some(a => fold(a) === f))
     || envs.filter(e => { const g = fold(e.name); return g.length >= 3 && f.length >= 3 && (f.includes(g) || g.includes(f)) }).sort((a, b) => b.name.length - a.name.length)[0];
 }
 $("p-apply").addEventListener("click", () => {
@@ -2736,7 +3247,7 @@ function renderInvest() {
       ${P()[c.id].length ? `<div class="tablewrap"><table>
         <thead><tr><th style="width:26%">Actif</th><th>Symbole</th><th class="r">Qté</th><th class="r">Cours</th><th class="r">Valeur (€)</th><th class="r">+/- value</th><th></th></tr></thead>
         <tbody>${P()[c.id].map(a => rowHTML(c.id, a)).join("")}</tbody>
-      </table></div>` : `<div class="notice">Aucune ligne. Importez vos positions DEGIRO ou touchez « Ajouter ».</div>`}
+      </table></div>` : `<div class="notice">Aucune ligne</div>`}
       <div class="clsfoot"><span>Total ${esc(cname(c.id).toLowerCase())}</span><span class="num" data-total="${c.id}"></span></div>
     </section>`).join("");
   $("band").value = S.invest.band;
@@ -2781,7 +3292,7 @@ function renderTotals() {
   $("grand").textContent = fmtEUR(grand);
   if (document.activeElement !== $("fc-amount")) $("fc-amount").value = S.invest.freeCash ? fmtIn(S.invest.freeCash.amount) : "";
   $("fc-total").textContent = fmtEUR(grand + freeCash());
-  $("fc-note").textContent = (S.invest.freeCash?.date ? `Mise à jour le ${fmtDate(S.invest.freeCash.date)}. ` : "") + "Comptée dans le patrimoine, pas dans la performance. Mise à jour par l'import DEGIRO, le tableau privé ou ici.";
+  $("fc-note").textContent = (S.invest.freeCash?.date ? `Au ${fmtDate(S.invest.freeCash.date)} / ` : "") + "dans le patrimoine / hors performance";
   $("ap-fc").hidden = !(freeCash() > 0.5); $("ap-fc").textContent = `Répartir ma marge libre (${fmtEUR(freeCash())})`;
   $("alloc").innerHTML = CLASSES.map(c => grand ? `<i style="width:${totalOf(c.id) / grand * 100}%;background:${c.c}"></i>` : "").join("");
   $("legend").innerHTML = CLASSES.map(c => `<div><span class="dot" style="background:${c.c}"></span><span>${esc(cname(c.id))}</span><span class="pct num muted">${grand ? (totalOf(c.id) / grand * 100).toLocaleString("fr-FR", { maximumFractionDigits: 1 }) : "0"} %</span></div>`).join("");
@@ -2790,7 +3301,7 @@ function renderTotals() {
 }
 function renderPerf() {
   const el = $("perf"), withCost = allAssets().filter(a => isFinite(a.cost) && a.cost > 0);
-  if (!withCost.length) { el.innerHTML = `<div class="small muted">Importez vos exports DEGIRO (Portefeuille + Transactions) pour afficher le montant investi et vos plus ou moins-values.</div>`; return }
+  if (!withCost.length) { el.innerHTML = `<div class="small muted">Plus-values : import DEGIRO (Portefeuille + Transactions)</div>`; return }
   const row = (label, v, p) => `<div class="prow"><span>${label}</span><span class="num" style="color:${v >= 0 ? "var(--up)" : "var(--down)"}">${v >= 0 ? "+" : "−"}${fmtEUR(Math.abs(v))} · ${fmtPct(p)}</span></div>`;
   const V = withCost.reduce((s, a) => s + val(a), 0), C = withCost.reduce((s, a) => s + a.cost, 0);
   const now = Date.now(), yrs = a => a.costDate ? Math.max(0, (now - Date.parse(a.costDate)) / (365.25 * 864e5)) : 0;
@@ -2822,8 +3333,8 @@ function renderRebalance(grand) {
   const st = $("rbstatus");
   const reg = regimeOf(macro.data[S.invest.country], S.invest.method), fav = FAVOR[reg] || [];
   $("rbregime").innerHTML = reg
-    ? `Situation actuelle (${esc(countryName(S.invest.country))}) : <b>${REGIMES[reg].name}</b>. Classes historiquement favorisées dans ce contexte : <b>${fav.map(id => esc(cname(id))).join(", ")}</b>. Repère indicatif, pas un conseil en investissement.`
-    : `La situation économique n'est pas encore disponible : ouvrez l'onglet Conjoncture.`;
+    ? `${esc(countryName(S.invest.country))} / <b>${REGIMES[reg].name}</b> / favorisées : <b>${fav.map(id => esc(cname(id))).join(", ")}</b> (repère, pas un conseil)`
+    : `Conjoncture pas encore chargée`;
   if (apport > 0) {
     const sp = splitApport(apport), newTot = grand + apport;
     const maxGap = Math.max(...CLASSES.map(c => Math.abs((totalOf(c.id) + sp[c.id]) / newTot * 100 - 25)));
@@ -2832,7 +3343,7 @@ function renderRebalance(grand) {
   } else $("aprows").innerHTML = "";
   if (!grand) {
     $("rbrows").innerHTML = ""; st.textContent = "—"; st.className = "pill";
-    $("rbnote").textContent = "Renseignez la valeur de vos actifs pour voir le rééquilibrage.";
+    $("rbnote").textContent = "Aucune valeur";
     return;
   }
   const target = grand / 4; let out = false;
@@ -2846,8 +3357,8 @@ function renderRebalance(grand) {
   }).join("");
   st.textContent = out ? "À rééquilibrer" : "Équilibré"; st.className = "pill " + (out ? "warn" : "good");
   $("rbnote").textContent = out
-    ? `Cible : ${fmtEUR(target)} par classe. Les ventes financent les achats : la valeur totale ne change pas.`
-    : `Chaque classe reste à moins de ${band} points de 25 %. Aucun mouvement nécessaire.`;
+    ? `Cible : ${fmtEUR(target)} par classe / ventes = achats`
+    : `✓ Toutes les classes à ± ${band} points / rien à faire`;
 }
 // Un point d'historique par jour où la valeur totale change.
 // Après une modification : point du jour mis à jour. Après une actualisation des cours : au plus une fois par heure
@@ -2869,8 +3380,7 @@ function renderHistory() {
   const el = $("chart"), pts = S.invest.history.filter(p => isFinite(p.total));
   if (pts.length < 2) {
     el.innerHTML = ""; el.hidden = true; $("histdelta").textContent = "";
-    $("histnote").textContent = pts.length ? "Premier point enregistré. La courbe apparaîtra dès qu'un deuxième jour sera enregistré (un point par jour où la valeur change)."
-      : "Renseignez la valeur de vos actifs : un point sera enregistré chaque jour.";
+    $("histnote").textContent = pts.length ? "Courbe à partir du 2e jour" : "Aucune valeur";
     return;
   }
   el.hidden = false; $("histnote").textContent = "";
@@ -3271,7 +3781,8 @@ function gsBudgetRows(rows) {
   if (!rows.length) return [];
   const { idx, body } = gsCols(rows, { name: [/enveloppe|^nom|poste/, 0], amount: [/prevu|montant|budget/, 1], type: [/^type/, 2] });
   return body.map(r => ({ name: cell(r, idx.name), amount: round2(toNum(r[idx.amount])), kind: /epargn/.test(fold(r[idx.type])) ? "save" : /depens/.test(fold(r[idx.type])) ? "spend" : null }))
-    .filter(r => r.name && isFinite(r.amount) && !/^(total|salaire|revenu|reste|non affect)/.test(fold(r.name)));
+    .filter(r => r.name && isFinite(r.amount) && !/^(total|salaire|revenu|reste|non affect)/.test(fold(r.name)))
+    .filter(r => !(S.budget.charges.length && matchEnv(r.name)?.id === S.budget.chargesEnv));
 }
 const budgetDiffers = rows => rows.some(r => { const e = matchEnv(r.name); return !e || Math.abs((+e.planned || 0) - r.amount) > 0.004 || (r.kind && e.kind !== r.kind) });
 function applyBudgetRows(rows, res) {
@@ -3434,6 +3945,15 @@ function gswRows() {
   const plannedSpend = B.envelopes.filter(e => e.kind !== "save").reduce((t, e) => t + (+e.planned || 0), 0), plannedSave = B.envelopes.filter(e => e.kind === "save").reduce((t, e) => t + (+e.planned || 0), 0);
   bu.push([], ["Cycle", `${ymd(cur.start)} → ${ymd(cur.end)}`], ["Revenu du cycle", "", round2(cycleIncome(cur))], ["Entrées en plus (ventes, primes…)", "", round2(st.extra)],
     ["Prévu en dépenses", "", round2(plannedSpend)], ["Prévu en épargne", "", round2(plannedSave)], ["Sorti au total (net des remboursements)", "", round2(st.out)], ["Dont épargne", "", round2(st.saved)]);
+  if (B.charges.length) {
+    const cs = chargeStatus(cur);
+    bu.push([], ["Charge", "Jour prévu", "Prévu", "Payée le", "Payé"]);
+    B.charges.forEach(ch => { const e = cs.paid[ch.id]; bu.push([ch.name, ch.day || "", round2(ch.amount), e ? e.date : "", e ? round2(+e.amount) : ""]) });
+  }
+  if (B.goals.length) {
+    bu.push([], ["Objectif", "Pour le", "Visé", "Atteint", "Par cycle"]);
+    B.goals.forEach(g => { const h = goalProgress(g), n = g.due ? cyclesLeft(g.due) : 0; bu.push([g.name, g.due || "", round2(g.target), h, n ? round2(Math.max(0, g.target - h) / n) : ""]) });
+  }
 
   // Comptes
   const cc = ccpEstimate(), co = [["Compte", "Nature", "Solde", "Date du solde", "Objectif", "Note"]];
@@ -3578,12 +4098,12 @@ function renderQuoteNote() {
   const el = $("qnote"); if (!el) return;
   const assets = allAssets().filter(a => val(a) > 0 || a.sym || +a.units > 0);
   const nLive = assets.filter(live).length, missing = assets.filter(a => !live(a)).length;
-  if (!S.invest.quotesUrl) { el.innerHTML = `Pour des cours automatiques, reliez un Google Sheets : <button class="linkbtn small" type="button" data-goto="reglages" data-anchor="set-quotes">Réglages › Cours en direct</button>.`; return }
-  if (qBusy) { el.textContent = "Actualisation des cours…"; return }
+  if (!S.invest.quotesUrl) { el.innerHTML = `Non configuré / <button class="linkbtn small" type="button" data-goto="reglages" data-anchor="set-quotes">Réglages</button>`; return }
+  if (qBusy) { el.textContent = "Actualisation…"; return }
   const when = quotes.at ? new Date(quotes.at).toLocaleString("fr-FR", { weekday: "short", hour: "2-digit", minute: "2-digit" }) : "jamais";
   el.textContent = (qErr ? qErr + " " : "")
-    + `${nLive} ligne${nLive > 1 ? "s" : ""} au cours du marché · actualisé ${when} (différé d'environ 20 min, toutes les 5 min quand l'appli est ouverte).`
-    + (missing ? ` ${missing} ligne${missing > 1 ? "s" : ""} sans cours : indiquez la quantité et le symbole.` : "");
+    + `${nLive} en direct / ${when}`
+    + (missing ? ` / ${missing} sans cours (quantité et symbole ?)` : "");
   el.className = "notice" + (qErr ? " err" : "");
 }
 function sheetTSV() {
@@ -3706,16 +4226,16 @@ $("mrefresh").addEventListener("click", () => refreshMacro());
 
 /* ---------- Réglages : liste de rubriques, chacune sur sa page ---------- */
 const SET_SECS = [
-  { id: "sync", t: "Synchronisation", i: "cloud", s: () => sync.status === "off" ? "Données sur cet appareil uniquement" : (PILL[sync.status] || PILL.off)[0] },
-  { id: "theme", t: "Apparence", i: "sun", s: () => ({ light: "Thème clair", dark: "Thème sombre" })[ls.get("fin.theme")] || "Automatique (suit l'appareil)" },
-  { id: "perso", t: "Personnalisation", i: "palette", s: () => pzDirty() ? "Modifications non enregistrées" : "Ordre de l'accueil, du menu et des enveloppes" },
-  { id: "cycle", t: "Cycle de paie", i: "calendar", s: () => `Paie le ${S.budget.payday} · revenu habituel ${fmtEUR(+S.budget.income || 0)}` },
-  { id: "inc", t: "Catégories d'entrées", i: "euro", s: () => `${S.budget.incomeCats.length} catégories : remboursements, ventes, primes…` },
-  { id: "gs", t: "Google Sheets privé", i: "doc", s: () => gsReady() ? "Tableau relié" : "Tableau rempli par Claude, non relié" },
-  { id: "quotes", t: "Cours en direct", i: "trend", s: () => S.invest.quotesUrl ? "Lien des cours enregistré" : "Non configuré" },
-  { id: "invest", t: "Portefeuille", i: "chart", s: "Noms des classes du rééquilibrage" },
-  { id: "hist", t: "Importer un historique", i: "receipt", s: "Anciennes dépenses depuis Excel ou CSV" },
-  { id: "backup", t: "Sauvegarde & données", i: "safe", s: "Exporter, importer, tout effacer" },
+  { id: "sync", t: "Synchronisation", i: "cloud", s: () => sync.status === "off" ? "Cet appareil seulement" : (PILL[sync.status] || PILL.off)[0] },
+  { id: "theme", t: "Apparence", i: "sun", s: () => ({ light: "Clair", dark: "Sombre" })[ls.get("fin.theme")] || "Automatique" },
+  { id: "perso", t: "Personnalisation", i: "palette", s: () => pzDirty() ? "Non enregistré" : "Accueil / menu / enveloppes" },
+  { id: "cycle", t: "Cycle de paie", i: "calendar", s: () => `Paie le ${S.budget.payday} / ${fmtEUR(+S.budget.income || 0)}` },
+  { id: "inc", t: "Catégories d'entrées", i: "euro", s: () => `${S.budget.incomeCats.length} catégories` },
+  { id: "gs", t: "Google Sheets privé", i: "doc", s: () => gsReady() ? "Relié" : "Non relié" },
+  { id: "quotes", t: "Cours en direct", i: "trend", s: () => S.invest.quotesUrl ? "Configuré" : "Non configuré" },
+  { id: "invest", t: "Portefeuille", i: "chart", s: "Noms des classes" },
+  { id: "hist", t: "Importer un historique", i: "receipt", s: "Excel / CSV" },
+  { id: "backup", t: "Sauvegarde & données", i: "safe", s: "Exporter / importer / effacer" },
   { id: "about", t: "À propos", i: "star", s: () => `Version ${APP_VERSION}` }
 ];
 let setSec = null, setFromList = false;
@@ -3726,7 +4246,7 @@ function renderSetNav() {
   if (!setSec) $("set-home").innerHTML = SET_SECS.map(x => `<button type="button" data-secopen="${x.id}"><span class="gic" style="--c:var(--accent)">${ico(x.i)}</span><span><b>${esc(x.t)}</b><small>${esc(typeof x.s === "function" ? x.s() : x.s)}</small></span><span class="chev" aria-hidden="true">›</span></button>`).join("");
   else { const x = SET_SECS.find(y => y.id === setSec); $("set-title").textContent = x ? x.t : ""; $("vtitle").textContent = x ? x.t : "Réglages" }
 }
-$("set-home").addEventListener("click", e => { const b = e.target.closest("[data-secopen]"); if (b) { setFromList = true; location.hash = "reglages/" + b.dataset.secopen } });
+$("set-home").addEventListener("click", e => { const b = e.target.closest("[data-secopen]"); if (b) { setFromList = !IOS; setHash("reglages/" + b.dataset.secopen) } });
 $("set-back").addEventListener("click", () => { if (setFromList) { setFromList = false; history.back() } else { history.replaceState(null, "", "#reglages"); show("reglages") } });
 
 // Personnalisation : brouillon modifié avec ▲ ▼ et 👁, appliqué seulement avec « Enregistrer »
@@ -3735,8 +4255,8 @@ const pzFrom = () => ({ ...JSON.parse(JSON.stringify(S.ui)), envOrder: S.budget.
 const pzDirty = () => !!pz && JSON.stringify(pz) !== JSON.stringify(pzFrom());
 const EYE = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg>';
 const EYE_OFF = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18M10.6 5.6c.5-.1.9-.1 1.4-.1 6 0 9.5 6.5 9.5 6.5a17 17 0 0 1-2.6 3.4M6.6 6.6C4 8.3 2.5 12 2.5 12S6 18.5 12 18.5c1.7 0 3.2-.5 4.5-1.2M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
-const HOME_NAMES = { summary: "Résumé du budget", envs: "Enveloppes", savs: "Épargne & placements", movs: "Mouvements" };
-const HOME_ICONS = { summary: "wallet", envs: "cart", savs: "piggy", movs: "repeat" };
+const HOME_NAMES = { summary: "Résumé du budget", charges: "Charges", envs: "Enveloppes", savs: "Épargne & placements", movs: "Mouvements" };
+const HOME_ICONS = { summary: "wallet", charges: "repeat", envs: "cart", savs: "piggy", movs: "swap" };
 function renderPerso() {
   if (!pz) pz = pzFrom();
   const ids = S.budget.envelopes.map(e => e.id); pz.envOrder = pz.envOrder.filter(id => ids.includes(id)).concat(ids.filter(id => !pz.envOrder.includes(id)));
@@ -3789,7 +4309,7 @@ function renderSettings() {
   $("s-shift").setAttribute("aria-checked", String(!!b.shiftWeekend));
   const envOpts = sel => `<option value="">Aucune (argent en plus)</option>` + b.envelopes.map(e => `<option value="${esc(e.id)}"${sel === e.id ? " selected" : ""}>Déduire de « ${esc(e.name)} »</option>`).join("");
   $("s-incs").innerHTML = b.incomeCats.map(c => `<div class="erow" data-icid="${esc(c.id)}">
-      <div class="full" style="display:flex;gap:8px;align-items:center"><button type="button" class="icopick" data-cico aria-label="Changer le logo de ${esc(c.name)}"><span class="gic" style="--c:var(--c-rev)">${ico(catIcon(c))}</span></button><input data-ick="name" type="text" value="${esc(c.name)}" aria-label="Nom de la catégorie" placeholder="Nom" style="flex:1;min-width:0"></div>
+      <div class="full" style="display:flex;gap:8px;align-items:center"><button type="button" class="grip" aria-label="Déplacer ${esc(c.name)} (rester appuyé)">⠿</button><button type="button" class="icopick" data-cico aria-label="Changer le logo de ${esc(c.name)}"><span class="gic" style="--c:var(--c-rev)">${ico(catIcon(c))}</span></button><input data-ick="name" type="text" value="${esc(c.name)}" aria-label="Nom de la catégorie" placeholder="Nom" style="flex:1;min-width:0"></div>
       <select data-ick="env" aria-label="Enveloppe par défaut" style="grid-column:1 / 3">${envOpts(c.env)}</select>
       <button class="del" type="button" data-icdel aria-label="Supprimer la catégorie ${esc(c.name)}">✕</button></div>`).join("") || `<div class="notice">Aucune catégorie.</div>`;
   $("s-classes").innerHTML = CLASSES.map(c => `<label class="field"><span class="small muted" style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:3px;background:${c.c}"></span>Classe ${CLASSES.indexOf(c) + 1}</span><input type="text" data-cn="${c.id}" value="${esc(cname(c.id))}"></label>`).join("");
@@ -3814,6 +4334,7 @@ $("s-envs").addEventListener("change", e => {
 $("s-envs").addEventListener("click", e => {
   const del = e.target.closest("[data-edel]"); if (!del) return;
   const id = del.closest("[data-eid]").dataset.eid, used = S.budget.expenses.some(x => x.env === id);
+  if (id === S.budget.chargesEnv && S.budget.charges.length) { toast("Retirer d'abord les charges (Accueil › Charges)"); return }
   if (!del.dataset.confirm) { del.dataset.confirm = "1"; del.textContent = used ? "Suppr. ? (dépenses gardées)" : "Suppr. ?"; del.style.color = "var(--down)";
     setTimeout(() => { if (del.isConnected) { delete del.dataset.confirm; del.textContent = "✕"; del.style.color = "" } }, 3500); return }
   S.budget.envelopes = S.budget.envelopes.filter(x => x.id !== id); if (envFilter === id) envFilter = null; commit();
@@ -4049,6 +4570,25 @@ $("syncbox").addEventListener("click", e => {
   else if (id === "fbremove") { const b = e.target.closest("button"); if (!b.dataset.confirm) { b.dataset.confirm = "1"; b.textContent = "Confirmer : retirer la synchronisation de cet appareil"; return } sync.remove() }
 });
 $("syncbox").addEventListener("keydown", e => { if (e.key === "Enter" && e.target.id === "au-pw") sync.signIn($("au-mail").value.trim(), $("au-pw").value, false) });
+
+/* ---------- Explications repliées (ⓘ) ---------- */
+// Chaque panneau qui contient des explications (.info) reçoit un bouton « i » qui les affiche ou les masque.
+function setupInfo() {
+  document.querySelectorAll(".info").forEach(el => {
+    const panel = el.closest(".panel, .sheetcard"); if (!panel || panel.querySelector(".infobtn")) return;
+    const b = document.createElement("button"); b.type = "button"; b.className = "infobtn"; b.textContent = "i";
+    b.setAttribute("aria-label", "Explications"); b.setAttribute("aria-expanded", "false");
+    const first = panel.firstElementChild;
+    if (first?.tagName === "H2") { const h = document.createElement("div"); h.className = "infohead"; first.before(h); h.append(first, b) }
+    else if (first?.classList.contains("clshead")) first.appendChild(b);
+    else { panel.classList.add("infoabs"); b.classList.add("abs"); panel.appendChild(b) }
+  });
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest(".infobtn"); if (!b) return;
+  const p = b.closest(".panel, .sheetcard"), on = p.classList.toggle("showinfo"); b.setAttribute("aria-expanded", String(on));
+});
+setupInfo();
 
 /* ---------- Démarrage ---------- */
 show(location.hash.slice(1) || "budget");
