@@ -408,6 +408,22 @@ details.tbl td.calc { padding: 6px 5px }
 .setlist .chev { color: var(--muted); font-size: 1.4rem }
 .sethead { display: flex; flex-direction: column; align-items: flex-start; gap: 2px }
 .sethead .linkbtn { font-size: .95rem }
+/* Détail d'une enveloppe */
+html, body { overflow-x: clip }
+.evnav { padding: 0 }
+.evbtn { margin-top: 4px }
+.evchart { display: block; width: 100%; height: auto; margin: 8px 0 4px; overflow: visible }
+.evchart .b { fill: var(--c, var(--c-exp)) }
+.evchart .b.now { fill: var(--c, var(--c-exp)); stroke: var(--fg); stroke-width: 1 }
+.evchart .z { fill: var(--line) }
+.evchart .ref { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 3 }
+.evchart .lb { font-family: var(--mono); font-size: 9px; fill: var(--muted) }
+.evchart .hit { fill: transparent; cursor: pointer }
+.evleg { display: flex; gap: 14px; flex-wrap: wrap }
+.evleg .ln { display: inline-block; width: 14px; border-top: 1px dashed var(--muted); vertical-align: middle; margin-right: 4px }
+.exp.nod { grid-template-columns: minmax(0, 1fr) auto }
+.evg { scroll-margin-top: calc(70px + env(safe-area-inset-top, 0px)) }
+.evswipe { box-shadow: -12px 0 24px rgba(0, 0, 0, .12) }
 /* Personnalisation */
 .plist { display: flex; flex-direction: column }
 .prow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line) }
@@ -471,8 +487,7 @@ details.tbl td.calc { padding: 6px 5px }
 .msearch input { flex: 1; min-width: 0; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--fg) }
 .ccprow.warn b { color: var(--warn) !important }
 .chghead { border-bottom: 0; padding: 2px 2px 4px }
-.chghead .chev { display: inline-block; transition: transform .15s; color: var(--muted); margin-left: 4px; font-weight: 400 }
-.chghead[aria-expanded="true"] .chev { transform: rotate(90deg) }
+.chghead .chev { display: inline-block; color: var(--muted); margin-left: 4px; font-weight: 400 }
 .chgbody { border-top: 1px solid var(--line); margin-top: 8px }
 .chg { display: grid; grid-template-columns: 46px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--line) }
 .chg .cbox { width: 34px; height: 34px; border-radius: 10px; border: 2px solid var(--line); background: var(--surface); display: grid; place-items: center; color: transparent; font-weight: 800; font-size: 1rem; justify-self: center; padding: 0 }
@@ -560,7 +575,7 @@ details.tbl td.calc { padding: 6px 5px }
   </div>
 
   <div class="panel total" data-block="summary">
-    <div class="eyebrow" id="b-lefttitle">Disponible à dépenser</div>
+    <div class="eyebrow" id="b-lefttitle">Disponible</div>
     <div class="big" id="b-left">0,00 €</div>
     <div class="tribars">
       <div class="tb"><span class="eyebrow" id="b-revlbl">Revenus</span><span class="bar" aria-hidden="true"><i class="t-rev" id="b-revbar"></i></span><span class="v" id="b-revv">0,00 €</span><span class="small muted" id="b-revnote"></span></div>
@@ -570,12 +585,10 @@ details.tbl td.calc { padding: 6px 5px }
     <div class="small" id="b-pace" style="font-weight:600"></div>
     <button type="button" class="ccprow" id="b-ccp"></button>
     <label class="incrow" id="b-incbox"><span class="small muted">Revenu du cycle</span><input id="b-income" type="text" inputmode="decimal" autocomplete="off" placeholder="0" aria-label="Revenu du cycle"><span class="small muted" id="b-incnote"></span></label>
-    <div class="small muted" id="b-incdetail" hidden></div>
   </div>
 
   <div class="panel" data-block="charges" id="b-charges">
-    <button type="button" class="env chghead" id="chg-head" aria-expanded="false" aria-controls="chg-body"></button>
-    <div id="chg-body" class="chgbody" hidden></div>
+    <button type="button" class="env chghead" id="chg-head"></button>
   </div>
 
   <div class="panel" data-block="envs">
@@ -596,6 +609,14 @@ details.tbl td.calc { padding: 6px 5px }
     <div class="seg sm" id="m-sort" role="group" aria-label="Classer les mouvements" style="margin:10px 0 4px"><button type="button" data-ms="date" aria-pressed="true">Par date</button><button type="button" data-ms="env" aria-pressed="false">Par enveloppe</button></div>
     <div id="explist"></div>
   </div>
+</section>
+
+<!-- ============ ENVELOPPE (détail) ============ -->
+<section id="v-env" class="wrap" hidden>
+  <div class="sethead"><button type="button" class="linkbtn" data-back>‹ Accueil</button></div>
+  <div class="panel total" id="ev-hero"></div>
+  <div class="panel" id="ev-charges" hidden></div>
+  <div class="panel" id="ev-detail"></div>
 </section>
 
 <!-- ============ BILAN ============ -->
@@ -1025,7 +1046,7 @@ details.tbl td.calc { padding: 6px 5px }
 
 <script>
 "use strict";
-const APP_VERSION = "1.10.0";
+const APP_VERSION = "1.11.0";
 const FB_VERSION = "10.12.2"; // SDK Firebase chargé depuis gstatic uniquement si la synchronisation est configurée
 const LS = { state: "fin.state", fb: "fin.firebase", dev: "fin.device", link: "fin.linked", lastSync: "fin.lastsync" };
 const CLASSES = [{ id: "stocks", c: "#2346d8" }, { id: "bonds", c: "#7a4fd0" }, { id: "gold", c: "#c99a0a" }, { id: "cash", c: "#138a5b" }];
@@ -1485,27 +1506,46 @@ function applyRemote(remote) {
 document.addEventListener("focusout", () => { if (renderLater) setTimeout(() => { if (renderLater && !document.activeElement?.matches?.("input, textarea, select")) { renderLater = false; renderView() } }, 50) });
 
 /* ---------- Navigation : menu latéral ---------- */
-const VIEWS = ["budget", "bilan", "comptes", "plan", "invest", "conj", "reglages"];
-const TITLES = { budget: "Accueil", bilan: "Bilan", comptes: "Comptes", plan: "Budget", invest: "Portefeuille", conj: "Conjoncture", reglages: "Réglages" };
+const VIEWS = ["budget", "bilan", "comptes", "plan", "invest", "conj", "reglages", "env"];
+const TITLES = { budget: "Accueil", bilan: "Bilan", comptes: "Comptes", plan: "Budget", invest: "Portefeuille", conj: "Conjoncture", reglages: "Réglages", env: "Enveloppe" };
 let view = "budget", pendingAnchor = null;
+// Page d'une enveloppe (#env/<id>) : ouverte depuis l'accueil ; au retour, l'accueil reprend là où il était
+let envPage = null, envFromHome = false, homeY = null;
 function show(v, anchor) {
-  let sec = null; v = String(v || ""); if (v.includes("/")) [v, sec] = v.split("/");
+  let sec = null; v = String(v || ""); if (v.includes("/")) { const i = v.indexOf("/"); sec = v.slice(i + 1); v = v.slice(0, i) }
   if (!VIEWS.includes(v)) v = "budget";
+  if (v === "env") { try { sec = decodeURIComponent(sec || "") } catch { sec = "" } envPage = sec === "__none" || envById(sec) ? sec : null; if (!envPage) v = "budget" }
+  const from = view;
+  if (v !== "env") envFromHome = false;
   if (v === "reglages") { if (!sec && anchor) sec = secOf(anchor); setSec = SET_SECS.some(x => x.id === sec) ? sec : null }
   if (v !== "reglages" || !setSec) setFromList = false;
   view = v;
-  VIEWS.forEach(x => { $("v-" + x).hidden = x !== v });
+  VIEWS.forEach(x => { const el = $("v-" + x); el.hidden = x !== v; el.style.transform = ""; el.style.transition = ""; el.classList.remove("evswipe") });
   document.querySelectorAll("#dnav [data-view]").forEach(b => b.setAttribute("aria-current", b.dataset.view === v ? "page" : "false"));
   $("vtitle").textContent = TITLES[v];
   document.title = v === "budget" ? "Mes Finances" : TITLES[v] + " · Mes Finances";
   $("fab").hidden = v !== "budget";
   closeDrawer(false);
   renderView();
-  if (anchor && $(anchor) && !(v === "reglages" && $(anchor).dataset.sec)) $(anchor).scrollIntoView({ block: "start" }); else window.scrollTo(0, 0);
+  if (anchor && $(anchor) && !(v === "reglages" && $(anchor).dataset.sec)) $(anchor).scrollIntoView({ block: "start" });
+  else if (v === "budget" && from === "env" && homeY !== null) window.scrollTo(0, homeY);
+  else window.scrollTo(0, 0);
 }
+function openEnv(id) {
+  if (!id || !(id === "__none" || envById(id))) return;
+  homeY = view === "budget" ? window.scrollY : null; envFromHome = !IOS && view === "budget";
+  setHash("env/" + encodeURIComponent(id));
+}
+function backFromEnv() {
+  if (envFromHome) { envFromHome = false; history.back() } else { history.replaceState(null, "", "#budget"); show("budget") }
+}
+// Retour : page d'une enveloppe → accueil, sous-page des réglages → liste des réglages
+const canGoBack = () => view === "env" || (view === "reglages" && !!setSec);
+function goBack() { if (view === "env") backFromEnv(); else if (view === "reglages" && setSec) $("set-back").click() }
+document.addEventListener("click", e => { if (e.target.closest("[data-back]")) goBack() });
 function renderView() {
   applyMenu();
-  ({ budget: renderBudget, bilan: renderBilan, comptes: renderComptes, plan: renderPlan, invest: renderInvest, conj: renderConj, reglages: renderSettings })[view]();
+  ({ budget: renderBudget, bilan: renderBilan, comptes: renderComptes, plan: renderPlan, invest: renderInvest, conj: renderConj, reglages: renderSettings, env: renderEnv })[view]();
   renderSync();
 }
 // Changer de rubrique en passant par l'adresse (#bilan…), pour que le bouton Retour du téléphone fonctionne
@@ -1557,24 +1597,38 @@ $("drawer").addEventListener("touchend", () => {
   if (dragX === null) return; dragX = null; $("drawer").style.transition = ""; $("drawer").style.transform = "";
   if (dragDx < -60) closeDrawer(false);
 });
-// Glisser depuis le bord gauche pour ouvrir le menu
+// Glisser depuis le bord gauche : sur une sous-page (enveloppe, rubrique des réglages), la page suit le doigt et revient
+// à l'écran précédent ; sur les pages principales, le menu s'ouvre
 let edge = null;
+const sheetOpen = () => ["sheet", "acsheet", "icsheet", "chsheet"].some(id => $(id) && !$(id).hidden);
 document.addEventListener("touchstart", e => {
   const t = e.touches[0];
-  if (e.touches.length !== 1 || t.clientX > 28 || wideScreen() || $("drawer").classList.contains("open") || !$("sheet").hidden || !$("acsheet").hidden || !$("icsheet").hidden) { edge = null; return }
-  edge = { x: t.clientX, y: t.clientY, dx: 0, on: false };
+  if (e.touches.length !== 1 || t.clientX > 28 || wideScreen() || $("drawer").classList.contains("open") || sheetOpen() || lsDrag) { edge = null; return }
+  edge = { x: t.clientX, y: t.clientY, dx: 0, on: false, back: canGoBack() };
 }, { passive: true });
 document.addEventListener("touchmove", e => {
   if (!edge) return; const t = e.touches[0], dx = t.clientX - edge.x, dy = t.clientY - edge.y;
   if (!edge.on) { if (Math.abs(dy) > 12 && Math.abs(dy) > dx) { edge = null; return } if (dx < 8) return; edge.on = true }
-  edge.dx = Math.max(0, dx); const d = $("drawer"), w = d.offsetWidth || 300;
+  edge.dx = Math.max(0, dx);
+  if (edge.back) { const p = $("v-" + view); p.style.transition = "none"; p.classList.add("evswipe"); p.style.transform = `translateX(${edge.dx}px)`; return }
+  const d = $("drawer"), w = d.offsetWidth || 300;
   d.style.transition = "none"; d.style.visibility = "visible"; d.style.transform = `translateX(${Math.min(0, edge.dx - w)}px)`;
 }, { passive: true });
-document.addEventListener("touchend", () => {
-  if (!edge) return; const open = edge.on && edge.dx > 70, d = $("drawer"); edge = null;
+const edgeEnd = () => {
+  if (!edge) return; const g = edge; edge = null;
+  if (g.back) {
+    const p = $("v-" + view), ok = g.on && g.dx > Math.min(90, innerWidth * .25);
+    p.style.transition = "transform .18s ease-out";
+    if (ok) { p.style.transform = "translateX(100vw)"; setTimeout(goBack, 170) }
+    else { p.style.transform = ""; setTimeout(() => { p.style.transition = ""; p.classList.remove("evswipe") }, 200) }
+    return;
+  }
+  const open = g.on && g.dx > 70, d = $("drawer");
   d.style.transition = ""; d.style.visibility = ""; d.style.transform = "";
   if (open) openDrawer();
-});
+};
+document.addEventListener("touchend", edgeEnd);
+document.addEventListener("touchcancel", edgeEnd);
 const savTotal = () => S.budget.savings.reduce((s, a) => s + (+a.balance || 0), 0);
 function fmtWhen(t) {
   const d = new Date(t), time = d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
@@ -1673,7 +1727,7 @@ function shiftPeriod(dir) {
   else if (PF.period === "week") viewDate = addDays(viewDate, 7 * dir);
   else if (PF.period === "multi" && PF.multi === "range") { const a = parseYmd(PF.range.a), b = parseYmd(PF.range.b), n = (dayDiff(a, b) + 1) * dir; PF.range = { a: ymd(addDays(a, n)), b: ymd(addDays(b, n)) }; savePrefs() }
   else viewCycle = shiftCycle(viewCycle, dir * (PF.period === "multi" ? +PF.multi : 1));
-  renderBudget();
+  renderView();
 }
 const savePlanned = () => S.budget.envelopes.filter(e => e.kind === "save").reduce((s, e) => s + (+e.planned || 0), 0);
 // Budget d'un jour : ce qui reste à dépenser sur le cycle au matin de ce jour, réparti sur les jours restants jusqu'à la veille de la paie
@@ -1741,7 +1795,7 @@ function periodSummary(pi) {
   else if (cur) { const days = dayDiff(new Date(), c.end) + 1; pace = `${days} j avant la paie` + (left > 0 ? ` / ${fmtEUR(left / days)} par jour` : left < 0 ? " / épargne compromise" : "") }
   else pace = past ? (left >= 0 ? "Cycle terminé" : "Cycle terminé / dépassé") : "Cycle à venir";
   return { st, spend, factor: 1, left, pct: pct(spend, income - saveGoal), cur, toSave,
-    title: past ? "Restant en fin de cycle" : "Disponible à dépenser",
+    title: past ? "Restant en fin de cycle" : "Disponible",
     pace, pstat: null, revLbl: "Revenus", rev: income, revNote: extraNote,
     outTarget: plannedSpend || income - saveGoal, savTarget: savePlan,
     outNote: of(plannedSpend), savedNote: savedOf(savePlan) };
@@ -1811,25 +1865,7 @@ function renderBudget() {
   $("m-sort").hidden = searching; $("m-sbox").hidden = !mSearchOpen; $("m-sbtn").setAttribute("aria-expanded", String(mSearchOpen));
   $("explist").classList.toggle("years", searching);
   document.querySelectorAll("#m-sort [data-ms]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.ms === PF.movSort)));
-  const movRow = ({ k, o }) => {
-    const d = parseYmd(o.date), day = `<span class="d">${pad(d.getDate())}/${pad(d.getMonth() + 1)}${searching && d.getFullYear() !== thisYear ? "/" + String(d.getFullYear()).slice(2) : ""}</span>`;
-    if (k === "tr") {
-      const fr = acctById(o.from), to = acctById(o.to);
-      return `<button type="button" class="exp" data-tr="${esc(o.id)}">${day}
-        <span class="l"><b><span class="tdot t-sav"></span>${esc(o.label || "Virement")}</b><small>${esc(fr?.name || "?")} → ${esc(to?.name || "?")}</small></span>
-        <span class="num" style="font-weight:600">${fmtEUR(o.amount)}</span></button>`;
-    }
-    if (k === "inc") {
-      const cat = incCat(o.cat), env = envById(refundEnv(o));
-      return `<button type="button" class="exp" data-inc="${esc(o.id)}">${day}
-        <span class="l"><b><span class="tdot t-rev"></span>${esc(o.label || cat?.name || "Entrée")}</b><small>${esc(cat?.name || "Entrée")}${env ? " / " + esc(env.name) : ""}</small></span>
-        <span class="num" style="font-weight:600">+${fmtEUR(o.amount)}</span></button>`;
-    }
-    const en = envById(o.env);
-    return `<button type="button" class="exp" data-exp="${esc(o.id)}">${day}
-      <span class="l"><b><span class="tdot ${en?.kind === "save" ? "t-sav" : "t-exp"}"></span>${esc(o.label || en?.name || "Dépense")}</b><small>${esc(en?.name || "Sans enveloppe")}</small></span>
-      <span class="num" style="font-weight:600">${o.amount < 0 ? "+" + fmtEUR(-o.amount) : fmtEUR(o.amount)}</span></button>`;
-  };
+  const movRow = x => movRowHtml(x, { searching, thisYear });
   let html = "";
   if (list.length && PF.movSort === "env" && !searching) {
     // Regroupés par enveloppe, dans l'ordre des enveloppes ; entrées et virements sans effet sur le budget à la fin
@@ -1844,6 +1880,27 @@ function renderBudget() {
     }).join("");
   } else html = list.map(movRow).join("");
   $("explist").innerHTML = (html || `<div class="notice">${searching ? "Aucun résultat" : "Aucun mouvement"}</div>`) + (searching && total > list.length ? `<div class="notice" style="padding-top:8px">${list.length} plus récents sur ${total}</div>` : "");
+}
+// Une ligne de mouvement. opt.env : page d'une enveloppe (le nom de l'enveloppe n'est pas répété) ; opt.nod : sans la date (regroupé par jour)
+function movRowHtml({ k, o }, opt = {}) {
+  const d = parseYmd(o.date), cls = opt.nod ? "exp nod" : "exp";
+  const day = opt.nod ? "" : `<span class="d">${pad(d.getDate())}/${pad(d.getMonth() + 1)}${opt.searching && d.getFullYear() !== opt.thisYear ? "/" + String(d.getFullYear()).slice(2) : ""}</span>`;
+  if (k === "tr") {
+    const fr = acctById(o.from), to = acctById(o.to);
+    return `<button type="button" class="${cls}" data-tr="${esc(o.id)}">${day}
+      <span class="l"><b><span class="tdot t-sav"></span>${esc(o.label || "Virement")}</b><small>${esc(fr?.name || "?")} → ${esc(to?.name || "?")}</small></span>
+      <span class="num" style="font-weight:600">${fmtEUR(o.amount)}</span></button>`;
+  }
+  if (k === "inc") {
+    const cat = incCat(o.cat), env = envById(refundEnv(o));
+    return `<button type="button" class="${cls}" data-inc="${esc(o.id)}">${day}
+      <span class="l"><b><span class="tdot t-rev"></span>${esc(o.label || cat?.name || "Entrée")}</b><small>${esc(cat?.name || "Entrée")}${env && !opt.env ? " / " + esc(env.name) : ""}</small></span>
+      <span class="num" style="font-weight:600">+${fmtEUR(o.amount)}</span></button>`;
+  }
+  const en = envById(o.env), sub = opt.env ? "" : `<small>${esc(en?.name || "Sans enveloppe")}</small>`;
+  return `<button type="button" class="${cls}" data-exp="${esc(o.id)}">${day}
+    <span class="l"><b><span class="tdot ${en?.kind === "save" ? "t-sav" : "t-exp"}"></span>${esc(o.label || en?.name || "Dépense")}</b>${sub}</span>
+    <span class="num" style="font-weight:600">${o.amount < 0 ? "+" + fmtEUR(-o.amount) : fmtEUR(o.amount)}</span></button>`;
 }
 // Recherche dans tous les mouvements : libellé, enveloppe, catégorie, comptes, montant (42, 42,5, 1234) et date (12/11, nov, 2026-11)
 let mQ = "", mSearchOpen = false;
@@ -1895,9 +1952,6 @@ function updateSummary(pi = periodInfo()) {
     : `<span><span class="small muted">Compte courant</span><small>Solde à indiquer</small></span><b style="font-family:var(--body);font-size:.85rem;color:var(--accent)">Ajouter ›</b>`;
   $("b-out").textContent = fmtEUR(s.spend); $("b-outnote").textContent = s.outNote; $("b-revnote").hidden = !s.revNote; $("b-outnote").hidden = !s.outNote; $("b-savenote").hidden = !s.savedNote;
   $("b-saved").textContent = fmtEUR(st.saved); $("b-savenote").innerHTML = s.savedNote;
-  const cats = Object.entries(st.byCat).sort((a, b) => b[1] - a[1]);
-  $("b-incdetail").textContent = cats.length ? "Entrées / " + cats.map(([id, v]) => `${incCat(id)?.name || "Autre"} ${fmtEUR(v)}`).join(" / ") : "";
-  $("b-incdetail").hidden = !cats.length;
   return s;
 }
 $("b-ccp").addEventListener("click", () => { if (S.budget.ccp) go("comptes"); else openAcct("ccp") });
@@ -1918,7 +1972,7 @@ $("b-income").addEventListener("input", e => {
   $("b-incnote").textContent = v === "" ? "habituel" : "modifié";
   commit(false); updateSummary();
 });
-const envClick = e => { const b = e.target.closest("[data-env]"); if (!b) return; envFilter = envFilter === b.dataset.env ? null : b.dataset.env; renderBudget() };
+const envClick = e => { const b = e.target.closest("[data-env]"); if (b) openEnv(b.dataset.env) };
 $("envlist").addEventListener("click", envClick);
 $("savlist").addEventListener("click", envClick);
 $("expclear").addEventListener("click", () => { envFilter = null; renderBudget() });
@@ -1931,7 +1985,7 @@ $("explist").addEventListener("click", e => {
 /* ---------- Charges à cocher (loyer, abonnements…) ---------- */
 // Une charge cochée = une dépense { charge: id } datée du jour, dans l'enveloppe des charges. Elle ne compte dans le disponible qu'une fois cochée.
 // Tout repart décoché au cycle suivant. Une dépense de l'enveloppe dont le libellé contient le nom d'une charge la coche aussi (import, tableau de Claude).
-let chOpen = false, chEdit = null;
+let chEdit = null;
 const chargesEnvObj = () => envById(S.budget.chargesEnv);
 const chargesBlockOn = () => PF.period === "cycle" && !S.ui.homeHidden.includes("charges");
 const dmIso = iso => { const d = parseYmd(iso); return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}` };
@@ -1970,21 +2024,9 @@ function renderCharges() {
   const dueLate = ch => { const d = chargeDue(ch, c); return !s.paid[ch.id] && d && d < today };
   const late = B.charges.filter(dueLate).length, rest = round2(s.planned - s.net);
   const over = s.planned > 0 ? s.net > s.planned + 0.005 : s.net > 0.005, pct = s.planned > 0 ? Math.min(100, Math.max(0, s.net / s.planned * 100)) : (s.net > 0 ? 100 : 0);
-  $("chg-head").setAttribute("aria-expanded", String(chOpen));
   $("chg-head").innerHTML = `<span><b><span class="eic" style="--c:var(--c-exp)">${ico(env ? envIcon(env) : "repeat")}</span>Charges<span class="chev" aria-hidden="true">›</span></b><br><span class="small muted num">${fmtEUR(s.net)} / ${fmtEUR(s.planned)}${n ? ` / ${s.count}/${n}` : ""}${late ? ` / <span style="color:var(--warn)">${late} en retard</span>` : ""}</span></span>
     <span class="num small" style="font-weight:600;text-align:right;color:${over ? "var(--down)" : "var(--fg)"}">${s.planned > 0 || s.net ? (rest >= 0 ? "reste " + fmtEUR(rest) : "⚠ +" + fmtEUR(-rest)) : "—"}</span>
     <span class="bar"><i class="${over ? "over" : "t-exp"}" style="width:${pct}%"></i></span>`;
-  $("chg-body").hidden = !chOpen;
-  if (!chOpen) return;
-  const rows = B.charges.map(ch => {
-    const e = s.paid[ch.id], due = chargeDue(ch, c), isLate = dueLate(ch);
-    const sub = e ? `payée le ${dmIso(e.date)}` : due ? `le ${dmDate(due)}${isLate ? " / en retard" : ""}` : "à payer";
-    return `<div class="chg lsrow${e ? " paid" : ""}${isLate ? " late" : ""}" data-ch="${esc(ch.id)}"><button type="button" class="cbox" data-chk aria-pressed="${!!e}" aria-label="${esc(ch.name)} : ${e ? "payée" : "à cocher"}">✓</button>
-      <button type="button" class="cmain" data-chedit><b>${esc(ch.name)}</b><small>${sub}</small></button><span class="num">${fmtEUR(e ? +e.amount : ch.amount)}</span></div>`;
-  }).join("");
-  const others = s.others.map(x => `<div class="chg paid"><span></span><button type="button" class="cmain" data-chexp="${esc(x.id)}"><b>${esc(x.label || "Autre dépense")}</b><small>payée le ${dmIso(x.date)}</small></button><span class="num">${fmtEUR(x.amount)}</span></div>`).join("");
-  $("chg-body").innerHTML = `<div id="chg-list">${rows}</div>` + (n ? "" : `<div class="notice" style="padding:10px 0">Aucune charge</div>`) + others
-    + `<div class="chgfoot"><button type="button" class="linkbtn" data-chadd>+ Ajouter une charge</button></div>`;
 }
 function openCharge(mode, id) {
   const B = S.budget, ch = id ? B.charges.find(x => x.id === id) : null; if (mode === "check" && !ch) return;
@@ -2019,7 +2061,7 @@ $("chform").addEventListener("submit", e => {
   const name = $("ch-name").value.trim(); if (!name) { $("ch-err").textContent = "Nom ?"; $("ch-name").focus(); return }
   const day = Math.min(31, Math.max(0, Math.round(+$("ch-day").value) || 0)), ch = t.id && B.charges.find(x => x.id === t.id);
   if (ch) Object.assign(ch, { name, amount: Math.max(0, amount), day }); else B.charges.push({ id: rid(), name, amount: Math.max(0, amount), day });
-  ensureChargesEnv(); chOpen = true; closeCharge(); commit(); toast(ch ? "Charge modifiée" : "Charge ajoutée");
+  ensureChargesEnv(); closeCharge(); commit(); toast(ch ? "Charge modifiée" : "Charge ajoutée");
 });
 $("ch-del").addEventListener("click", e => {
   const b = e.currentTarget, B = S.budget, t = chEdit; if (!t) return;
@@ -2027,14 +2069,111 @@ $("ch-del").addEventListener("click", e => {
   if (t.mode === "check") { B.expenses = B.expenses.filter(x => x.id !== t.exp); closeCharge(); commit(); toast("Décochée"); return }
   B.charges = B.charges.filter(x => x.id !== t.id); closeCharge(); commit(); toast("Charge supprimée");
 });
-$("b-charges").addEventListener("click", e => {
-  if (e.target.closest("#chg-head")) { chOpen = !chOpen; renderCharges(); return }
+$("chg-head").addEventListener("click", () => { ensureChargesEnv(); openEnv(S.budget.chargesEnv) });
+$("ev-charges").addEventListener("click", e => {
+  if (PF.period === "day" || PF.period === "week") viewCycle = cycleOf(viewDate);   // les cases portent sur le cycle du jour affiché
   if (e.target.closest("[data-chadd]")) { openCharge("edit", null); return }
   const x = e.target.closest("[data-chexp]"); if (x) { const o = S.budget.expenses.find(v => v.id === x.dataset.chexp); if (o) openSheet("exp", o); return }
   const row = e.target.closest("[data-ch]"); if (!row) return;
   if (e.target.closest("[data-chk]")) openCharge("check", row.dataset.ch); else if (e.target.closest("[data-chedit]")) openCharge("edit", row.dataset.ch);
 });
 sheetGestures("chsheet", closeCharge);
+
+/* ---------- Page d'une enveloppe : jauge, détail jour par jour (semaine par semaine pour les charges), ajout d'une dépense ---------- */
+// Mouvements d'une enveloppe sur une période, avec leur effet sur l'enveloppe (v) : dépense +, remboursement −, virement d'épargne ±
+function envMovs(id, a, b) {
+  const st = cycleStats({ start: a, end: b }), none = id === "__none";
+  const ex = st.ex.filter(e => none ? !envById(e.env) : e.env === id).map(o => ({ k: "exp", o, v: +o.amount || 0 }));
+  const inc = none ? [] : st.inc.filter(i => refundEnv(i) === id).map(o => ({ k: "inc", o, v: -(+o.amount || 0) }));
+  const tr = none ? [] : st.tr.filter(t => trEnv(t) === id).map(o => ({ k: "tr", o, v: trFlow(o)?.amount || 0 }));
+  return [...ex, ...inc, ...tr].sort((x, y) => y.o.date.localeCompare(x.o.date) || (y.o.at || 0) - (x.o.at || 0));
+}
+// Cycle des cases à cocher : celui affiché (vue Cycle ou Plusieurs), sinon celui du jour ou de la semaine affichés
+const chargeCycle = () => (PF.period === "day" || PF.period === "week") ? cycleOf(viewDate) : viewCycle;
+// Barres SVG : une par jour ou par semaine ; trait pointillé = rythme prévu
+function evChart(buckets, ref, color, byWeek) {
+  const n = buckets.length; if (!n) return "";
+  const W = 340, H = 132, B = 18, T = 8, gap = n > 45 ? 1 : n > 20 ? 2 : 4, bw = Math.max(1, (W - gap * (n - 1)) / n);
+  const max = Math.max(ref || 0, ...buckets.map(x => x.v), 1) * 1.1, y = v => T + (H - B - T) * (1 - Math.max(0, v) / max);
+  const step = byWeek ? (n > 14 ? Math.ceil(n / 7) : 1) : (n <= 10 ? 1 : n <= 20 ? 2 : n <= 45 ? 5 : Math.ceil(n / 8));
+  let g = "";
+  buckets.forEach((x, i) => {
+    const X = i * (bw + gap), yy = y(x.v), h = H - B - yy;
+    if (x.v > 0.004) g += `<rect class="b${x.now ? " now" : ""}" x="${X.toFixed(1)}" y="${yy.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(1.5, h).toFixed(1)}" rx="${Math.min(3, bw / 3).toFixed(1)}"/>`;
+    else g += `<rect class="z" x="${X.toFixed(1)}" y="${(H - B - 1.5).toFixed(1)}" width="${bw.toFixed(1)}" height="1.5"/>`;
+    if (i % step === 0) g += `<text class="lb" x="${(X + bw / 2).toFixed(1)}" y="${H - 4}" text-anchor="middle">${x.lab}</text>`;
+    if (x.items.length) g += `<rect class="hit" data-evjump="${x.key}" x="${(X - gap / 2).toFixed(1)}" y="0" width="${(bw + gap).toFixed(1)}" height="${H}"><title>${x.title} : ${fmtEUR(x.v)}</title></rect>`;
+  });
+  const refLine = ref > 0.005 ? `<line class="ref" x1="0" x2="${W}" y1="${y(ref).toFixed(1)}" y2="${y(ref).toFixed(1)}"/>` : "";
+  return `<svg class="evchart" viewBox="0 0 ${W} ${H}" style="--c:${color}" role="img" aria-label="${byWeek ? "Dépenses par semaine" : "Dépenses par jour"}">${refLine}${g}</svg>`;
+}
+function renderEnv() {
+  const id = envPage, e = id === "__none" ? null : envById(id);
+  if (!id || (id !== "__none" && !e)) { backFromEnv(); return }
+  const B = S.budget, pi = periodInfo(), [lbl, sub] = periodLabel(pi), today = midnight(new Date());
+  const isCh = !!e && e.id === B.chargesEnv, save = e?.kind === "save", name = e ? e.name : "Sans enveloppe";
+  const color = save ? "var(--c-sav)" : "var(--c-exp)";
+  $("vtitle").textContent = name; document.title = name + " · Mes Finances";
+  const list = envMovs(id, pi.a, pi.b), net = round2(list.reduce((t, x) => t + x.v, 0)), refunds = round2(list.filter(x => x.k === "inc").reduce((t, x) => t - x.v, 0));
+  const f = periodSummary(pi).factor;
+  const pl = !e ? 0 : round2(isCh && PF.period === "cycle" && B.charges.length ? chargeStatus(viewCycle).planned : (+e.planned || 0) * f);
+  const rest = round2(pl - net), over = !save && (pl > 0 ? net > pl + 0.005 : net > 0.005);
+  const pct = pl > 0 ? Math.min(100, Math.max(0, net / pl * 100)) : (net > 0 ? 100 : 0), ok = '<span style="color:var(--c-sav)">✓</span> ';
+  const right = save
+    ? (pl > 0 ? (rest > 0.005 ? "reste " + fmtEUR(rest) : rest < -0.005 ? ok + "+" + fmtEUR(-rest) : ok + "atteint") : (net > 0 ? ok + fmtEUR(net) : ""))
+    : (pl > 0 || net ? (rest >= 0 ? "reste " + fmtEUR(rest) : "⚠ +" + fmtEUR(-rest)) : "");
+  const daysLeft = pi.now ? dayDiff(today, pi.b) + 1 : 0, perDay = !save && !isCh && daysLeft > 1 && pl > 0 && rest > 0.005 ? ` / ${fmtEUR(rest / daysLeft)} par jour` : "";
+  $("ev-hero").innerHTML = `<div class="cyclenav evnav"><button class="arrow" type="button" data-evshift="-1" aria-label="Période précédente">‹</button><div><b>${esc(lbl)}</b><div class="small muted">${esc(sub)}</div></div><button class="arrow" type="button" data-evshift="1" aria-label="Période suivante">›</button></div>
+    <div><div class="eyebrow">${save ? "Versé" : "Dépensé"}</div><div class="big"${over ? ' style="color:var(--down)"' : ""}>${fmtEUR(net)}</div>
+    <div class="small muted num">${[pl > 0 ? "Prévu " + fmtEUR(pl) : "Rien de prévu", refunds ? "remboursé " + fmtEUR(refunds) : ""].filter(Boolean).join(" / ")}</div></div>
+    <span class="bar" aria-hidden="true"><i class="${over ? "over" : save ? "t-sav" : "t-exp"}" style="width:${pct}%"></i></span>
+    ${right ? `<div class="small num" style="font-weight:600${over ? ";color:var(--down)" : ""}">${right}${perDay}</div>` : ""}
+    ${e ? `<button type="button" class="btn primary evbtn" data-evadd>＋ ${save ? "Versement" : "Dépense"}</button>` : ""}`;
+
+  // Charges : ce qui reste à cocher d'ici la paie
+  const chBox = $("ev-charges"); chBox.hidden = !isCh;
+  if (isCh) {
+    const c = chargeCycle(), s = chargeStatus(c), cur = isCurrent(c), due = ch => chargeDue(ch, c);
+    const todo = B.charges.filter(ch => !s.paid[ch.id]).sort((x, y) => (due(x) || c.end) - (due(y) || c.end));
+    const left = round2(todo.reduce((t, ch) => t + (+ch.amount || 0), 0));
+    const rows = todo.map(ch => {
+      const d = due(ch), late = d && d < today;
+      return `<div class="chg${late ? " late" : ""}" data-ch="${esc(ch.id)}"><button type="button" class="cbox" data-chk aria-pressed="false" aria-label="${esc(ch.name)} : à cocher">✓</button>
+        <button type="button" class="cmain" data-chedit><b>${esc(ch.name)}</b><small${late ? ' style="color:var(--warn)"' : ""}>${d ? `le ${dmDate(d)}${late ? " / en retard" : ""}` : "à payer"}</small></button><span class="num">${fmtEUR(ch.amount)}</span></div>`;
+    }).join("");
+    chBox.innerHTML = `<div class="clshead"><h2>${cur ? "À passer d'ici la paie" : c.end < today ? "Non cochées" : "À passer"}</h2>${todo.length ? `<span class="num small" style="font-weight:600">${fmtEUR(left)}</span>` : ""}</div>
+      <div class="small muted">${fmtDay(c.start)} → ${fmtDay(c.end)}${B.charges.length ? ` / ${s.count}/${B.charges.length} cochées` : ""}</div>
+      ${rows ? `<div style="margin-top:6px">${rows}</div>` : `<div class="notice" style="padding:12px 0 4px">${B.charges.length ? "✓ Tout est passé" : "Aucune charge"}</div>`}
+      <div class="chgfoot"><button type="button" class="linkbtn" data-chadd>+ Ajouter une charge</button></div>`;
+  }
+
+  // Détail jour par jour (semaine par semaine pour les charges, ou au-delà de 62 jours)
+  const days = dayDiff(pi.a, pi.b) + 1, byWeek = isCh || days > 62, bk = [];
+  for (let d = midnight(pi.a); d <= pi.b; d = addDays(d, byWeek ? 7 : 1)) {
+    const z = byWeek ? (addDays(d, 6) < pi.b ? addDays(d, 6) : midnight(pi.b)) : d, a = ymd(d), b2 = ymd(z);
+    const items = list.filter(x => x.o.date >= a && x.o.date <= b2);
+    const t = d.toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" });
+    bk.push({ key: a, items, v: round2(items.reduce((s, x) => s + x.v, 0)), now: today >= d && today <= z,
+      lab: byWeek ? dmDate(d) : String(d.getDate()), title: byWeek ? `${dmDate(d)} → ${dmDate(z)}` : t.charAt(0).toUpperCase() + t.slice(1) });
+  }
+  const ref = pl > 0 && !save && !isCh ? pl / days * (byWeek ? 7 : 1) : 0;   // pas de rythme pour les charges, payées en une fois
+  const groups = bk.filter(x => x.items.length).reverse().map(x => `<div class="mgroup evg" id="evg-${x.key}"><span>${esc(x.title)} <span class="muted" style="font-weight:500">· ${x.items.length}</span></span><span class="num">${fmtEUR(x.v)}</span></div>`
+    + x.items.map(m => movRowHtml(m, { env: id, nod: !byWeek })).join("")).join("");
+  $("ev-detail").innerHTML = `<div class="clshead"><h2>${byWeek ? "Semaine par semaine" : "Jour par jour"}</h2><span class="small muted">${list.length} mouvement${list.length > 1 ? "s" : ""}</span></div>
+    ${list.length ? evChart(bk, ref, color, byWeek) : ""}
+    ${list.length && ref ? `<div class="small muted evleg"><span><span class="ln"></span>prévu ${fmtEUR(ref)} / ${byWeek ? "semaine" : "jour"}</span></div>` : ""}
+    ${groups || `<div class="notice" style="padding-top:8px">Aucun mouvement</div>`}`;
+}
+$("ev-hero").addEventListener("click", e => {
+  const sh = e.target.closest("[data-evshift]"); if (sh) { shiftPeriod(+sh.dataset.evshift); return }
+  if (e.target.closest("[data-evadd]")) openSheet("exp", null);
+});
+$("ev-detail").addEventListener("click", e => {
+  const j = e.target.closest("[data-evjump]"); if (j) { $("evg-" + j.dataset.evjump)?.scrollIntoView({ behavior: "smooth", block: "start" }); return }
+  const x = e.target.closest("[data-exp]"); if (x) { openSheet("exp", S.budget.expenses.find(o => o.id === x.dataset.exp)); return }
+  const i = e.target.closest("[data-inc]"); if (i) { openSheet("inc", S.budget.incomes.find(o => o.id === i.dataset.inc)); return }
+  const t = e.target.closest("[data-tr]"); if (t) openSheet("tr", S.budget.transfers.find(o => o.id === t.dataset.tr));
+});
 
 /* ---------- Objectifs d'épargne datés (indépendants des comptes) ---------- */
 let glEdit = null;
@@ -2189,7 +2328,7 @@ function openSheet(kind, item) {
   const envs = S.budget.envelopes, cats = S.budget.incomeCats;
   const orphan = kind === "exp" && item && !envById(item.env);
   $("f-env").innerHTML = envs.map(e => `<option value="${esc(e.id)}">${esc(e.name)}</option>`).join("") + (orphan ? `<option value="${esc(item.env)}">Sans enveloppe</option>` : "");
-  $("f-env").value = (kind === "exp" && item?.env) || (envFilter && envById(envFilter) ? envFilter : null) || (lastEnv && envById(lastEnv) ? lastEnv : envs[0]?.id || "");
+  $("f-env").value = (kind === "exp" && item?.env) || (view === "env" && envById(envPage) ? envPage : null) || (envFilter && envById(envFilter) ? envFilter : null) || (lastEnv && envById(lastEnv) ? lastEnv : envs[0]?.id || "");
   $("g-env").innerHTML = gridHTML(envs.map(e => ({ id: e.id, name: e.name, icon: envIcon(e), color: e.kind === "save" ? "var(--c-sav)" : "var(--c-exp)" }))
     .concat(orphan ? [{ id: item.env, name: "Sans enveloppe", icon: "dots", color: "var(--muted)" }] : []), $("f-env").value);
   $("f-cat").innerHTML = cats.map(c => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join("")
@@ -2374,7 +2513,6 @@ lsBind($("savlist"), { sel: ".env[data-env]", kind: "env", id: el => el.dataset.
 lsBind($("c-groups"), { sel: ".acct[data-acc]", kind: "acct", id: el => el.dataset.acc, ok: el => S.budget.savings.some(a => a.id === el.dataset.acc) });
 lsBind($("s-incs"), { sel: ".erow[data-icid]", kind: "cat", id: el => el.dataset.icid, handle: ".grip" });
 lsBind($("s-envs"), { sel: ".erow[data-eid]", kind: "env", id: el => el.dataset.eid, handle: ".grip", same: (a, b) => a.dataset.kind === b.dataset.kind });
-lsBind($("b-charges"), { sel: ".chg[data-ch]", kind: "chg", id: el => el.dataset.ch });
 document.addEventListener("click", e => { if (e.target.closest("[data-rodone]")) roEnd() });
 $("fab").addEventListener("click", () => openSheet("exp", null));
 $("f-kind").addEventListener("click", e => { const b = e.target.closest("[data-k]"); if (b) setSheetKind(b.dataset.k) });
@@ -4605,11 +4743,11 @@ document.addEventListener("visibilitychange", () => {
 if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) navigator.serviceWorker.register("./sw.js").catch(() => {});
 // Au retour sur l'appli (ex. le lendemain), on recale le cycle affiché sur la date du jour.
 document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState !== "visible" || view !== "budget" || !$("sheet").hidden) return;
+  if (document.visibilityState !== "visible" || (view !== "budget" && view !== "env") || !$("sheet").hidden) return;
   const t = midnight(new Date()); let redo = false;
   if (+viewDate === +lastToday && +t !== +lastToday) { viewDate = t; redo = true }
   const c = cycleOf(new Date()); if (c.key !== viewCycle.key && isCurrent(shiftCycle(viewCycle, 1))) { viewCycle = c; redo = true }
-  if (redo) renderBudget();
+  if (redo) renderView();
 });
 </script>
 </body>
