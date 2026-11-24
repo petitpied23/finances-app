@@ -167,6 +167,22 @@ label.field { display: flex; flex-direction: column; gap: 6px; min-width: 0 }
 .env .tag { font-size: .7rem; font-weight: 600; color: var(--fg); margin-left: 6px; padding: 1px 7px; border-radius: 99px; background: color-mix(in srgb, var(--c-sav) 18%, transparent) }
 .exp { display: grid; grid-template-columns: 3.4em minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px 2px; border: 0; border-bottom: 1px solid var(--line); background: none; text-align: left; width: 100%; border-radius: 0 }
 .exp:last-child { border-bottom: 0 }
+.txb { display: inline-block; font-size: .7rem; font-weight: 600; padding: 2px 6px; margin-right: 4px; border-radius: 6px; vertical-align: 1px;
+  color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent) }
+.sel, .stat select { padding: 7px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); max-width: 100% }
+.sel { max-width: 11em }
+.chart .pjband { fill: var(--accent); opacity: .13 }
+.chart .pjmed { fill: none; stroke: var(--accent); stroke-width: 2; stroke-dasharray: 6 4 }
+.chart .pjexp { fill: none; stroke: var(--muted); stroke-width: 1.6; stroke-dasharray: 2 3 }
+.chart .pjnow { stroke: var(--muted); stroke-width: 1; opacity: .6 }
+.pjleg i { display: inline-block; width: 16px; height: 0; margin-right: 6px; vertical-align: middle; border-top: 2px solid var(--accent) }
+.pjleg i.l-exp { border-top: 2px dotted var(--muted) } .pjleg i.l-med { border-top-style: dashed }
+.pjleg i.l-band { height: 9px; border: 0; border-radius: 2px; background: var(--accent); opacity: .25 }
+.seg.seg3 { grid-template-columns: repeat(3, 1fr) }
+.pjhead, .pjrow { display: grid; grid-template-columns: minmax(0, 1.7fr) repeat(5, minmax(0, 1fr)); gap: 5px; align-items: center }
+.pjhead span { font-size: .66rem; color: var(--muted); text-align: center }
+.pjrow span { min-width: 0; font-size: .8rem; line-height: 1.2 } .pjrow small { display: block; color: var(--muted); font-size: .72rem }
+.pjrow input { width: 100%; min-width: 0; padding: 6px 2px; text-align: center; border-radius: 7px; border: 1px solid var(--line); background: var(--bg); font-family: var(--mono); font-size: 16px }
 .chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 0 -2px; padding: 0 2px 2px }
 .chips::-webkit-scrollbar { display: none }
 .chips button { flex: none; border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 999px; padding: 7px 13px; font: inherit; font-size: .85rem; cursor: pointer }
@@ -658,6 +674,15 @@ html, body { overflow-x: clip }
   </div>
   <div class="panel"><div class="clshead"><h2>Par enveloppe</h2></div><div id="bl-env"></div></div>
   <div class="panel"><div class="clshead"><h2>Entrées</h2></div><div id="bl-inc"></div></div>
+  <div class="panel total stack" id="pj-box" hidden>
+    <div class="clshead"><div><div class="eyebrow">Patrimoine</div><h2>Trajectoire</h2></div></div>
+    <div class="seg sm" id="pj-unit" role="group" aria-label="Euros"><button type="button" data-pjreal="0" aria-pressed="true">€ courants</button><button type="button" data-pjreal="1" aria-pressed="false">€ d'aujourd'hui</button></div>
+    <div class="vlegend pjleg"><span><i class="l-ln"></i>Réel</span><span><i class="l-exp"></i>Prévu</span><span><i class="l-med"></i>Projection</span><span><i class="l-band"></i>Prudent – optimiste</span></div>
+    <div class="chart" id="pj-chart"></div>
+    <label class="field"><span class="small muted" id="pj-hl">Horizon</span><input type="range" id="pj-h" min="1" max="40" step="1" value="10"></label>
+    <div class="stats" id="pj-stats"></div>
+    <details class="tbl" id="pj-hyp"><summary>Hypothèses</summary><div id="pj-hypbody" class="stack" style="margin-top:10px"></div></details>
+  </div>
 </section>
 
 <!-- ============ COMPTES ============ -->
@@ -736,6 +761,19 @@ html, body { overflow-x: clip }
     </div>
     <div class="chart" id="chart" hidden></div>
     <div class="notice" id="histnote"></div>
+  </div>
+  <div class="panel stack" id="tx-panel">
+    <div class="clshead"><div><div class="eyebrow">Journal</div><h2>Opérations</h2></div><button class="btn" type="button" id="tx-add">+ Opération</button></div>
+    <div class="chips" id="tx-f" role="group" aria-label="Filtrer par compte" hidden></div>
+    <div class="stats" id="tx-stats" hidden></div>
+    <div id="tx-pos"></div>
+    <div id="tx-list"></div>
+    <div class="switchrow" style="flex-wrap:wrap;border-top:1px solid var(--line);padding-top:12px">
+      <div style="min-width:0;flex:1"><div style="font-weight:600">Importer un relevé</div><div class="small muted" id="tx-impnote">CSV ou Excel du courtier</div></div>
+      <select id="tx-impacct" class="sel" aria-label="Compte du relevé"></select>
+      <label class="btn" for="tx-file"><span>Choisir…</span><input type="file" id="tx-file" class="vh" accept=".csv,.xls,.xlsx,text/csv"></label>
+    </div>
+    <div class="xprev" id="tx-prev" hidden></div>
   </div>
   <div class="panel rb">
     <div class="clshead">
@@ -1027,6 +1065,40 @@ html, body { overflow-x: clip }
   </form>
 </div>
 
+<!-- Opération de placement (achat, vente, dividende…) -->
+<div id="txsheet" class="sheet" hidden>
+  <div class="sheetbg" data-txclose></div>
+  <form class="sheetcard" id="txform" novalidate>
+    <h2 id="txtitle">Opération</h2>
+    <div class="stats">
+      <label class="stat"><span class="eyebrow">Type</span><select id="tx-type"></select></label>
+      <label class="stat"><span class="eyebrow">Compte</span><select id="tx-acc"></select></label>
+    </div>
+    <label class="field"><span class="small muted">Date</span><input id="tx-date" type="date"></label>
+    <label class="field" id="tx-namebox"><span class="small muted">Titre</span><input id="tx-name" type="text" list="tx-names" autocomplete="off" placeholder="Ex. Airbus"></label>
+    <datalist id="tx-names"></datalist>
+    <div class="stats" id="tx-idbox">
+      <label class="stat"><span class="eyebrow">Symbole</span><input id="tx-sym" type="text" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="EPA:AIR"></label>
+      <label class="stat"><span class="eyebrow">ISIN</span><input id="tx-isin" type="text" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="—"></label>
+    </div>
+    <div class="stats" id="tx-qbox">
+      <label class="stat"><span class="eyebrow">Quantité</span><input id="tx-qty" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></label>
+      <label class="stat"><span class="eyebrow">Prix unitaire (€)</span><input id="tx-price" type="text" inputmode="decimal" autocomplete="off" placeholder="0,00"></label>
+    </div>
+    <div class="stats">
+      <label class="stat"><span class="eyebrow" id="tx-amtlbl">Montant (€)</span><input id="tx-amount" type="text" inputmode="decimal" autocomplete="off" placeholder="0,00"></label>
+      <label class="stat" id="tx-feebox"><span class="eyebrow">Frais (€)</span><input id="tx-fees" type="text" inputmode="decimal" autocomplete="off" placeholder="0,00"></label>
+    </div>
+    <div class="small muted" id="tx-note"></div>
+    <div class="notice err" id="tx-err"></div>
+    <div class="actions">
+      <button type="button" class="btn danger" id="tx-del" hidden>Supprimer</button>
+      <button type="button" class="btn" data-txclose>Annuler</button>
+      <button type="submit" class="btn primary">Enregistrer</button>
+    </div>
+  </form>
+</div>
+
 <!-- Objectif d'épargne daté -->
 <div id="glsheet" class="sheet" hidden>
   <div class="sheetbg" data-glclose></div>
@@ -1063,7 +1135,7 @@ html, body { overflow-x: clip }
 
 <script>
 "use strict";
-const APP_VERSION = "1.12.1";
+const APP_VERSION = "1.13.0";
 const FB_VERSION = "10.12.2"; // SDK Firebase chargé depuis gstatic uniquement si la synchronisation est configurée
 const LS = { state: "fin.state", fb: "fin.firebase", dev: "fin.device", link: "fin.linked", lastSync: "fin.lastsync" };
 const CLASSES = [{ id: "stocks", c: "#2346d8" }, { id: "bonds", c: "#7a4fd0" }, { id: "gold", c: "#c99a0a" }, { id: "cash", c: "#138a5b" }];
@@ -1455,6 +1527,22 @@ function defaultState() {
     ui: normUi({})   // ordre et blocs masqués de l'accueil et du menu
   };
 }
+// Journal des opérations de placement (1.13)
+const TX_TYPES = { buy: "Achat", sell: "Vente", div: "Dividende", int: "Intérêts", fee: "Frais", dep: "Versement", wd: "Retrait" };
+// Projection du patrimoine : familles de placements, rendements annuels bruts (prudent / médian / optimiste, %) et imposition (%).
+// Taux au 24/11/2026 : Livret A et LDDS 1,7 % nets (depuis le 1er août 2026), LEP 2,5 % ; PEL ouvert en 2026 : 2 % brut ;
+// flat tax 31,4 % (12,8 % + 18,6 %) ; PEA après 5 ans : 18,6 % ; PEL et assurance vie : 17,2 % de prélèvements sociaux.
+// defer : impôt payé à la sortie, sur les gains (sinon chaque année, sur les intérêts).
+const PJ_BK = [
+  { id: "liq", name: "Comptes courants & espèces", r: [0, 0, 0], tax: 0 },
+  { id: "reg", name: "Livrets réglementés", r: [1.5, 1.7, 2.2], tax: 0 },
+  { id: "liv", name: "Livrets bancaires", r: [0.3, 1, 2], tax: 31.4 },
+  { id: "pel", name: "Épargne logement", r: [2, 2, 2], tax: 30 },
+  { id: "pea", name: "PEA", r: [2, 5, 8], tax: 18.6, defer: true },
+  { id: "cto", name: "Compte-titres", r: [2, 5, 8], tax: 31.4, defer: true },
+  { id: "av", name: "Assurance vie", r: [2, 3, 5], tax: 17.2, defer: true },
+  { id: "crypto", name: "Crypto & trading", r: [0, 4, 10], tax: 31.4, defer: true }
+];
 function normalize(s) {
   const d = defaultState();
   if (!s || typeof s !== "object") return d;
@@ -1492,6 +1580,12 @@ function normalize(s) {
   if (!["trend", "absolute"].includes(i.method)) i.method = "trend";
   if (!i.freeCash || typeof i.freeCash !== "object" || !isFinite(+i.freeCash.amount)) i.freeCash = null;   // marge libre DEGIRO { amount, date }
   i.look = { color: "#222222", icon: "chart", ...(i.look && typeof i.look === "object" ? i.look : {}) };
+  try {
+    i.tx = Array.isArray(i.tx) ? i.tx.filter(t => t && typeof t === "object" && t.id && /^\d{4}-\d{2}-\d{2}$/.test(t.date || "") && TX_TYPES[t.type]) : [];
+    i.proj = pjNorm(i.proj);
+    // Date du dernier état connu de chaque ligne : les opérations postérieures la mettent à jour
+    const asOf0 = ymd(new Date(Date.now() - 864e5)); Object.values(i.portfolio).forEach(L => L.forEach(a => { if (a && a.asOf == null) a.asOf = asOf0 }));
+  } catch { if (!Array.isArray(i.tx)) i.tx = []; if (!i.proj || !i.proj.r) i.proj = pjNorm(null) }
   const g = { ...d.gs, ...(s.gs && typeof s.gs === "object" ? s.gs : {}) };
   return { v: 1, updatedAt: +s.updatedAt || 0, budget: b, invest: i, gs: g, ui: normUi(s.ui) };
 }
@@ -1621,7 +1715,7 @@ $("drawer").addEventListener("touchend", () => {
 // Glisser depuis le bord gauche : sur une sous-page (enveloppe, rubrique des réglages), la page suit le doigt et revient
 // à l'écran précédent ; sur les pages principales, le menu s'ouvre
 let edge = null;
-const sheetOpen = () => ["sheet", "acsheet", "icsheet", "chsheet"].some(id => $(id) && !$(id).hidden);
+const sheetOpen = () => ["sheet", "acsheet", "icsheet", "chsheet", "txsheet"].some(id => $(id) && !$(id).hidden);
 document.addEventListener("touchstart", e => {
   const t = e.touches[0];
   if (e.touches.length !== 1 || t.clientX > 28 || wideScreen() || $("drawer").classList.contains("open") || sheetOpen() || lsDrag) { edge = null; return }
@@ -2425,7 +2519,7 @@ $("cal-prev").addEventListener("click", () => { cal.m = new Date(cal.m.getFullYe
 $("cal-next").addEventListener("click", () => { cal.m = new Date(cal.m.getFullYear(), cal.m.getMonth() + 1, 1); renderCal() });
 $("cal-ok").addEventListener("click", () => { if (!cal?.a || !cal.b) return; const { a, b, cb } = cal; closeCal(); cb(a, b) });
 sheetGestures("calsheet", closeCal);
-document.addEventListener("keydown", e => { if (e.key !== "Escape") return; if (!$("calsheet").hidden) closeCal(); else if (!$("chsheet").hidden) closeCharge(); else if (!$("glsheet").hidden) closeGoal() });
+document.addEventListener("keydown", e => { if (e.key !== "Escape") return; if (!$("calsheet").hidden) closeCal(); else if (!$("chsheet").hidden) closeCharge(); else if (!$("glsheet").hidden) closeGoal(); else if (!$("txsheet").hidden) closeTx() });
 
 /* ---------- Feuille de saisie (dépense, entrée ou virement) ---------- */
 let editing = null, sheetKind = "exp", trFrom = "ccp", trTo = "", lastTo = "";
@@ -2887,7 +2981,214 @@ function renderBilan() {
     ? `<button type="button" class="totrow rowbtn" data-catd="${esc(r.id)}" style="font-weight:500"><span><span class="tdot t-rev"></span>${esc(r.name)}<span class="chev" aria-hidden="true">›</span></span><span class="num">${fmtEUR(r.v)}</span></button>`
     : `<div class="totrow" style="font-weight:500"><span><span class="tdot t-rev"></span>${esc(r.name)}</span><span class="num">${fmtEUR(r.v)}</span></div>`).join("")
     || `<div class="notice">Aucune entrée</div>`;
+  try { renderProj() } catch (e) { console.error(e); $("pj-box").hidden = true }
 }
+/* ---------- Bilan : patrimoine depuis la première donnée et projection ---------- */
+// Passé : patrimoine d'aujourd'hui (tous les comptes) moins ce que le budget a ajouté depuis (salaires + entrées − dépenses ;
+// les virements entre comptes et l'épargne ne changent rien) et moins les gains du portefeuille (historique des valeurs).
+// Futur : chaque mois, chaque famille de placement rapporte son rendement (net d'impôt chaque année pour les livrets et le PEL,
+// impôt sur les gains déduit à la sortie pour PEA, compte-titres, assurance vie et crypto) et reçoit sa part de l'épargne.
+function pjNorm(p) {
+  p = p && typeof p === "object" ? p : {};
+  const o = { h: Math.min(40, Math.max(1, Math.round(+p.h) || 10)), real: !!p.real, cmode: ["plan", "real", "custom"].includes(p.cmode) ? p.cmode : "plan",
+    custom: Math.max(0, +p.custom || 0), inf: isFinite(+p.inf) && p.inf !== null && p.inf !== "" ? Math.min(20, Math.max(-5, +p.inf)) : 2, r: {}, tax: {}, alloc: null };
+  PJ_BK.forEach(b => {
+    const x = p.r && p.r[b.id];
+    o.r[b.id] = Array.isArray(x) && x.length === 3 && x.every(v => v !== null && v !== "" && isFinite(+v)) ? x.map(Number) : b.r.slice();
+    const t = p.tax && p.tax[b.id];
+    o.tax[b.id] = t !== null && t !== undefined && t !== "" && isFinite(+t) ? Math.min(100, Math.max(0, +t)) : b.tax;
+  });
+  if (p.alloc && typeof p.alloc === "object") { const a = {}; PJ_BK.forEach(b => { const v = +p.alloc[b.id]; if (v > 0) a[b.id] = v }); o.alloc = Object.keys(a).length ? a : null }
+  return o;
+}
+function pjBucket(a) {
+  const f = foldTxt(a.name), k = a.kind;
+  if (a.id === "ccp" || k === "courant" || k === "especes") return "liq";
+  if (k === "logement") return "pel";
+  if (k === "crypto") return "crypto";
+  if (k === "titres") return /\bpea\b/.test(f) ? "pea" : /assurance.?vie/.test(f) ? "av" : "cto";
+  if (/livret a\b|\bldds?\b|\blep\b|livret jeune|livret bleu/.test(f)) return "reg";
+  return "liv";
+}
+const PJ_YEAR = 365.25 * 864e5;
+// Départ : premier mouvement du budget (les opérations de placement anciennes ne disent rien du reste du patrimoine), sinon premier point du portefeuille
+function pjFirstDate() {
+  const B = S.budget, t = todayKey(), ok = d => /^\d{4}-\d{2}-\d{2}$/.test(d || "") && d <= t, ds = [];
+  [B.expenses, B.incomes, B.transfers].forEach(L => L.forEach(x => ok(x.date) && ds.push(x.date)));
+  if (!ds.length) S.invest.history.forEach(p => ok(p.d) && ds.push(p.d));
+  return ds.sort()[0] || null;
+}
+// Ce que le budget a ajouté au patrimoine entre a (exclu) et b (inclus) : salaires des paies + entrées − dépenses hors épargne
+function pjFlow(a, b) {
+  const B = S.budget, save = id => envById(id)?.kind === "save"; let f = 0;
+  B.incomes.forEach(i => { if (i.date > a && i.date <= b) f += +i.amount || 0 });
+  B.expenses.forEach(e => { if (e.date > a && e.date <= b && !save(e.env)) f -= +e.amount || 0 });
+  for (let c = cycleOf(parseYmd(a)); ymd(c.start) <= b; c = shiftCycle(c, 1)) { const s = ymd(c.start); if (s > a) f += cycleIncome(c) }
+  return f;
+}
+// Gains du portefeuille entre a et b d'après l'historique des valeurs ; les sauts de plus de 10 % en un jour sont des mises à jour des lignes, pas des gains
+function pjGain(a, b, H, trades) {
+  let g = 0;
+  for (let i = 1; i < H.length; i++) {
+    const x = H[i - 1], y = H[i]; if (y.d <= a || y.d > b) continue;
+    const net = trades.filter(t => t.date > x.d && t.date <= y.d).reduce((s, t) => s + (t.type === "buy" ? t.amount : -t.amount), 0), d = y.total - x.total - net;
+    if (Math.abs(d) <= 0.1 * Math.max(x.total, y.total)) g += d;
+  }
+  return g;
+}
+// Répartition de l'épargne : virements des 6 derniers cycles (montants plafonnés à 2 × l'épargne prévue), sinon comptes d'aujourd'hui
+function pjAutoAlloc(nowBy) {
+  const T = midnight(new Date()), a = ymd(shiftCycle(cycleOf(T), -6).start), z = ymd(T), w = {}, cap = savePlanned() > 0 ? savePlanned() * 2 : Infinity;
+  const add = (id, v) => { const acc = acctById(id); if (!acc) return; const b = pjBucket(acc); w[b] = (w[b] || 0) + Math.sign(v) * Math.min(Math.abs(v), cap) };
+  S.budget.transfers.forEach(x => { if (x.date < a || x.date > z) return; if (x.from === "ccp" && x.to !== "ccp") add(x.to, +x.amount || 0); else if (x.to === "ccp" && x.from !== "ccp") add(x.from, -(+x.amount || 0)) });
+  S.budget.expenses.forEach(e => { if (e.date < a || e.date > z || envById(e.env)?.kind !== "save") return; const to = acctFromText(e.label); if (to) add(to.id, +e.amount || 0) });
+  let pos = Object.entries(w).filter(([b, v]) => v > 0 && b !== "liq");
+  if (!pos.length) pos = Object.entries(nowBy).filter(([b, v]) => v > 0 && b !== "liq");
+  const tot = pos.reduce((s, [, v]) => s + v, 0); if (!tot) return { reg: 100 };
+  return Object.fromEntries(pos.map(([b, v]) => [b, v / tot * 100]));
+}
+// Simulation mois par mois d'un scénario (0 prudent, 1 médian, 2 optimiste) : valeur nette d'impôt chaque mois
+function pjSim(v0, months, C, alloc, s, P) {
+  const v = {}, c = {}, sumA = PJ_BK.reduce((t, b) => t + (alloc[b.id] || 0), 0) || 1, out = [];
+  PJ_BK.forEach(b => { v[b.id] = v0[b.id] || 0; c[b.id] = v[b.id] });
+  const net = () => PJ_BK.reduce((t, b) => t + v[b.id] - (b.defer ? P.tax[b.id] / 100 * Math.max(0, v[b.id] - c[b.id]) : 0), 0);
+  out.push(net());
+  for (let m = 1; m <= months; m++) {
+    PJ_BK.forEach(b => { const r = (P.r[b.id][s] || 0) / 100, rr = b.defer ? r : r * (1 - P.tax[b.id] / 100); v[b.id] *= Math.pow(1 + rr, 1 / 12) });
+    PJ_BK.forEach(b => { const add = C * (alloc[b.id] || 0) / sumA; v[b.id] += add; c[b.id] += add });
+    out.push(net());
+  }
+  return out;
+}
+const pjMonth = (d, m) => new Date(d.getFullYear(), d.getMonth() + m, Math.min(d.getDate(), 28));
+function pjData() {
+  const P = S.invest.proj, T = midnight(new Date()), tk = ymd(T), first = pjFirstDate();
+  const by = {}; let now = 0;
+  acctValues().forEach(a => { const b = pjBucket(a); by[b] = (by[b] || 0) + a.value; now += a.value });
+  if (!first && !now) return null;
+  // Épargne par mois : prévue (enveloppes d'épargne), réelle (médiane de ce que le budget a ajouté sur les 6 derniers cycles complets), ou choisie
+  const C0 = first ? cycleOf(parseYmd(first)) : cycleOf(T), flows = [];
+  for (let k = 1; k <= 6; k++) { const c = shiftCycle(cycleOf(T), -k); if (c.start < C0.start) break; flows.push(pjFlow(ymd(addDays(c.start, -1)), ymd(c.end))) }
+  flows.sort((a, b) => a - b);
+  const real = flows.length ? Math.max(0, flows.length % 2 ? flows[(flows.length - 1) / 2] : (flows[flows.length / 2 - 1] + flows[flows.length / 2]) / 2) : savePlanned();
+  const contrib = { plan: savePlanned(), real: round2(real), custom: P.custom }, C = contrib[P.cmode];
+  const autoAlloc = pjAutoAlloc(by), alloc = P.alloc || autoAlloc;
+  // Passé reconstitué : veille du premier cycle, fin de chaque cycle, aujourd'hui
+  const past = [];
+  if (first) {
+    const dates = [ymd(addDays(C0.start, -1))], cur = cycleOf(T);
+    for (let c = C0; c.start < cur.start; c = shiftCycle(c, 1)) dates.push(ymd(c.end));
+    if (dates.at(-1) !== tk) dates.push(tk);
+    const H = S.invest.history.filter(p => isFinite(p.total) && p.total > 0), trades = S.invest.tx.filter(t => t.acct === "pf" && isTrade(t)), W = [];
+    W[dates.length - 1] = now;
+    for (let i = dates.length - 2; i >= 0; i--) W[i] = W[i + 1] - pjFlow(dates[i], dates[i + 1]) - pjGain(dates[i], dates[i + 1], H, trades);
+    dates.forEach((d, i) => past.push({ t: +parseYmd(d), v: W[i] }));
+  } else past.push({ t: +T, v: now });
+  // Trajectoire prévue depuis le départ : patrimoine de départ réparti comme aujourd'hui, épargne prévue chaque mois, scénario médian
+  const t0 = past[0].t, monthsPast = Math.max(0, Math.round((+T - t0) / (PJ_YEAR / 12))), W0 = past[0].v;
+  const v0 = {}; PJ_BK.forEach(b => { v0[b.id] = now > 0 ? W0 * Math.max(0, by[b.id] || 0) / Math.max(1e-9, PJ_BK.reduce((t, x) => t + Math.max(0, by[x.id] || 0), 0)) : (b.id === "liq" ? W0 : 0) });
+  const e = pjSim(v0, monthsPast, savePlanned(), alloc, 1, P), expAt = t => { const m = (t - t0) / (+T - t0 || 1) * monthsPast, i = Math.min(e.length - 1, Math.floor(m)), f = m - i; return e[i] + (e[Math.min(e.length - 1, i + 1)] - e[i]) * f };
+  const exp = past.map(p => ({ t: p.t, v: expAt(p.t) }));
+  // Futur : trois scénarios
+  const M = P.h * 12, fut = [0, 1, 2].map(s => pjSim(by, M, C, alloc, s, P)), ft = Array.from({ length: M + 1 }, (_, m) => +pjMonth(T, m));
+  ft[0] = +T;
+  return { P, T: +T, now, by, past, exp, expNow: exp.at(-1).v, fut, ft, contrib, C, alloc, autoAlloc, first };
+}
+let pjD = null, pjTimer = null;
+const pjDefl = (v, t) => S.invest.proj.real ? v * Math.pow(1 + S.invest.proj.inf / 100, (pjD.T - t) / PJ_YEAR) : v;
+const pjK = v => { const a = Math.abs(v), s = v < 0 ? "−" : ""; return a >= 1e6 ? s + (a / 1e6).toLocaleString("fr-FR", { maximumFractionDigits: 2 }) + " M€" : a >= 1e4 ? s + Math.round(a / 1000).toLocaleString("fr-FR") + " k€" : s + Math.round(a).toLocaleString("fr-FR") + " €" };
+function renderProj() {
+  pjD = pjData(); const box = $("pj-box");
+  box.hidden = !pjD; if (!pjD) return;
+  const P = pjD.P;
+  document.querySelectorAll("#pj-unit button").forEach(b => b.setAttribute("aria-pressed", String((b.dataset.pjreal === "1") === P.real)));
+  $("pj-h").value = P.h;
+  if ($("pj-hyp").open) renderProjHyp();
+  drawProj();
+}
+function drawProj() {
+  const D = pjD, P = D.P, el = $("pj-chart"), y1 = new Date(D.ft.at(-1)).getFullYear();
+  $("pj-hl").textContent = `Horizon : ${P.h} an${P.h > 1 ? "s" : ""} (${y1})`;
+  const dv = (v, t) => pjDefl(v, t), past = D.past.map(p => ({ t: p.t, v: dv(p.v, p.t) })), exp = D.exp.map(p => ({ t: p.t, v: dv(p.v, p.t) }));
+  const step = Math.max(1, Math.round(D.ft.length / 160)), idx = D.ft.map((_, i) => i).filter(i => i % step === 0 || i === D.ft.length - 1);
+  const ser = s => idx.map(i => ({ t: D.ft[i], v: dv(D.fut[s][i], D.ft[i]) })), lo = ser(0), med = ser(1), hi = ser(2);
+  const W = Math.max(280, el.clientWidth || 600), H = 210, pl = 60, pr = 10, pt = 12, pb = 24;
+  const vals = [...past, ...exp, ...lo, ...hi].map(p => p.v), vmin = Math.min(0, ...vals), vmax = Math.max(1, ...vals) * 1.06;
+  const t0 = past[0].t, t1 = D.ft.at(-1), x = t => pl + (t - t0) / (t1 - t0 || 1) * (W - pl - pr), y = v => pt + (1 - (v - vmin) / (vmax - vmin)) * (H - pt - pb);
+  const path = L => L.map((p, i) => `${i ? "L" : "M"}${x(p.t).toFixed(1)},${y(p.v).toFixed(1)}`).join("");
+  const band = path(hi) + lo.slice().reverse().map(p => `L${x(p.t).toFixed(1)},${y(p.v).toFixed(1)}`).join("") + "Z";
+  const area = past.length > 1 ? `${path(past)}L${x(past.at(-1).t).toFixed(1)},${y(Math.max(0, vmin)).toFixed(1)}L${x(past[0].t).toFixed(1)},${y(Math.max(0, vmin)).toFixed(1)}Z` : "";
+  const yr = t => new Date(t).getFullYear(), xt = x(D.T);
+  const ticks = [0, .5, 1].map(f => vmin + f * (vmax - vmin) / 1.06);
+  el.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Patrimoine : passé et projection">
+    ${ticks.map(v => `<line x1="${pl}" x2="${W - pr}" y1="${y(v)}" y2="${y(v)}" class="grid"/><text x="${pl - 6}" y="${y(v) + 4}" text-anchor="end" class="ax">${pjK(v)}</text>`).join("")}
+    <path d="${band}" class="pjband"/>${area ? `<path d="${area}" class="area"/>` : ""}
+    ${exp.length > 1 ? `<path d="${path(exp)}" class="pjexp"/>` : ""}<path d="${path(med)}" class="pjmed"/>${past.length > 1 ? `<path d="${path(past)}" class="ln"/>` : ""}
+    <line x1="${xt}" x2="${xt}" y1="${pt}" y2="${H - pb}" class="pjnow"/>
+    <circle cx="${xt}" cy="${y(past.at(-1).v)}" r="4.5" class="end"/>
+    <text x="${pl}" y="${H - 6}" class="ax">${yr(t0)}</text>${xt - pl > 60 && W - pr - xt > 60 ? `<text x="${xt}" y="${H - 6}" text-anchor="middle" class="ax">auj.</text>` : ""}<text x="${W - pr}" y="${H - 6}" text-anchor="end" class="ax">${yr(t1)}</text>
+    <line class="xh" y1="${pt}" y2="${H - pb}" display="none"/><circle class="end hd" r="4.5" display="none"/>
+    <rect x="${pl}" y="0" width="${W - pl - pr}" height="${H}" fill="transparent" class="hit"/>
+  </svg><div class="tip" hidden></div>`;
+  const hit = el.querySelector(".hit"), tip = el.querySelector(".tip"), xh = el.querySelector(".xh"), hd = el.querySelector(".hd");
+  const pts = past.map((p, i) => ({ t: p.t, v: p.v, e: exp[i]?.v, k: "past" })).concat(med.slice(1).map((p, i) => ({ t: p.t, v: p.v, lo: lo[i + 1].v, hi: hi[i + 1].v, k: "fut" })));
+  const onMove = ev => {
+    const px = ev.clientX - el.getBoundingClientRect().left; let best = pts[0], bd = Infinity;
+    pts.forEach(p => { const d = Math.abs(x(p.t) - px); if (d < bd) { bd = d; best = p } });
+    const cx = x(best.t), cy = y(best.v), dt = new Date(best.t).toLocaleDateString("fr-FR", { month: "short", year: "numeric" });
+    xh.setAttribute("x1", cx); xh.setAttribute("x2", cx); xh.removeAttribute("display"); hd.setAttribute("cx", cx); hd.setAttribute("cy", cy); hd.removeAttribute("display");
+    tip.innerHTML = best.k === "past" ? `<b>${pjK(best.v)}</b><span>${dt}${best.e !== undefined ? ` / prévu ${pjK(best.e)}` : ""}</span>` : `<b>${pjK(best.v)}</b><span>${dt} / ${pjK(best.lo)} – ${pjK(best.hi)}</span>`;
+    tip.hidden = false; tip.style.width = "150px"; tip.style.left = Math.min(Math.max(cx - 75, 0), W - 150) + "px"; tip.style.top = Math.max(cy - 58, 0) + "px";
+  };
+  hit.addEventListener("pointermove", onMove); hit.addEventListener("pointerdown", onMove);
+  hit.addEventListener("pointerleave", () => { tip.hidden = true; xh.setAttribute("display", "none"); hd.setAttribute("display", "none") });
+  // Chiffres clés
+  const end = i => dv(D.fut[i].at(-1), D.ft.at(-1)), gap = D.now - D.expNow, mode = { plan: "prévue", real: "réelle (médiane)", custom: "choisie" }[P.cmode];
+  const stat = (l, v, sub, c = "") => `<div class="stat"><span class="eyebrow">${l}</span><span class="v">${v}</span><span class="small${c ? "" : " muted"}"${c ? ` style="color:${c};font-weight:600"` : ""}>${sub}</span></div>`;
+  $("pj-stats").innerHTML = stat("Aujourd'hui", fmtEUR(D.now), D.first ? `depuis ${fmtDate(D.first)}` : "")
+    + stat(`Dans ${P.h} an${P.h > 1 ? "s" : ""}`, pjK(end(1)), `${pjK(end(0))} – ${pjK(end(2))}`)
+    + stat("Épargne / mois", fmtEUR(D.C), mode)
+    + stat("Prévu à ce jour", pjK(D.expNow), `${gap >= 0 ? "+" : "−"}${pjK(Math.abs(gap))} ${gap >= 0 ? "d'avance" : "de retard"}`, Math.abs(gap) < 1 ? "" : gap > 0 ? "var(--up)" : "var(--down)");
+}
+function renderProjHyp() {
+  const D = pjD, P = D.P, al = P.alloc || D.autoAlloc, inf = macro?.data?.FRA?.cpi;
+  const shown = PJ_BK.filter(b => Math.abs(D.by[b.id] || 0) > 0.5 || (al[b.id] || 0) > 0);
+  const num = (v, a) => `<input type="text" inputmode="decimal" ${a} value="${String(v).replace(".", ",")}">`;
+  const sumA = PJ_BK.reduce((t, b) => t + (+al[b.id] || 0), 0);
+  $("pj-hypbody").innerHTML = `
+    <div class="field"><span class="small muted">Épargne par mois</span>
+      <div class="seg seg3 sm" id="pj-cmode" role="group">${[["plan", "Prévue", D.contrib.plan], ["real", "Réelle", D.contrib.real], ["custom", "Autre", null]].map(([k, n, v]) => `<button type="button" data-pjc="${k}" aria-pressed="${P.cmode === k}">${n}${v !== null ? `<small style="display:block;font-weight:500">${pjK(v)}</small>` : ""}</button>`).join("")}</div>
+      <input id="pj-custom" type="text" inputmode="decimal" placeholder="Montant par mois" value="${P.custom ? fmtIn(P.custom) : ""}" ${P.cmode === "custom" ? "" : "hidden"} style="margin-top:6px">
+    </div>
+    <label class="field"><span class="small muted">Inflation par an (%)${typeof inf?.value === "number" ? ` / Insee : ${inf.value.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} % sur un an (${esc(fmtPeriod(inf.period))})` : ""}</span>${num(P.inf, 'id="pj-inf"')}</label>
+    <div class="pjhead"><span></span><span>Épargne %</span><span>Prudent</span><span>Médian</span><span>Optim.</span><span>Impôt</span></div>
+    ${shown.map(b => `<div class="pjrow"><span><b>${esc(b.name)}</b><small>${pjK(D.by[b.id] || 0)}</small></span>${num(Math.round(+(al[b.id] || 0)), `data-pja="${b.id}" aria-label="Part de l'épargne, ${esc(b.name)}"`)}${[0, 1, 2].map(s => num(P.r[b.id][s], `data-pjr="${b.id}:${s}" aria-label="Rendement ${["prudent", "médian", "optimiste"][s]}, ${esc(b.name)}"`)).join("")}${num(P.tax[b.id], `data-pjt="${b.id}" aria-label="Impôt, ${esc(b.name)}"`)}</div>`).join("")}
+    <div class="small muted">Rendements bruts par an (%). ${P.alloc && Math.abs(sumA - 100) > 0.5 ? `Parts ramenées à 100 % (total ${sumA.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %). ` : ""}${P.alloc ? "" : "Parts d'après vos virements des 6 derniers cycles. "}Taux au 24/11/2026 : Livret A / LDDS 1,7 % · PEL 2026 2 % brut · flat tax 31,4 % · PEA (+5 ans) 18,6 % · PEL et assurance vie 17,2 %.</div>
+    <div><button class="btn" type="button" id="pj-reset">Valeurs par défaut</button></div>`;
+}
+function pjSave(redrawHyp) {
+  clearTimeout(pjTimer); pjTimer = setTimeout(() => commit(false), 500);
+  pjD = pjData(); if (redrawHyp) renderProjHyp(); drawProj();
+}
+$("pj-box").addEventListener("click", e => {
+  const P = S.invest.proj;
+  const u = e.target.closest("[data-pjreal]"); if (u) { P.real = u.dataset.pjreal === "1"; document.querySelectorAll("#pj-unit button").forEach(b => b.setAttribute("aria-pressed", String(b === u))); pjSave(false); return }
+  const c = e.target.closest("[data-pjc]"); if (c) { P.cmode = c.dataset.pjc; if (P.cmode === "custom" && !P.custom) P.custom = Math.round(pjD.contrib.plan || pjD.contrib.real); pjSave(true); if (P.cmode === "custom") $("pj-custom").focus(); return }
+  if (e.target.closest("#pj-reset")) { S.invest.proj = pjNorm({ h: P.h, real: P.real }); pjSave(true) }
+});
+$("pj-box").addEventListener("input", e => {
+  const P = S.invest.proj, t = e.target, v = toNum(t.value);
+  if (t.id === "pj-h") { P.h = Math.min(40, Math.max(1, Math.round(+t.value) || 10)); pjSave(false); return }
+  if (!isFinite(v)) return;
+  if (t.id === "pj-inf") P.inf = Math.min(20, Math.max(-5, v));
+  else if (t.id === "pj-custom") P.custom = Math.max(0, v);
+  else if (t.dataset.pjr) { const [b, s] = t.dataset.pjr.split(":"); P.r[b][+s] = Math.min(50, Math.max(-50, v)) }
+  else if (t.dataset.pjt) P.tax[t.dataset.pjt] = Math.min(100, Math.max(0, v));
+  else if (t.dataset.pja) { if (!P.alloc) P.alloc = { ...pjD.autoAlloc }; P.alloc[t.dataset.pja] = Math.max(0, v); if (!Object.values(P.alloc).some(x => x > 0)) P.alloc = null }
+  else return;
+  pjSave(false);
+});
+$("pj-hyp").addEventListener("toggle", () => { if ($("pj-hyp").open && pjD) renderProjHyp() });
 function blShift(dir) { blMove(dir); renderBilan() }
 function blMove(dir) {
   const m = PF.blMode;
@@ -3635,8 +3936,8 @@ const val = a => { const q = live(a); return q ? +a.units * q.eur : (+a.amount |
 const totalOf = id => P()[id].reduce((s, a) => s + val(a), 0);
 const grandTotal = () => CLASSES.reduce((s, c) => s + totalOf(c.id), 0);
 const allAssets = () => CLASSES.flatMap(c => P()[c.id]);
-const newAsset = name => ({ id: rid(), name: name || "Nouvel actif", isin: "", amount: 0 });
-let apport = 0, impRows = [], degiroTx = null;
+const newAsset = name => ({ id: rid(), name: name || "Nouvel actif", isin: "", amount: 0, asOf: ymd(new Date()) });
+let apport = 0, impRows = [], degiroTx = null, degiroRows = null;
 
 function isinOk(s) {
   if (!/^[A-Z]{2}[A-Z0-9]{9}[0-9]$/.test(s)) return false;
@@ -3662,6 +3963,7 @@ function renderInvest() {
   renderTotals();
   renderHistory();
   renderQuoteNote();
+  try { renderTx() } catch (e) { console.error(e); $("tx-list").innerHTML = `<div class="notice err">Journal illisible : ${esc(e.message)}</div>` }
 }
 function priceCell(a) {
   const q = quoteFor(a);
@@ -3828,13 +4130,14 @@ function renderHistory() {
   $("histdelta").textContent = `${fmtPct(ch)} depuis le ${fmtD(pts[0].d)}`;
 }
 let resizeTimer = null;
-window.addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { if (view === "invest") renderHistory(); else if (view === "bilan") drawBilanChart() }, 150) });
+window.addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { if (view === "invest") renderHistory(); else if (view === "bilan") { drawBilanChart(); if (pjD) drawProj() } }, 150) });
 
 $("classes").addEventListener("input", e => {
   const inp = e.target.closest("input[data-k]"); if (!inp) return;
   const cls = inp.closest("[data-cls]").dataset.cls, a = P()[cls].find(x => x.id === inp.closest("tr").dataset.id), k = inp.dataset.k; if (!a) return;
   if (k === "sym") { const p = inp.selectionStart; inp.value = inp.value.toUpperCase().replace(/\s+/g, ""); try { inp.setSelectionRange(p, p) } catch {} }
   a[k] = (k === "amount" || k === "units") ? parseNum(inp.value) : inp.value;
+  if (k === "amount" || k === "units") a.asOf = ymd(new Date());   // ligne corrigée à la main : nouvel état de référence
   commit(false); renderTotals();
 });
 $("classes").addEventListener("change", e => {
@@ -3993,12 +4296,13 @@ $("impfile").addEventListener("change", async e => {
   try {
     let pos = null, found = false;
     for (const file of files) for (const rows of await sheetsOf(file)) {
-      const t = parseDegiroTx(rows); if (t) { degiroTx = t; found = true; break }
+      const t = parseDegiroTx(rows); if (t) { degiroTx = t; degiroRows = rows; found = true; break }
       const p = parseDegiroPortfolio(rows); if (p?.length) { pos = p; found = true; break }
     }
     if (!found) throw new Error("format");
     if (pos) impRows = pos.map(p => ({ ...p, target: p.cash ? "skip" : guessTarget(p) }));
-    if (!impRows.length) { $("impnote").textContent = "Historique des transactions lu. Choisissez maintenant l'export « Portefeuille » de DEGIRO."; return }
+    if (degiroRows) { const r = txFromRows([degiroRows], "pf", "degiro"); degiroRows = null; if (r) { txImp = r; renderTxImp() } }
+    if (!impRows.length) { $("impnote").textContent = "Transactions lues : à ajouter au journal dans Opérations (plus haut). Ajoutez l'export « Portefeuille » pour mettre à jour les lignes."; return }
     // Montant investi : repris de l'historique quand la quantité recalculée correspond à celle du portefeuille.
     let miss = 0;
     impRows.forEach(p => {
@@ -4041,21 +4345,356 @@ $("impprev").addEventListener("click", e => {
     a.amount = round2(g.value);
     if (!g.noCost) { a.cost = round2(g.cost); a.costDate = new Date(g.tw / g.cost).toISOString() }
     else if (!keep) { delete a.cost; delete a.costDate }
-    a.units = isFinite(g.units) ? g.units : null; a.degiro = one ? one.tk : (a.degiro || g.list[0].tk);
+    a.units = isFinite(g.units) ? g.units : null; a.degiro = one ? one.tk : (a.degiro || g.list[0].tk); a.asOf = ymd(new Date());
     if (one?.isin && !a.isin) a.isin = one.isin;
     if (!a.sym && a.isin) { const s = symForIsin(a.isin); if (s) a.sym = s }
   });
   const cashRows = impRows.filter(p => p.cash);
   if (cashRows.length) S.invest.freeCash = { amount: round2(cashRows.reduce((t, p) => t + (+p.value || 0), 0)), date: ymd(new Date()) };
   S.invest.importAt = new Date().toISOString(); impRows = []; renderImpPreview();
+  // Transactions DEGIRO lues en même temps : ajoutées au journal (antérieures au nouvel état des lignes, elles ne les modifient pas)
+  if (txImp?.src === "degiro") { txAdd(txImp.list); txImp = null }
   commit();
   $("impnote").textContent = `${n} position${n > 1 ? "s" : ""} importée${n > 1 ? "s" : ""} depuis DEGIRO. Les prochains imports reconnaîtront automatiquement ces lignes.`;
 });
 
+/* ---------- Journal des opérations de placement : achats, ventes, dividendes, frais, versements ---------- */
+// Opération : { id, date, acct ("pf" = portefeuille DEGIRO, sinon id d'un compte), type, name, sym, isin, qty, price,
+//   amount (€, frais à part ; signé pour dividendes et intérêts : une retenue d'impôt est négative), fees, src, ref, k, gs, gsh, at,
+//   ap : effet appliqué à la ligne du portefeuille, à la marge libre ou au solde du compte, quand l'opération est postérieure
+//   à leur dernier état connu (import, onglet Portefeuille, solde saisi) ; retiré si l'opération est modifiée ou supprimée }
+const round6 = v => Math.round(v * 1e6) / 1e6;
+const fmtIn6 = v => (isFinite(+v) && +v !== 0) ? String(round6(+v)).replace(".", ",") : "";
+const fmtQty = v => (+v || 0).toLocaleString("fr-FR", { maximumFractionDigits: 6 });
+const TX_PL = { buy: "achats", sell: "ventes", div: "dividendes", int: "intérêts", fee: "frais", dep: "versements", wd: "retraits" };
+const TX_COLOR = { buy: "var(--accent)", sell: "var(--warn)", div: "var(--up)", int: "var(--up)", fee: "var(--down)", dep: "var(--c-sav)", wd: "var(--muted)" };
+const isTrade = t => t.type === "buy" || t.type === "sell";
+const txPosKey = t => (t.isin || "").toUpperCase() || normSym(t.sym) || fold(t.name);
+const txKey = t => t.ref ? `${t.acct}|ref|${t.ref}` : [t.acct, t.date, t.type, txPosKey(t), Math.round((+t.qty || 0) * 1e6), Math.round((+t.amount || 0) * 100)].join("|");
+// Type d'opération d'après un libellé (« Achat », « Sell », « Dividende », « Impôts sur dividende », « Frais de connexion »…)
+function txType(text, qty) {
+  const f = fold(text);
+  if (/\b(vente|ventes|sell|sold|verkauf|verkoop|cession)\b/.test(f)) return "sell";
+  if (/\b(achat|achats|buy|bought|kauf|koop|purchase|souscription)\b|savings plan|plan d.?investissement|epargne programmee|sparplan/.test(f)) return "buy";
+  if (/dividend|coupon|distribution|retenue a la source|withholding|quellensteuer/.test(f)) return "div";
+  if (/interet|interest|zinsen/.test(f)) return "int";
+  if (/frais|\bfees?\b|commission|kosten|gebuhr|courtage|\btaxe|\btax\b/.test(f)) return "fee";
+  if (/retrait|withdraw|removal|auszahlung|opname/.test(f)) return "wd";
+  if (/depot|versement|deposit|einzahlung|storting|apport|top.?up|virement/.test(f)) return "dep";
+  if (isFinite(qty) && qty) return qty > 0 ? "buy" : "sell";
+  return "";
+}
+// Compte d'une opération : DEGIRO → portefeuille ; sinon compte d'épargne du même nom (PEA, Trade Republic, Kraken…)
+function txAcct(text) {
+  const f = fold(text);
+  if (!f || /degiro/.test(f)) return "pf";
+  if (/^(compte courant|ccp|courant)$/.test(f)) return null;
+  const a = acctFromText(text);
+  return (a && a.id !== "pf" && a.id !== "ccp" ? a.id : null) || S.budget.savings.find(x => fold(x.name) === f)?.id || null;
+}
+const txAcctName = id => id === "pf" ? "DEGIRO" : (S.budget.savings.find(a => a.id === id)?.name || "Compte supprimé");
+// Comptes proposés : DEGIRO (positions du portefeuille), les comptes titres, PEA et crypto (sauf le doublon « Degiro »), et ceux déjà utilisés
+function txAccts() {
+  const used = new Set(S.invest.tx.map(t => t.acct));
+  return [{ id: "pf", name: "DEGIRO" }].concat(S.budget.savings
+    .filter(a => (["titres", "crypto"].includes(a.kind) && !/degiro/.test(fold(a.name))) || used.has(a.id)).map(a => ({ id: a.id, name: a.name })));
+}
+// Argent de l'opération sur le compte : achat −, vente +, dividende et intérêts ±, frais − ; versements et retraits passent par les virements
+const txCash = t => t.type === "buy" ? -((+t.amount || 0) + (+t.fees || 0)) : t.type === "sell" ? (+t.amount || 0) - (+t.fees || 0)
+  : (t.type === "div" || t.type === "int") ? (+t.amount || 0) - (+t.fees || 0) : t.type === "fee" ? -(+t.amount || 0) : 0;
+function txAsset(t) {
+  const isin = (t.isin || "").toUpperCase(), sym = normSym(t.sym), nm = fold(t.name);
+  return allAssets().find(a => isin && (a.isin || "").toUpperCase() === isin) || allAssets().find(a => sym && normSym(a.sym) === sym)
+    || allAssets().find(a => nm && fold(a.name) === nm) || null;
+}
+function txApply(t) {
+  if (t.ap) return;
+  const ap = {};
+  if (t.acct === "pf") {
+    if (isTrade(t)) {
+      let a = txAsset(t), created = false;
+      if (!a && t.type === "buy") {
+        a = newAsset(t.name || t.sym || t.isin); a.isin = (t.isin || "").toUpperCase(); a.sym = normSym(t.sym) || (a.isin ? symForIsin(a.isin) : "");
+        a.units = 0; a.asOf = ""; P()[guessClass(t.name)].push(a); created = true;
+      }
+      if (a && t.date > (a.asOf || "")) {
+        const u0 = +a.units || 0, q = Math.abs(+t.qty || 0), c0 = +a.cost || 0, hasCost = c0 > 0 || u0 < 1e-9;
+        let du, dc, dm;
+        if (t.type === "buy") { du = q; dc = (+t.amount || 0) + (+t.fees || 0); dm = +t.amount || 0 }
+        else { const k = u0 > 1e-9 ? Math.min(1, q / u0) : 0; du = -Math.min(q, u0); dc = -c0 * k; dm = -(+a.amount || 0) * k }
+        a.units = round6(u0 + du); a.amount = round2(Math.max(0, (+a.amount || 0) + dm));
+        if (hasCost) {
+          const c1 = Math.max(0, c0 + dc);
+          if (t.type === "buy" && c1 > 0) { const t0 = Date.parse(a.costDate) || Date.parse(t.date); a.costDate = new Date((t0 * c0 + Date.parse(t.date) * dc) / c1).toISOString() }
+          a.cost = round2(c1);
+        } else dc = 0;
+        Object.assign(ap, { aid: a.id, du, dc, dm, created });
+      } else if (created) CLASSES.forEach(c => { P()[c.id] = P()[c.id].filter(x => x !== a) });
+    }
+    const fc = S.invest.freeCash, cash = txCash(t);
+    if (cash && fc && (!fc.date || t.date > fc.date)) { fc.amount = round2((+fc.amount || 0) + cash); ap.fc = cash }
+  } else if (t.type === "div" || t.type === "int" || t.type === "fee") {
+    const a = S.budget.savings.find(x => x.id === t.acct), cash = txCash(t);
+    if (a && cash && (!a.date || t.date > a.date)) { a.balance = round2((+a.balance || 0) + cash); ap.bal = cash }
+  }
+  if (Object.keys(ap).length) t.ap = ap;
+}
+function txRevert(t) {
+  const ap = t.ap; if (!ap) return;
+  if (ap.aid) {
+    const a = allAssets().find(x => x.id === ap.aid);
+    if (a && t.date > (a.asOf || "")) {
+      a.units = round6(Math.max(0, (+a.units || 0) - ap.du)); a.amount = round2(Math.max(0, (+a.amount || 0) - ap.dm));
+      if (ap.dc && +a.cost > 0) a.cost = round2(Math.max(0, a.cost - ap.dc));
+      if (ap.created && !(+a.units > 1e-9)) CLASSES.forEach(c => { P()[c.id] = P()[c.id].filter(x => x !== a) });
+    }
+  }
+  if (ap.fc) { const fc = S.invest.freeCash; if (fc && (!fc.date || t.date > fc.date)) fc.amount = round2((+fc.amount || 0) - ap.fc) }
+  if (ap.bal) { const a = S.budget.savings.find(x => x.id === t.acct); if (a && (!a.date || t.date > a.date)) a.balance = round2((+a.balance || 0) - ap.bal) }
+  delete t.ap;
+}
+// Opération propre (nombres, signes, ISIN) ou null si incomplète
+function txClean(t) {
+  const n = v => { const x = typeof v === "number" ? v : toNum(v); return isFinite(x) ? x : 0 };
+  const o = { id: t.id || rid(), date: t.date, acct: t.acct, type: t.type, name: String(t.name || "").trim(), sym: normSym(t.sym), isin: String(t.isin || "").trim().toUpperCase(),
+    qty: Math.abs(n(t.qty)), price: Math.abs(n(t.price)), amount: n(t.amount), fees: Math.abs(n(t.fees)), src: t.src || "app", at: t.at || Date.now() };
+  if (t.ref) o.ref = String(t.ref);
+  if (t.gs) { o.gs = t.gs; o.gsh = t.gsh }
+  if (o.isin && !isinOk(o.isin)) o.isin = "";
+  if (isTrade(o)) { o.amount = Math.abs(o.amount); if (!o.amount && o.qty && o.price) o.amount = o.qty * o.price; if (!o.price && o.qty && o.amount) o.price = o.amount / o.qty }
+  else { o.qty = 0; o.price = 0; if (o.type !== "div" && o.type !== "int") o.amount = Math.abs(o.amount) }
+  o.amount = round2(o.amount); o.fees = round2(o.fees); o.qty = round6(o.qty); o.price = Math.round(o.price * 1e4) / 1e4;
+  if (!o.sym && o.isin) o.sym = symForIsin(o.isin) || "";
+  const ok = /^\d{4}-\d{2}-\d{2}$/.test(o.date || "") && TX_TYPES[o.type] && o.acct && (isTrade(o) ? o.qty > 0 && o.amount > 0 : o.amount !== 0);
+  return ok ? o : null;
+}
+// Ajoute des opérations sans doublon (même référence d'ordre, ou même date, type, titre, quantité et montant), dans l'ordre des dates
+function txAdd(list) {
+  const keys = new Set(S.invest.tx.map(t => t.k || txKey(t))); let add = 0, dup = 0;
+  list.slice().sort((a, b) => a.date.localeCompare(b.date)).forEach(t => {
+    t.k = txKey(t); if (keys.has(t.k)) { dup++; return }
+    keys.add(t.k); S.invest.tx.push(t); txApply(t); add++;
+  });
+  return { add, dup };
+}
+function txReplace(cur, t) { txRevert(cur); Object.keys(cur).forEach(k => delete cur[k]); Object.assign(cur, t); cur.k = txKey(cur); txApply(cur) }
+// Positions et résultats d'après le journal (prix de revient moyen pondéré, frais d'achat compris ; une vente retire sa part du coût)
+function ledger(acct) {
+  const pos = {}, pl = {}, Y = String(new Date().getFullYear());
+  const tot = { realized: 0, div: 0, fees: 0, dep: 0, wd: 0, yr: { realized: 0, div: 0, fees: 0, dep: 0, wd: 0 } };
+  const add = (k, v, t) => { tot[k] += v; if (t.date.startsWith(Y)) tot.yr[k] += v };
+  S.invest.tx.filter(t => !acct || t.acct === acct).slice().sort((a, b) => a.date.localeCompare(b.date) || (a.type === "buy" ? 0 : 1) - (b.type === "buy" ? 0 : 1)).forEach(t => {
+    const key = t.acct + "|" + txPosKey(t);
+    if (isTrade(t)) {
+      const p = pos[key] ||= { k: key, acct: t.acct, name: t.name, sym: t.sym, isin: t.isin, qty: 0, cost: 0, realized: 0, div: 0, partial: false };
+      if (!p.name && t.name) p.name = t.name; if (!p.sym && t.sym) p.sym = t.sym; if (!p.isin && t.isin) p.isin = t.isin;
+      add("fees", +t.fees || 0, t);
+      if (t.type === "buy") { p.qty = round6(p.qty + t.qty); p.cost += t.amount + (+t.fees || 0); return }
+      if (p.qty < t.qty - 1e-6) p.partial = true;
+      const q = Math.min(t.qty, p.qty), out = p.qty > 1e-9 ? p.cost * q / p.qty : 0;
+      if (q > 1e-9) { const v = (t.amount - (+t.fees || 0)) * q / t.qty - out; p.realized += v; add("realized", v, t); pl[t.id] = round2(v) }
+      p.qty = round6(p.qty - q); p.cost = p.qty > 1e-9 ? Math.max(0, p.cost - out) : 0;
+    } else if (t.type === "div" || t.type === "int") { const v = t.amount - (+t.fees || 0); add("div", v, t); if (pos[key]) pos[key].div += v }
+    else if (t.type === "fee") add("fees", t.amount, t);
+    else if (t.type === "dep") add("dep", t.amount, t);
+    else if (t.type === "wd") add("wd", t.amount, t);
+  });
+  return { pos: Object.values(pos), pl, tot };
+}
+
+/* Panneau « Opérations » de la page Portefeuille */
+let txF = "", txAll = false, txImp = null, txEdit = null, txAmtTouched = false;
+function renderTx() {
+  const accts = txAccts(), used = [...new Set(S.invest.tx.map(t => t.acct))];
+  if (txF && !used.includes(txF)) txF = "";
+  const chips = accts.filter(a => used.includes(a.id));
+  $("tx-f").hidden = chips.length < 2;
+  $("tx-f").innerHTML = [["", "Tous"], ...chips.map(a => [a.id, a.name])].map(([id, n]) => `<button type="button" data-txf="${esc(id)}" aria-pressed="${id === txF}">${esc(n)}</button>`).join("");
+  const L = ledger(txF), T = L.tot, Y = new Date().getFullYear(), ops = S.invest.tx.filter(t => !txF || t.acct === txF);
+  const sg = v => `${v >= 0 ? "+" : "−"}${fmtEUR(Math.abs(v))}`, col = v => Math.abs(v) < 0.005 ? "" : v > 0 ? "var(--up)" : "var(--down)";
+  const stat = (lbl, v, yr, signed = true) => `<div class="stat"><span class="eyebrow">${lbl}</span><span class="v" style="color:${signed ? col(v) : ""}">${signed ? sg(v) : fmtEUR(v)}</span><span class="small muted">${Y} : ${signed ? sg(yr) : fmtEUR(yr)}</span></div>`;
+  $("tx-stats").hidden = !ops.length;
+  $("tx-stats").innerHTML = ops.length ? stat("Plus-values réalisées", T.realized, T.yr.realized) + stat("Dividendes et intérêts", T.div, T.yr.div)
+    + stat("Frais", -T.fees, -T.yr.fees) + stat("Versé", T.dep - T.wd, T.yr.dep - T.yr.wd, false) : "";
+  // Positions des autres comptes (celles de DEGIRO sont dans les classes plus bas)
+  const pos = L.pos.filter(p => p.acct !== "pf" && p.qty > 1e-9), byAcct = {};
+  pos.forEach(p => (byAcct[p.acct] ||= []).push(p));
+  $("tx-pos").innerHTML = Object.entries(byAcct).map(([id, list]) => {
+    const rows = list.map(p => { const q = p.sym ? quoteFor({ sym: p.sym }) : null; return { p, q, v: q ? p.qty * q.eur : null } });
+    const tv = rows.reduce((t, r) => t + (r.v ?? r.p.cost), 0);
+    return `<div class="mhead"><span>${esc(txAcctName(id))}</span><span class="num">${fmtEUR(tv)}</span></div>` + rows.map(({ p, q, v }) => {
+      const g = v === null ? null : v - p.cost;
+      return `<div class="exp nod" style="cursor:default"><span class="l"><b>${esc(p.name || p.sym || p.isin)}</b><small>${fmtQty(p.qty)} × PRU ${fmtEUR(p.cost / p.qty)}${q ? ` / cours ${fmtEUR(q.eur)}` : ""}</small></span>
+        <span class="num" style="text-align:right;font-weight:600">${fmtEUR(v ?? p.cost)}<small style="display:block;font-weight:500;color:${g === null ? "var(--muted)" : col(g)}">${g === null ? "sans cours" : `${sg(g)} · ${fmtPct(p.cost ? g / p.cost * 100 : 0)}`}</small></span></div>`;
+    }).join("");
+  }).join("");
+  // Liste des opérations, de la plus récente à la plus ancienne
+  const list = ops.slice().sort((a, b) => b.date.localeCompare(a.date) || (b.at || 0) - (a.at || 0)), shown = txAll ? list : list.slice(0, 12);
+  $("tx-list").innerHTML = shown.map(t => {
+    const d = parseYmd(t.date), yr = d.getFullYear() !== Y ? "/" + String(d.getFullYear()).slice(2) : "", pl = L.pl[t.id] ?? ledger(t.acct).pl[t.id];
+    const sub = [txF ? "" : txAcctName(t.acct), isTrade(t) ? `${fmtQty(t.qty)} × ${fmtEUR(t.price)}` : "", t.fees ? `frais ${fmtEUR(t.fees)}` : "", pl != null ? `PV ${sg(pl)}` : ""].filter(Boolean).join(" / ");
+    const amt = t.type === "div" || t.type === "int" ? sg(t.amount) : t.type === "fee" || t.type === "wd" ? "−" + fmtEUR(t.amount) : t.type === "dep" ? "+" + fmtEUR(t.amount) : fmtEUR(t.amount);
+    const c = t.type === "div" || t.type === "int" ? col(t.amount) : t.type === "fee" ? "var(--down)" : "";
+    return `<button type="button" class="exp" data-txid="${esc(t.id)}"><span class="d">${pad(d.getDate())}/${pad(d.getMonth() + 1)}${yr}</span>
+      <span class="l"><b><span class="txb" style="--c:${TX_COLOR[t.type]}">${TX_TYPES[t.type]}</span> ${esc(t.name || (isTrade(t) || t.type === "div" ? t.sym || t.isin : ""))}</b><small>${esc(sub)}</small></span>
+      <span class="num" style="font-weight:600${c ? ";color:" + c : ""}">${amt}</span></button>`;
+  }).join("") + (list.length > shown.length ? `<button type="button" class="linkbtn small" data-txall style="margin-top:8px">Tout afficher (${list.length})</button>` : "")
+    || `<div class="notice">Aucune opération<span class="small muted" style="display:block">+ Opération / relevé du courtier / onglet « Transactions » du tableau</span></div>`;
+  const ia = $("tx-impacct"), keep = ia.value;
+  ia.innerHTML = accts.map(a => `<option value="${esc(a.id)}">${esc(a.name)}</option>`).join("");
+  ia.value = accts.some(a => a.id === keep) ? keep : (txF || "pf");
+  renderTxImp();
+}
+function renderTxImp() {
+  const el = $("tx-prev");
+  if (!txImp) { el.hidden = true; el.innerHTML = ""; return }
+  const by = {}; txImp.list.forEach(t => { by[t.type] = (by[t.type] || 0) + 1 });
+  const dates = txImp.list.map(t => t.date).sort(), n = txImp.list.length;
+  el.hidden = false;
+  el.innerHTML = `<div class="small">${n ? `<b>${n} opération${n > 1 ? "s" : ""}</b> pour ${esc(txAcctName(txImp.acct))} : ${Object.entries(by).map(([k, c]) => `${c} ${c > 1 ? TX_PL[k] : TX_TYPES[k].toLowerCase()}`).join(", ")}, du ${fmtDate(dates[0])} au ${fmtDate(dates.at(-1))}` : "Rien de nouveau"}${txImp.dup ? ` / ${txImp.dup} déjà présente${txImp.dup > 1 ? "s" : ""}` : ""}${txImp.skip ? ` / ${txImp.skip} ligne${txImp.skip > 1 ? "s" : ""} ignorée${txImp.skip > 1 ? "s" : ""}` : ""}</div>
+    <div class="actions"><button class="btn" type="button" data-txi="cancel">Annuler</button>${n ? `<button class="btn primary" type="button" data-txi="ok">Ajouter au journal</button>` : ""}</div>`;
+}
+$("tx-panel").addEventListener("click", e => {
+  const f = e.target.closest("[data-txf]"); if (f) { txF = f.dataset.txf; txAll = false; renderTx(); return }
+  if (e.target.closest("[data-txall]")) { txAll = true; renderTx(); return }
+  if (e.target.closest("#tx-add")) { openTx(null); return }
+  const r = e.target.closest("[data-txid]"); if (r) { const t = S.invest.tx.find(x => x.id === r.dataset.txid); if (t) openTx(t); return }
+  const b = e.target.closest("[data-txi]"); if (!b || !txImp) return;
+  if (b.dataset.txi === "cancel") { txImp = null; renderTxImp(); $("tx-impnote").textContent = "Import annulé."; return }
+  const res = txAdd(txImp.list), acct = txImp.acct; txImp = null; txF = S.invest.tx.some(t => t.acct !== acct) ? acct : txF; commit();
+  $("tx-impnote").textContent = `${res.add} opération${res.add > 1 ? "s" : ""} ajoutée${res.add > 1 ? "s" : ""} au journal.`;
+});
+// Relevé CSV ou Excel d'un courtier : colonnes repérées par leur titre (date, type ou description, titre, ISIN, quantité, cours, montant, frais…)
+function txDate(v) {
+  if (v instanceof Date) return ymd(v);
+  if (typeof v === "number") return gsDate(v);
+  const s = String(v ?? "").trim(); if (!s) return "";
+  const g = gsDate(s); if (g) return g;
+  const t = dmyTime(s); return t ? ymd(new Date(t)) : "";
+}
+function parseTxRows(rows) {
+  const RE_DATE = /^(date|datum|date d.?execution|date de l.?operation|date d.?operation|date operation|execution date|booking date|trade date|value date)$/;
+  const RE_AMT = /^(montant|amount|betrag|bedrag|mouvements?|value|valeur|waarde|wert|montant eur|amount eur)( \(eur\))?$/;
+  const hi = rows.slice(0, 20).findIndex(r => { const h = r.map(fold); return h.some(c => RE_DATE.test(c) || /^date/.test(c)) && h.some(c => RE_AMT.test(c) || RE_QTY.test(c) || /total|quantit|shares/.test(c)) });
+  if (hi < 0) return null;
+  const H = rows[hi].map(fold), col = (...res) => { for (const re of res) { const i = H.findIndex(h => re.test(h)); if (i >= 0) return i } return -1 };
+  const iDate = col(RE_DATE, /^date/, /datum/), iTime = col(/^(heure|time|tijd|zeit|uhrzeit)$/),
+    iType = col(/^(type|sens|side|operation|type d.?operation|transaction type|action|art|typ|order type)$/),
+    iDesc = col(/description|libelle|details?$|omschrijving|beschreibung|^note$/),
+    iName = col(/^(produit|product|produkt|nom|name|titre|instrument|asset|actif|security|wertpapier|valeur mobiliere|libelle produit)$/),
+    iIsin = col(/isin/), iSym = col(/^(symbole|symbol|ticker|code)$/),
+    iQty = col(/^(quantite|quantity|qte|qty|shares|parts|nombre de parts|nombre|aantal|anzahl|stuks|stuk|units)$/, /quantit|shares|stuks/),
+    iPrice = col(/^(cours|prix|price|kurs|koers|prix unitaire|unit price|share price|prix d.?execution|cours d.?execution)$/),
+    iTot = col(/^(total|totaal|gesamt|montant net|net amount|total eur|total \(eur\))$/),
+    iAmt = col(RE_AMT, /^montant|^amount|betrag/),
+    iFee = col(/frais|\bfees?\b|commission|kosten|gebuhr/), iCur = col(/^(devise|currency|wahrung|valuta|ccy)$/),
+    iRef = col(/^(id ordre|order id|identifiant de l.?ordre|transaction id|reference|ref)$/);
+  const cur3 = (r, i) => i < 0 ? "" : [r[i], r[i + 1]].map(x => String(x ?? "").trim().toUpperCase()).find(x => /^[A-Z]{3}$/.test(x)) || "";
+  const out = [], seenRef = {}; let skip = 0;
+  for (const r of rows.slice(hi + 1)) {
+    if (!r.some(c => String(c ?? "").trim())) continue;
+    const date = txDate(r[iDate]); if (!date) { skip++; continue }
+    const desc = [iType, iDesc].filter(i => i >= 0).map(i => cell(r, i)).join(" "), qty0 = iQty >= 0 ? toNum(r[iQty]) : NaN, type = txType(desc, qty0);
+    if (!type) { skip++; continue }
+    const fees = iFee >= 0 ? Math.abs(numAt(r, iFee)) || 0 : 0, total = iTot >= 0 ? numAt(r, iTot) : NaN, raw = iAmt >= 0 ? numAt(r, iAmt) : NaN;
+    let amount = isFinite(raw) ? raw : isFinite(total) ? (type === "buy" ? Math.abs(total) - fees : type === "sell" ? Math.abs(total) + fees : total) : NaN;
+    const cur = iCur >= 0 ? cell(r, iCur).toUpperCase() : cur3(r, isFinite(raw) ? iAmt : iTot);
+    if (isFinite(amount) && cur && cur !== "EUR" && !(isFinite(total) && cur3(r, iTot) === "EUR")) { const e = toEUR(amount, cur); if (e) amount = e }
+    if (isTrade({ type }) && !(isFinite(qty0) && qty0)) { skip++; continue }   // achat ou vente sans quantité (ligne de relevé déjà dans l'export Transactions)
+    const qty = Math.abs(qty0 || 0), price = iPrice >= 0 ? Math.abs(numAt(r, iPrice)) : NaN;
+    if (!isFinite(amount) || !amount) { if (isTrade({ type }) && qty && price) amount = qty * price; else { skip++; continue } }
+    if (type === "div" || type === "int") { /* montant signé : une retenue d'impôt est négative */ } else amount = Math.abs(amount);
+    let ref = iRef >= 0 ? cell(r, iRef) : "";
+    if (ref) { seenRef[ref] = (seenRef[ref] || 0) + 1; ref += "#" + seenRef[ref] + (iTime >= 0 ? "@" + cell(r, iTime) : "") }
+    const isin = cell(r, iIsin).toUpperCase();
+    // Titre : colonne dédiée, sinon la description sans le type (« Savings plan Amundi MSCI World » → « Amundi MSCI World »)
+    const name = iName >= 0 ? cell(r, iName) : (isTrade({ type }) || type === "div") && iDesc >= 0
+      ? cell(r, iDesc).replace(/^(savings plan|sparplan|plan d.?investissement|buy trade|sell trade|buy|sell|achat|vente|dividendes?|dividend|kauf|verkauf)\b[\s:–-]*/i, "").trim() : "";
+    out.push({ date, type, name, isin: isinOk(isin) ? isin : "", sym: iSym >= 0 ? cell(r, iSym) : "", qty, price: isFinite(price) ? price : 0, amount, fees, ref });
+  }
+  return { list: out, skip };
+}
+async function txReadFile(file, acct, src) { const r = txFromRows(await sheetsOf(file), acct, src); if (!r) throw new Error("format"); return { ...r, file: file.name } }
+function txFromRows(sheets, acct, src) {
+  let res = null;
+  for (const rows of sheets) { const r = parseTxRows(rows); if (r?.list.length) { res = r; break } if (r && !res) res = r }
+  if (!res?.list.length) return null;
+  const list = res.list.map(t => txClean({ ...t, acct, src })).filter(Boolean), keys = new Set(S.invest.tx.map(t => t.k || txKey(t)));
+  const fresh = list.filter(t => !keys.has(txKey(t)));
+  return { acct, src, list: fresh, dup: list.length - fresh.length, skip: res.skip + (res.list.length - list.length) };
+}
+$("tx-file").addEventListener("change", async e => {
+  const f = e.target.files?.[0]; e.target.value = ""; if (!f) return;
+  $("tx-impnote").textContent = "Lecture du fichier…";
+  try { txImp = await txReadFile(f, $("tx-impacct").value || "pf", "csv"); $("tx-impnote").textContent = "Rien n'est ajouté tant que vous n'avez pas validé."; renderTxImp() }
+  catch (err) { txImp = null; renderTxImp(); $("tx-impnote").textContent = err?.message === "format" ? "Aucune opération reconnue dans ce fichier." : "Fichier illisible (Excel : connexion internet nécessaire, sinon CSV)." }
+});
+
+/* Fiche d'une opération */
+function txFields() {
+  const ty = $("tx-type").value, trade = ty === "buy" || ty === "sell", named = trade || ty === "div";
+  $("tx-namebox").hidden = !named; $("tx-idbox").hidden = !named; $("tx-qbox").hidden = !trade; $("tx-feebox").hidden = !trade;
+  $("tx-amtlbl").textContent = ty === "div" || ty === "int" ? "Montant net (€)" : "Montant (€)";
+  const t = txEdit && S.invest.tx.find(x => x.id === txEdit);
+  $("tx-note").textContent = !t ? "" : t.ap?.aid ? "Ligne du portefeuille mise à jour" : t.ap?.fc ? "Marge libre mise à jour" : t.ap?.bal ? "Solde du compte mis à jour"
+    : t.acct === "pf" && trade ? "Avant le dernier état du portefeuille : seulement dans l'historique" : "";
+}
+function openTx(t) {
+  txEdit = t ? t.id : null; txAmtTouched = !!t;
+  $("txtitle").textContent = t ? "Modifier l'opération" : "Nouvelle opération";
+  $("tx-type").innerHTML = Object.entries(TX_TYPES).map(([k, n]) => `<option value="${k}">${n}</option>`).join("");
+  const accts = txAccts(); if (t && !accts.some(a => a.id === t.acct)) accts.push({ id: t.acct, name: txAcctName(t.acct) });
+  $("tx-acc").innerHTML = accts.map(a => `<option value="${esc(a.id)}">${esc(a.name)}</option>`).join("");
+  $("tx-type").value = t?.type || "buy"; $("tx-acc").value = t?.acct || txF || "pf"; $("tx-date").value = t?.date || todayKey();
+  $("tx-name").value = t?.name || ""; $("tx-sym").value = t?.sym || ""; $("tx-isin").value = t?.isin || "";
+  $("tx-qty").value = t?.qty ? fmtIn6(t.qty) : ""; $("tx-price").value = t?.price ? fmtIn6(t.price) : "";
+  $("tx-amount").value = t ? fmtIn(t.amount) : ""; $("tx-fees").value = t?.fees ? fmtIn(t.fees) : "";
+  const names = new Map(); allAssets().forEach(a => a.name && names.set(a.name, a)); S.invest.tx.forEach(x => x.name && !names.has(x.name) && names.set(x.name, x));
+  $("tx-names").innerHTML = [...names.keys()].map(n => `<option value="${esc(n)}"></option>`).join("");
+  const del = $("tx-del"); del.hidden = !t; delete del.dataset.confirm; del.textContent = "Supprimer";
+  $("tx-err").textContent = ""; txFields(); $("txsheet").hidden = false;
+  if (!t) setTimeout(() => $("tx-name").focus(), 60);
+}
+const closeTx = () => { $("txsheet").hidden = true; txEdit = null };
+$("txsheet").addEventListener("click", e => { if (e.target.closest("[data-txclose]")) closeTx() });
+$("tx-type").addEventListener("change", txFields);
+$("tx-name").addEventListener("change", () => {
+  const nm = fold($("tx-name").value); if (!nm) return;
+  const a = allAssets().find(x => fold(x.name) === nm) || S.invest.tx.find(x => fold(x.name) === nm);
+  if (a) { if (!$("tx-sym").value && a.sym) $("tx-sym").value = a.sym; if (!$("tx-isin").value && a.isin) $("tx-isin").value = a.isin }
+});
+["tx-qty", "tx-price"].forEach(id => $(id).addEventListener("input", () => {
+  if (txAmtTouched) return; const q = toNum($("tx-qty").value), p = toNum($("tx-price").value);
+  $("tx-amount").value = isFinite(q) && isFinite(p) && q && p ? fmtIn(q * p) : "";
+}));
+$("tx-amount").addEventListener("input", () => { txAmtTouched = true });
+$("txform").addEventListener("submit", e => {
+  e.preventDefault();
+  const ty = $("tx-type").value, trade = ty === "buy" || ty === "sell", named = trade || ty === "div";
+  const raw = { type: ty, acct: $("tx-acc").value, date: $("tx-date").value, name: named ? $("tx-name").value : "", sym: named ? $("tx-sym").value : "", isin: named ? $("tx-isin").value : "",
+    qty: trade ? $("tx-qty").value : 0, price: trade ? $("tx-price").value : 0, amount: $("tx-amount").value, fees: trade ? $("tx-fees").value : 0, src: "app" };
+  const old = txEdit && S.invest.tx.find(t => t.id === txEdit);
+  if (old) { Object.assign(raw, { id: old.id, at: old.at, src: old.src }); if (old.ref) raw.ref = old.ref; if (old.gs) { raw.gs = old.gs; raw.gsh = old.gsh } }
+  if (raw.isin.trim() && !isinOk(raw.isin.trim().toUpperCase())) { $("tx-err").textContent = "ISIN invalide"; $("tx-isin").focus(); return }
+  const t = txClean(raw);
+  if (!t) { $("tx-err").textContent = !/^\d{4}-\d{2}-\d{2}$/.test(raw.date) ? "Date ?" : trade ? "Quantité et montant (ou prix) ?" : "Montant ?"; return }
+  if (trade && !t.name && !t.sym && !t.isin) { $("tx-err").textContent = "Titre ?"; $("tx-name").focus(); return }
+  if (old) txReplace(old, t);
+  else if (!txAdd([t]).add) { $("tx-err").textContent = "Cette opération existe déjà."; return }
+  closeTx(); commit(); toast(old ? "Opération modifiée" : "Opération ajoutée");
+});
+$("tx-del").addEventListener("click", e => {
+  const b = e.currentTarget, t = txEdit && S.invest.tx.find(x => x.id === txEdit); if (!t) return;
+  if (!b.dataset.confirm) { b.dataset.confirm = "1"; b.textContent = "Confirmer la suppression"; return }
+  txRevert(t); S.invest.tx = S.invest.tx.filter(x => x !== t); closeTx(); commit(); toast("Opération supprimée");
+});
+sheetGestures("txsheet", closeTx);
+
 /* ---------- Google Sheets privé (rempli par Claude) ---------- */
 // L'appli lit le tableau avec le compte Google de l'utilisateur (Google Identity Services).
 // Onglets lus (remplis par Claude) : Mouvements (ID, Date, Type, Montant, Enveloppe, Catégorie, Libellé), Budget (Enveloppe, Prévu, Type),
-// Portefeuille (Symbole, Quantité, Montant investi, Classe, ISIN, Nom), Soldes. L'appli n'y écrit jamais.
+// Portefeuille (Symbole, Quantité, Montant investi, Classe, ISIN, Nom), Soldes, Transactions (ID, Date, Compte, Type, Nom, Symbole, ISIN,
+// Quantité, Prix, Montant, Frais). L'appli n'y écrit jamais.
 // Onglets écrits (copie des données de l'appli, pour que Claude voie les saisies) : « Appli · … », voir plus bas.
 const GS_SCOPE = "https://www.googleapis.com/auth/spreadsheets", LS_GSAT = "fin.gsat";
 let gsToken = null, gsTokenExp = 0, gsClient = null, gsClientId = "", gsBusy = false, gsLoad = null, gsPending = null, gsBudgetNote = "", gsLast = +ls.get(LS_GSAT) || 0;
@@ -4116,8 +4755,8 @@ async function gsFetch(auto) {
     const id = sheetIdOf(S.gs.sheet);
     const meta = await gsGet(id + "?fields=sheets.properties.title");
     const titles = (meta.sheets || []).map(x => x.properties.title), find = re => titles.find(t => re.test(fold(t)));
-    const want = [["mv", find(/^mouvements?/), "A1:H3000"], ["bu", find(/^budget/), "A1:C300"], ["pf", find(/^portefeuille/), "A1:F300"], ["so", find(/^soldes?/), "A1:G100"]].filter(x => x[1]);
-    if (!want.length) throw new Error("Aucun onglet « Mouvements », « Budget », « Portefeuille » ou « Soldes » dans ce tableau.");
+    const want = [["mv", find(/^mouvements?/), "A1:H3000"], ["bu", find(/^budget/), "A1:C300"], ["pf", find(/^portefeuille/), "A1:F300"], ["so", find(/^soldes?/), "A1:G100"], ["tx", find(/^(transactions?|operations?)( |$)/), "A1:L3000"]].filter(x => x[1]);
+    if (!want.length) throw new Error("Aucun onglet « Mouvements », « Budget », « Portefeuille », « Soldes » ou « Transactions » dans ce tableau.");
     const q = want.map(([, t, r]) => "ranges=" + encodeURIComponent(`'${t.replace(/'/g, "''")}'!${r}`)).join("&");
     const data = await gsGet(id + "/values:batchGet?" + q + "&valueRenderOption=UNFORMATTED_VALUE&dateTimeRenderOption=FORMATTED_STRING");
     const vals = {}; want.forEach(([k], i) => { vals[k] = data.valueRanges?.[i]?.values || [] });
@@ -4129,6 +4768,7 @@ async function gsFetch(auto) {
     if (res.budget) parts.push("budget mis à jour");
     if (res.port) parts.push(`${res.port} ligne${res.port > 1 ? "s" : ""} du portefeuille à jour`);
     if (res.sold) parts.push(`${res.sold} solde${res.sold > 1 ? "s" : ""} de compte à jour`);
+    if (res.tx || res.txUpd) { const n = res.tx || res.txUpd, pl = n > 1 ? "s" : ""; parts.push(`${n} opération${pl} de placement ${res.tx ? "ajoutée" + pl : "modifiée" + pl}${res.tx && res.txUpd ? `, ${res.txUpd} modifiée${res.txUpd > 1 ? "s" : ""}` : ""}`) }
     if (res.envNew.length) parts.push(`enveloppe${res.envNew.length > 1 ? "s" : ""} créée${res.envNew.length > 1 ? "s" : ""} : ${res.envNew.join(", ")}`);
     const when = new Date(gsLast).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
     const wNote = !gsWriteOn() ? "" : sent ? " Vos données ont été copiées dans le tableau." : gswErr ? " Copie dans le tableau impossible : " + gswErr : "";
@@ -4225,9 +4865,32 @@ function applyPortRows(rows) {
     }
     if (r.sym) a.sym = r.sym; if (r.isin && !a.isin) a.isin = r.isin;
     if (r.name && (!a.name || a.name === "Nouvel actif")) a.name = r.name;
-    a.units = Math.max(0, r.units); if (!a.units) a.amount = 0;
+    a.units = Math.max(0, r.units); if (!a.units) a.amount = 0; a.asOf = ymd(new Date());
     if (r.cost > 0) { a.cost = round2(r.cost); if (!a.costDate) a.costDate = new Date().toISOString(); if (!(+a.amount > 0) && a.units) a.amount = round2(r.cost) }
   });
+}
+// Onglet Transactions (rempli par Claude) : ID, Date, Compte, Type, Nom, Symbole, ISIN, Quantité, Prix, Montant, Frais.
+// Compte : DEGIRO (portefeuille) ou nom d'un compte (PEA, Trade Republic…). Type : Achat, Vente, Dividende, Intérêts, Frais, Versement, Retrait.
+function gsTx(rows, res) {
+  if (!rows.length) return;
+  const { idx, body } = gsCols(rows, { id: [/^id$|identifiant/, 0], date: [/^date/, 1], acct: [/compte|courtier/, 2], type: [/^type|operation|^sens/, 3], name: [/^nom|produit|titre|libelle/, 4],
+    sym: [/symbole|ticker/, 5], isin: [/isin/, 6], qty: [/quantit|nombre|parts/, 7], price: [/^prix|cours/, 8], amount: [/montant|total/, 9], fees: [/frais/, 10] });
+  const seen = {};
+  for (const r of body) {
+    if (!r.some(c => String(c ?? "").trim())) continue;
+    const qty = toNum(r[idx.qty]), raw = { date: gsDate(r[idx.date]), acct: txAcct(cell(r, idx.acct)), type: txType(cell(r, idx.type), qty), name: cell(r, idx.name), sym: cell(r, idx.sym),
+      isin: cell(r, idx.isin), qty, price: r[idx.price], amount: r[idx.amount], fees: r[idx.fees], src: "gs" };
+    const h = hashStr(JSON.stringify([raw.date, cell(r, idx.acct), cell(r, idx.type), raw.name, raw.sym, raw.isin, cell(r, idx.qty), cell(r, idx.price), cell(r, idx.amount), cell(r, idx.fees)]));
+    let gid = cell(r, idx.id); if (!gid) { seen[h] = (seen[h] || 0) + 1; gid = "h" + h + "-" + seen[h] }
+    const cur = S.invest.tx.find(t => t.gs === gid);
+    if (cur && cur.gsh === h) continue;                     // déjà lue et inchangée (une modification faite dans l'appli est gardée)
+    const t = txClean({ ...raw, id: cur?.id, at: cur?.at, gs: gid, gsh: h });
+    if (!t) { res.bad++; continue }
+    if (cur) { txReplace(cur, t); res.txUpd++; continue }
+    const same = S.invest.tx.find(x => !x.gs && (x.k || txKey(x)) === txKey(t));
+    if (same) { same.gs = gid; same.gsh = h; continue }    // déjà saisie dans l'appli ou importée d'un relevé
+    txAdd([t]); res.tx++;
+  }
 }
 // Onglet Soldes : Compte, Solde, Date. « Compte courant » met à jour le solde réel du compte courant ; les autres lignes, les comptes d'épargne du même nom.
 function gsSoldRows(rows) {
@@ -4252,8 +4915,8 @@ function applySoldRows(rows) {
   });
 }
 function gsApply(v) {
-  const res = { add: 0, upd: 0, bad: 0, budget: false, port: 0, sold: 0, envNew: [] };
-  const snap = () => JSON.stringify([S.budget, S.invest.portfolio, S.gs]), before = snap();
+  const res = { add: 0, upd: 0, bad: 0, budget: false, port: 0, sold: 0, tx: 0, txUpd: 0, envNew: [] };
+  const snap = () => JSON.stringify([S.budget, S.invest.portfolio, S.invest.tx, S.invest.freeCash, S.gs]), before = snap();
   gsMovements(v.mv || [], res);
   const bRows = gsBudgetRows(v.bu || []), bh = bRows.length ? hashStr(JSON.stringify(bRows.map(r => [fold(r.name), r.amount, r.kind]))) : "";
   gsPending = null;
@@ -4266,6 +4929,7 @@ function gsApply(v) {
   if (pRows.length && ph !== S.gs.portHash) { applyPortRows(pRows); S.gs.portHash = ph; res.port = pRows.length }
   const sRows = gsSoldRows(v.so || []), sh = sRows.length ? hashStr(JSON.stringify(sRows)) : "";
   if (sRows.length && sh !== S.gs.soldHash) { applySoldRows(sRows); S.gs.soldHash = sh; res.sold = sRows.length }
+  gsTx(v.tx || [], res);   // après le portefeuille et les soldes : une opération plus récente que leur état les met à jour
   if (snap() !== before) commit();
   return res;
 }
@@ -4316,14 +4980,14 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 // Onglets « Appli · … » réécrits entièrement à chaque envoi ; les onglets remplis par Claude ne sont jamais modifiés.
 // Envoi automatique quelques secondes après chaque changement tant que la connexion Google est active (environ 1 h après « ↻ Google Sheets »).
 // Sinon le bouton « ↻ Google Sheets » de l'Accueil affiche un point : le toucher récupère et envoie.
-const GSW_TABS = { in: "Appli · Infos", mv: "Appli · Mouvements", bu: "Appli · Budget", co: "Appli · Comptes", pf: "Appli · Portefeuille" };
+const GSW_TABS = { in: "Appli · Infos", mv: "Appli · Mouvements", bu: "Appli · Budget", co: "Appli · Comptes", pf: "Appli · Portefeuille", tx: "Appli · Opérations" };
 const GSW_MAX = 5000;   // mouvements recopiés au plus (les plus récents)
 let gswTimer = null, gswBusy = false, gswAgain = false, gswErr = "", gswMemo = { s: null, at: -1, h: "" };
 const gsWriteOn = () => S.gs.write !== false;
 // Empreinte des données saisies (pas des valeurs calculées comme les cours) : sert à savoir s'il reste quelque chose à envoyer.
 function gsDataHash() {
   if (gswMemo.s === S && gswMemo.at === S.updatedAt) return gswMemo.h;
-  const h = hashStr(JSON.stringify([S.budget, S.invest.portfolio, S.invest.freeCash, S.invest.classNames]));
+  const h = hashStr(JSON.stringify([S.budget, S.invest.portfolio, S.invest.freeCash, S.invest.classNames, S.invest.tx]));
   gswMemo = { s: S, at: S.updatedAt, h }; return h;
 }
 const gsUnsent = () => gsReady() && gsWriteOn() && gsDataHash() !== S.gs.wHash;
@@ -4395,8 +5059,17 @@ function gswRows() {
     ["Dernière modification dans l'appli", S.updatedAt ? stamp(S.updatedAt) : ""], ["Cycle en cours", `${ymd(cur.start)} → ${ymd(cur.end)}`],
     ["Jour de paie", B.payday + (B.shiftWeekend ? " (avancé au vendredi si week-end)" : "")], ["Revenu habituel", round2(+B.income || 0)],
     ["Mouvements dans l'appli", capped ? `${total} (les ${GSW_MAX} plus récents sont recopiés)` : total],
-    ["À savoir", "Ces onglets « Appli · … » sont réécrits par l'appli à chaque envoi : les modifier à la main ne sert à rien. Pour ajouter des données, utilisez les onglets Mouvements, Budget, Portefeuille et Soldes."]];
-  return { in: inf, mv: mvRows, bu, co, pf };
+    ["À savoir", "Ces onglets « Appli · … » sont réécrits par l'appli à chaque envoi : les modifier à la main ne sert à rien. Pour ajouter des données, utilisez les onglets Mouvements, Budget, Portefeuille, Soldes et Transactions."]];
+  // Journal des opérations de placement, puis positions des autres comptes d'après le journal
+  const LG = ledger(""), op = [["Date", "Compte", "Type", "Nom", "Symbole", "ISIN", "Quantité", "Prix", "Montant", "Frais", "Plus-value réalisée", "Origine", "ID"]];
+  S.invest.tx.slice().sort((a, b) => b.date.localeCompare(a.date)).forEach(t => op.push([t.date, txAcctName(t.acct), TX_TYPES[t.type], t.name || "", t.sym || "", t.isin || "",
+    isTrade(t) ? t.qty : "", isTrade(t) ? t.price : "", t.amount, t.fees || "", LG.pl[t.id] ?? "", t.gs ? "Tableau (Claude)" : t.src === "csv" ? "Relevé importé" : t.src === "degiro" ? "Import DEGIRO" : "Appli", t.id]));
+  const lp = LG.pos.filter(x => x.acct !== "pf" && x.qty > 1e-9);
+  if (lp.length) {
+    op.push([], ["Position", "Compte", "Symbole", "ISIN", "Quantité", "Prix de revient", "Valeur", "Plus-value latente"]);
+    lp.forEach(x => { const q = x.sym ? quoteFor({ sym: x.sym }) : null, v = q ? round2(x.qty * q.eur) : ""; op.push([x.name || "", txAcctName(x.acct), x.sym || "", x.isin || "", x.qty, round2(x.cost), v, v === "" ? "" : round2(v - x.cost)]) });
+  }
+  return { in: inf, mv: mvRows, bu, co, pf, tx: op };
 }
 async function gsApi(path, body) {
   const r = await fetch("https://sheets.googleapis.com/v4/spreadsheets/" + path, { method: "POST", headers: { Authorization: "Bearer " + gsToken, "Content-Type": "application/json" }, body: JSON.stringify(body) });

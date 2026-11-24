@@ -3,9 +3,9 @@
 Appli web installable pour gérer un budget par cycle de paie et suivre ses investissements, avec les mêmes données sur le téléphone et le PC.
 
 - **Budget** : cycle de paie (jour de paie réglable, avancé au vendredi si le jour tombe un week-end), enveloppes, dépenses et entrées d'argent, reste par jour, comptes d'épargne et patrimoine.
-- **Bilan** : revenus, dépenses et épargne sur 12 cycles, une année ou tout l'historique, avec le détail par enveloppe.
+- **Bilan** : revenus, dépenses et épargne sur 12 cycles, une année ou tout l'historique, avec le détail par enveloppe ; courbe du patrimoine depuis la première donnée et projection à 1–40 ans (3 scénarios, inflation, impôts).
 - **Import d'historique** : vos anciennes dépenses depuis Excel ou CSV (export d'une autre appli de budget, tableau personnel, relevé bancaire).
-- **Investissements** : import des exports DEGIRO, montant investi et plus-values, rééquilibrage à 25 % par classe, apport, historique.
+- **Investissements** : journal des opérations (achats, ventes, dividendes, frais) par compte, import des exports DEGIRO et des relevés de courtier, plus-values réalisées et latentes, rééquilibrage à 25 % par classe, apport, historique.
 - **Cours en direct** : la valeur de chaque ligne suit le marché (Google Finance via un Google Sheets à vous, différé d'environ 20 minutes), convertie en euros au taux de la BCE.
 - **Conjoncture** : régime économique (boom ou récession, inflationniste ou déflationniste) par pays, à partir des derniers chiffres de l'OCDE (PIB et inflation), relié au rééquilibrage.
 - **Synchronisation** avec votre propre projet Firebase (gratuit). Sans Firebase, l'appli marche en local sur un seul appareil.
@@ -137,6 +137,13 @@ La configuration Firebase (`apiKey`, etc.) n'est pas un secret : la protection v
 - **Dépenses** = sorties hors virements vers l'épargne et les placements. **Épargne** = revenus − dépenses sur un cycle ou plus ; sur un jour ou une semaine, c'est l'épargne virée. Revenus = salaires des paies tombées dans la période + autres entrées.
 - Les moyennes s'écrivent « Moyenne : montant / cycle » (ou / jour).
 - **Touchez une barre** : une bulle affiche les montants exacts, avec **Voir ›** qui ouvre ce jour, cette semaine ou ce cycle dans l'Accueil. **Chiffres** affiche les mêmes montants en tableau.
+- **Trajectoire** (bas de la page) : le patrimoine (tous les comptes) depuis votre premier mouvement, puis sa projection.
+  - **Passé** : patrimoine d'aujourd'hui moins ce que le budget a ajouté depuis chaque date (salaires + entrées − dépenses ; virements et épargne ne changent rien) et moins les gains du portefeuille (historique des valeurs).
+  - **Prévu** (pointillés) : où vous devriez être d'après l'épargne prévue et le scénario médian, depuis le départ. « Prévu à ce jour » donne l'avance ou le retard.
+  - **Projection** : chaque mois, chaque famille (livrets réglementés, livrets bancaires, épargne logement, PEA, compte-titres, assurance vie, crypto) rapporte son rendement et reçoit sa part de l'épargne. Ligne = scénario médian, zone = prudent → optimiste.
+  - **Impôts** : déduits chaque année pour les livrets et le PEL ; sur les gains, à la sortie, pour PEA, compte-titres, assurance vie et crypto. Les montants sont nets.
+  - **€ courants / € d'aujourd'hui** : bascule pour retirer l'inflation (passé réévalué, futur ramené au pouvoir d'achat d'aujourd'hui). Curseur : horizon de 1 à 40 ans.
+  - **Hypothèses** : épargne par mois (prévue, réelle = médiane des 6 derniers cycles, ou autre), inflation, et pour chaque famille : part de l'épargne (d'après vos virements des 6 derniers cycles, modifiable), rendements prudent / médian / optimiste, impôt. Valeurs par défaut au 24/11/2026 : Livret A et LDDS 1,7 %, PEL 2 % brut (ouvert en 2026), flat tax 31,4 %, PEA après 5 ans 18,6 %, PEL et assurance vie 17,2 %, inflation 2 % par an (long terme ; l'Insee mesurait 3,4 % sur un an en octobre 2026), actions 2 / 5 / 8 %. Ce sont des repères, pas des prévisions.
 
 **Importer un historique (Excel / CSV)**
 1. **Réglages** → **Importer un historique** → **Choisir le fichier**.
@@ -153,6 +160,16 @@ Vos choix de catégories sont mémorisés pour les imports suivants. Les envelop
 2. Pour le montant investi et les plus-values : export des **Transactions** en CSV, sur une période qui part de l'ouverture du compte.
 3. Dans l'appli, **Choisir les fichiers** : un aperçu s'affiche, avec la classe de chaque ligne modifiable avant validation.
 4. Pour actualiser les valeurs, réimportez l'export Portefeuille. Les lignes sont reconnues par leur ISIN.
+5. L'export Transactions alimente aussi le **journal des opérations** (aperçu dans **Opérations**, ajouté à la validation).
+
+**Journal des opérations (Portefeuille › Opérations)**
+- Une opération : date, compte (DEGIRO = les lignes du portefeuille ; PEA, Trade Republic, Kraken… = vos comptes titres et crypto), type (Achat, Vente, Dividende, Intérêts, Frais, Versement, Retrait), titre, symbole, ISIN, quantité, prix, montant, frais.
+- **Mise à jour automatique** : une opération plus récente que le dernier état connu d'une ligne (import, onglet Portefeuille, quantité corrigée à la main) met à jour la ligne : achat = quantité et prix de revient en plus (nouvelle ligne si le titre est nouveau), vente = quantité en moins et sa part du coût. La marge libre DEGIRO suit (achat −, vente +, dividende +, frais −). Pour les autres comptes, dividendes, intérêts et frais changent le solde ; achats et ventes restent à l'intérieur du compte. Les versements et retraits passent déjà par les virements.
+- Une opération plus ancienne que cet état ne change rien : elle sert à l'historique et aux calculs (plus-values réalisées, dividendes).
+- **Plus-values réalisées** : prix de revient moyen pondéré, frais d'achat compris ; la vente retire sa part du coût. Chiffres : plus-values réalisées, dividendes et intérêts, frais, montant versé, depuis le début et sur l'année.
+- **Positions** des autres comptes d'après le journal : quantité, prix de revient (PRU), valeur au cours en direct si le symbole est dans le tableau des cours, plus-value latente.
+- **Importer un relevé** : choisissez le compte puis un CSV ou Excel du courtier. Colonnes reconnues par leur titre (date, type ou description, titre, ISIN, symbole, quantité, cours, montant ou total, frais, devise). Aperçu avant ajout ; une opération déjà présente est ignorée.
+- Modifier ou supprimer une opération annule d'abord son effet sur la ligne, la marge libre ou le solde.
 
 **Cours en direct (Google Sheets)**
 
@@ -188,7 +205,7 @@ Les cours s'actualisent à l'ouverture de l'appli, puis toutes les 5 minutes tan
 
 **Google Sheets privé (rempli par Claude)**
 
-Un tableau de votre Google Drive, avec quatre onglets, que Claude remplit à partir de vos captures (relevé bancaire, ticket, confirmation DEGIRO) :
+Un tableau de votre Google Drive, avec cinq onglets, que Claude remplit à partir de vos captures (relevé bancaire, ticket, confirmation DEGIRO, Trade Republic…) :
 
 | Onglet | Colonnes | Effet dans l'appli |
 |---|---|---|
@@ -196,12 +213,13 @@ Un tableau de votre Google Drive, avec quatre onglets, que Claude remplit à par
 | Budget | Enveloppe, Prévu, Type (Dépense / Épargne) | Montants prévus. La première fois, l'appli demande votre accord ; ensuite, chaque changement du tableau s'applique avec « Annuler ». |
 | Portefeuille | Symbole, Quantité, Montant investi, Classe, ISIN, Nom | Quantités et coût des lignes du même symbole ou ISIN ; une valeur absente est ajoutée dans la classe indiquée. |
 | Soldes | Compte, Solde, Date, Couleur, Icône, Remarque, Nature | « Compte courant » (ou CCP) met à jour le solde réel du compte courant ; « Degiro », la couleur du portefeuille ; les autres lignes, les comptes du même nom (créés s'ils manquent), avec leur nature, couleur et logo. Un solde plus ancien que celui saisi dans l'appli est ignoré. |
+| Transactions | ID, Date, Compte (DEGIRO, PEA, Trade Republic…), Type (Achat / Vente / Dividende / Intérêts / Frais / Versement / Retrait), Nom, Symbole, ISIN, Quantité, Prix, Montant (€), Frais (€) | Ajout au journal des opérations, sans doublons grâce à l'ID ; une opération plus récente que l'état du portefeuille met la ligne à jour. Avec cet onglet, ne pas modifier aussi la quantité dans l'onglet Portefeuille (l'appli s'en charge). Dividende : montant net, négatif pour une retenue d'impôt. |
 
-L'appli lit ces quatre onglets avec votre compte Google et n'y écrit jamais. Le tableau n'est pas publié et reste visible par vous seul. Les cours, eux, viennent toujours du tableau « Cours en direct ».
+L'appli lit ces cinq onglets avec votre compte Google et n'y écrit jamais. Le tableau n'est pas publié et reste visible par vous seul. Les cours, eux, viennent toujours du tableau « Cours en direct ».
 
 *Copie des données de l'appli (pour que Claude voie vos saisies)*
 
-L'appli recopie aussi ses propres données dans cinq onglets qu'elle crée et réécrit entièrement à chaque envoi :
+L'appli recopie aussi ses propres données dans six onglets qu'elle crée et réécrit entièrement à chaque envoi :
 
 | Onglet | Contenu |
 |---|---|
@@ -210,6 +228,7 @@ L'appli recopie aussi ses propres données dans cinq onglets qu'elle crée et r�
 | Appli · Budget | Budget du cycle en cours : prévu, dépensé, remboursé et reste par enveloppe, puis les totaux |
 | Appli · Comptes | Compte courant (estimé), comptes d'épargne avec objectif, marge libre DEGIRO, valeur du portefeuille |
 | Appli · Portefeuille | Chaque ligne : quantité, montant investi, valeur, cours, plus-value |
+| Appli · Opérations | Journal des opérations (compte, type, titre, quantité, prix, montant, frais, plus-value réalisée, origine), puis les positions des autres comptes |
 
 - L'envoi est automatique quelques secondes après chaque changement, tant que la connexion Google est active (environ une heure après **↻ Google Sheets**).
 - Ensuite, un **point orange** sur **↻ Google Sheets** signale des changements pas encore envoyés : touchez-le avant d'écrire à Claude, il récupère et envoie.
@@ -245,7 +264,7 @@ Réglages → **Exporter** crée un fichier `.json`. Gardez-en une copie de temp
 
 ## Mettre à jour l'appli
 
-1. Dans GitHub : **Add file** → **Upload files** → déposez les fichiers modifiés (versions 1.2 à 1.12.1 : `index.html`, et `README.md` si vous voulez le guide à jour ; version 1.1 : `index.html`, `sw.js` et `README.md`) → **Commit changes**. GitHub remplace les anciens fichiers du même nom.
+1. Dans GitHub : **Add file** → **Upload files** → déposez les fichiers modifiés (versions 1.2 à 1.13 : `index.html`, et `README.md` si vous voulez le guide à jour ; version 1.1 : `index.html`, `sw.js` et `README.md`) → **Commit changes**. GitHub remplace les anciens fichiers du même nom.
 2. Attendez une minute, puis dans l'appli : **Réglages** → **Recharger l'appli**. La version affichée en bas des Réglages doit changer.
 3. Si vous changez aussi les icônes ou le manifeste, augmentez le numéro `CACHE` en haut de `sw.js` (`finances-v3`, etc.).
 
@@ -253,6 +272,7 @@ Vos données ne sont pas touchées par une mise à jour.
 
 ## Historique des versions
 
+- **1.13** : **journal des opérations** de placement par compte (saisie, export Transactions DEGIRO, relevés CSV ou Excel des courtiers, onglet « Transactions » du tableau rempli par Claude), qui met à jour les lignes du portefeuille, la marge libre et les soldes, avec plus-values réalisées, dividendes, frais et positions des autres comptes ; onglet « Appli · Opérations » ; **trajectoire du patrimoine** dans le Bilan (passé reconstitué depuis le premier mouvement, « Prévu à ce jour », projection à 1–40 ans en 3 scénarios, inflation, impôts, € courants ou € d'aujourd'hui, hypothèses modifiables).
 - **1.12.1** : le **montant par jour ne monte plus** quand on dépense moins que prévu (l'écart est mis de côté, « X d'avance ») ; **historique des virements** entre comptes dans la page Comptes, avec un filtre par compte (virements d'épargne importés compris).
 - **1.12** : **disponible et montant par jour calculés à partir du compte courant** (épargne à virer et charges à passer déduites ; montant du jour fixé le matin, reste du jour qui baisse avec les dépenses, semaine = lundi × 7) ; « Disponible » tout court ; virements d'épargne affichés en épargne et, à l'import ou depuis le tableau, créés comme de vrais virements vers le bon compte ; **détail des enveloppes et des catégories d'entrées depuis le Bilan et le Budget**, sur la même période, avec retour à l'écran d'origine ; **Bilan : une barre par période** (14 jours, 12 semaines, 12 cycles) avec la période choisie surlignée ; plus de « gros carré » dans le détail en vue Jour.
 - **1.11** : **page d'une enveloppe** en touchant sa jauge (détail jour par jour avec graphique, mouvements regroupés par jour, **+ Dépense** avec l'enveloppe déjà choisie) ; **page des charges** avec les cases **À passer d'ici la paie** et le détail semaine par semaine ; **retour en glissant** depuis le bord gauche sur ces pages et dans les rubriques des Réglages ; « Disponible à dépenser » devient **Disponible** ; la ligne du détail des entrées sous le résumé est retirée.
