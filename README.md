@@ -92,7 +92,9 @@ La configuration Firebase (`apiKey`, etc.) n'est pas un secret : la protection v
 - **Objectifs** (bloc Épargne & placements) : un montant à atteindre pour une date, indépendant des comptes. Cochez les comptes qui l'alimentent, ajoutez si besoin un montant hors comptes ; l'appli affiche la progression et ce qu'il faut mettre de côté par cycle jusqu'à l'échéance.
 - **Recherche** (loupe à côté de « Mouvements ») : dans tout l'historique, par libellé, enveloppe, catégorie, compte, montant (42, 42,5) ou date (12/11, nov).
 - Les enveloppes d'épargne ont leur propre bloc **Épargne & placements**. Les **mouvements** se classent **par date** ou **par enveloppe** (avec le total de chaque enveloppe).
-- **Disponible** = revenus du cycle (salaire + autres entrées) − dépenses − objectif d'épargne du cycle (total des enveloppes de type Épargne, ou ce qui a déjà été viré si c'est plus). C'est ce que vous pouvez encore dépenser jusqu'à la prochaine paie en tenant votre objectif d'épargne ; l'appli indique aussi le montant par jour. Sur un cycle terminé, le chiffre devient « Restant en fin de cycle ».
+- **Disponible** (cycle en cours, avec un solde de compte courant) = compte courant − épargne encore à virer ce cycle − charges pas encore passées. C'est ce qui reste vraiment sur le compte courant jusqu'à la paie. Les grosses opérations ponctuelles (vente, remboursement de crédit, argent mis sur un livret) ne jouent que sur le solde du compte courant. Épargner plus que prévu fait baisser le disponible, épargner moins le fait remonter. Sans solde de compte courant, et pour les cycles passés : revenus − dépenses − objectif d'épargne.
+- **Par jour** = disponible du matin ÷ jours jusqu'à la paie. Il est fixé pour la journée ; chaque dépense « libre » fait baisser le **reste aujourd'hui** (qui peut passer en négatif). Les charges cochées et les virements vers l'épargne ne le font pas baisser : ils étaient déjà mis de côté. Recalculé chaque matin.
+- **Vue Jour** : reste aujourd'hui. **Vue Semaine** : budget = montant par jour du lundi × 7, moins les dépenses libres de la semaine (un jour négatif peut être compensé sur la semaine).
 - **Sur le compte courant** : solde estimé du compte courant (voir Comptes), avec la part encore à virer vers l'épargne sur ce cycle.
 - Le bouton **+** ajoute une **dépense**, une **entrée d'argent** ou un **virement** (choix en haut de la fenêtre, ou glissez le doigt vers la gauche / la droite). Glissez la fenêtre vers le bas pour la fermer.
 - Enveloppes, catégories et comptes s'affichent en grille de logos. **Appui long** sur un logo : les logos bougent, faites-les glisser pour changer l'ordre (enregistré aussitôt, valable partout), puis **Terminé**.
@@ -128,7 +130,9 @@ La configuration Firebase (`apiKey`, etc.) n'est pas un secret : la protection v
 
 **Bilan**
 - Choisissez la période comme sur l'Accueil : **Jour**, **Semaine**, **Cycle** ou **Plusieurs** (3, 6, 12 cycles, **Tout**, ou **Dates…** sur un calendrier), puis ‹ ›.
-- Graphique par jour (Semaine, dates courtes), par semaine (Cycle, dates jusqu'à 4 mois) ou par cycle ; pas de graphique pour un seul jour.
+- **Jour**, **Semaine**, **Cycle** : une barre par période (14 derniers jours, 12 dernières semaines, 12 derniers cycles), la période choisie surlignée ; ‹ › ou toucher une barre change la période choisie. Les chiffres, les enveloppes et les entrées sont ceux de la période choisie ; les moyennes portent sur les périodes du graphique.
+- **Plusieurs** : une barre par cycle ; **Dates…** : par jour, par semaine ou par cycle selon la durée.
+- Toucher une enveloppe (liste, ou « Détail › » sous la répartition) ou une catégorie d'entrées ouvre son détail sur la même période ; ‹ (ou glisser depuis le bord gauche) ramène au Bilan. Dans Budget, « Détail › » sous chaque enveloppe.
 - **Dépenses** = sorties hors virements vers l'épargne et les placements. **Épargne** = revenus − dépenses sur un cycle ou plus ; sur un jour ou une semaine, c'est l'épargne virée. Revenus = salaires des paies tombées dans la période + autres entrées.
 - Les moyennes s'écrivent « Moyenne : montant / cycle » (ou / jour).
 - **Touchez une barre** : une bulle affiche les montants exacts, avec **Voir ›** qui ouvre ce jour, cette semaine ou ce cycle dans l'Accueil. **Chiffres** affiche les mêmes montants en tableau.
@@ -187,7 +191,7 @@ Un tableau de votre Google Drive, avec quatre onglets, que Claude remplit à par
 
 | Onglet | Colonnes | Effet dans l'appli |
 |---|---|---|
-| Mouvements | ID, Date, Type (Dépense / Entrée), Montant, Enveloppe, Catégorie (entrées), Libellé | Ajout des mouvements, sans doublons grâce à l'ID. Une ligne corrigée dans le tableau est corrigée dans l'appli ; une modification faite dans l'appli est gardée. |
+| Mouvements | ID, Date, Type (Dépense / Entrée / Virement), Montant, Enveloppe, Catégorie (entrées), Libellé, De, Vers (virements) | Ajout des mouvements, sans doublons grâce à l'ID. Un virement (ou une dépense « Virement vers Livret A ») devient un vrai virement : le solde du compte d'arrivée suit, sauf s'il a été relevé après.. Une ligne corrigée dans le tableau est corrigée dans l'appli ; une modification faite dans l'appli est gardée. |
 | Budget | Enveloppe, Prévu, Type (Dépense / Épargne) | Montants prévus. La première fois, l'appli demande votre accord ; ensuite, chaque changement du tableau s'applique avec « Annuler ». |
 | Portefeuille | Symbole, Quantité, Montant investi, Classe, ISIN, Nom | Quantités et coût des lignes du même symbole ou ISIN ; une valeur absente est ajoutée dans la classe indiquée. |
 | Soldes | Compte, Solde, Date, Couleur, Icône, Remarque, Nature | « Compte courant » (ou CCP) met à jour le solde réel du compte courant ; « Degiro », la couleur du portefeuille ; les autres lignes, les comptes du même nom (créés s'ils manquent), avec leur nature, couleur et logo. Un solde plus ancien que celui saisi dans l'appli est ignoré. |
@@ -240,7 +244,7 @@ Réglages → **Exporter** crée un fichier `.json`. Gardez-en une copie de temp
 
 ## Mettre à jour l'appli
 
-1. Dans GitHub : **Add file** → **Upload files** → déposez les fichiers modifiés (versions 1.2 à 1.11 : `index.html`, et `README.md` si vous voulez le guide à jour ; version 1.1 : `index.html`, `sw.js` et `README.md`) → **Commit changes**. GitHub remplace les anciens fichiers du même nom.
+1. Dans GitHub : **Add file** → **Upload files** → déposez les fichiers modifiés (versions 1.2 à 1.12 : `index.html`, et `README.md` si vous voulez le guide à jour ; version 1.1 : `index.html`, `sw.js` et `README.md`) → **Commit changes**. GitHub remplace les anciens fichiers du même nom.
 2. Attendez une minute, puis dans l'appli : **Réglages** → **Recharger l'appli**. La version affichée en bas des Réglages doit changer.
 3. Si vous changez aussi les icônes ou le manifeste, augmentez le numéro `CACHE` en haut de `sw.js` (`finances-v3`, etc.).
 
@@ -248,6 +252,7 @@ Vos données ne sont pas touchées par une mise à jour.
 
 ## Historique des versions
 
+- **1.12** : **disponible et montant par jour calculés à partir du compte courant** (épargne à virer et charges à passer déduites ; montant du jour fixé le matin, reste du jour qui baisse avec les dépenses, semaine = lundi × 7) ; « Disponible » tout court ; virements d'épargne affichés en épargne et, à l'import ou depuis le tableau, créés comme de vrais virements vers le bon compte ; **détail des enveloppes et des catégories d'entrées depuis le Bilan et le Budget**, sur la même période, avec retour à l'écran d'origine ; **Bilan : une barre par période** (14 jours, 12 semaines, 12 cycles) avec la période choisie surlignée ; plus de « gros carré » dans le détail en vue Jour.
 - **1.11** : **page d'une enveloppe** en touchant sa jauge (détail jour par jour avec graphique, mouvements regroupés par jour, **+ Dépense** avec l'enveloppe déjà choisie) ; **page des charges** avec les cases **À passer d'ici la paie** et le détail semaine par semaine ; **retour en glissant** depuis le bord gauche sur ces pages et dans les rubriques des Réglages ; « Disponible à dépenser » devient **Disponible** ; la ligne du détail des entrées sous le résumé est retirée.
 - **1.10** : rubrique **Charges** à cocher (jauge, détail, date de paiement, montant modifiable, retard en orange, remise à zéro à la paie) ; **objectifs d'épargne datés** ; **recherche** dans les mouvements ; **calendrier** pour choisir ses dates (Accueil › Plusieurs et Bilan) ; Bilan en jour / semaine / cycle / plusieurs ; **appui long** pour réordonner enveloppes, comptes, catégories et charges dans les listes ; retour **‹ Dépense** dans Entrée et Virement ; textes raccourcis partout (séparés par des /, explications derrière **i**) ; correction de la page en double à l'ouverture du menu sur iPhone. Les charges et objectifs sont aussi recopiés dans l'onglet « Appli · Budget ».
 - **1.9** : l'appli recopie ses données (mouvements, budget du cycle, comptes, portefeuille) dans des onglets « Appli · … » du Google Sheets privé, pour que Claude voie vos saisies ; envoi automatique tant que la connexion Google est active, point orange quand des changements restent à envoyer. La connexion Google demande désormais l'accès en modification.

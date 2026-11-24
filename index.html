@@ -488,6 +488,10 @@ html, body { overflow-x: clip }
 .ccprow.warn b { color: var(--warn) !important }
 .chghead { border-bottom: 0; padding: 2px 2px 4px }
 .chghead .chev { display: inline-block; color: var(--muted); margin-left: 4px; font-weight: 400 }
+.env .chev, .rowbtn .chev { color: var(--muted); margin-left: 6px; font-weight: 400 }
+.rowbtn { border: 0; background: none; width: 100%; text-align: left; color: inherit; font: inherit; cursor: pointer; padding-left: 0; padding-right: 0 }
+.bchart g.cur .hl { opacity: .12; fill: var(--accent) }
+.bchart g.cur text.ax { fill: var(--fg); font-weight: 700 }
 .chgbody { border-top: 1px solid var(--line); margin-top: 8px }
 .chg { display: grid; grid-template-columns: 46px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--line) }
 .chg .cbox { width: 34px; height: 34px; border-radius: 10px; border: 2px solid var(--line); background: var(--surface); display: grid; place-items: center; color: transparent; font-weight: 800; font-size: 1rem; justify-self: center; padding: 0 }
@@ -613,7 +617,7 @@ html, body { overflow-x: clip }
 
 <!-- ============ ENVELOPPE (détail) ============ -->
 <section id="v-env" class="wrap" hidden>
-  <div class="sethead"><button type="button" class="linkbtn" data-back>‹ Accueil</button></div>
+  <div class="sethead"><button type="button" class="linkbtn" data-back id="ev-back">‹ Accueil</button></div>
   <div class="panel total" id="ev-hero"></div>
   <div class="panel" id="ev-charges" hidden></div>
   <div class="panel" id="ev-detail"></div>
@@ -1046,7 +1050,7 @@ html, body { overflow-x: clip }
 
 <script>
 "use strict";
-const APP_VERSION = "1.11.0";
+const APP_VERSION = "1.12.0";
 const FB_VERSION = "10.12.2"; // SDK Firebase chargé depuis gstatic uniquement si la synchronisation est configurée
 const LS = { state: "fin.state", fb: "fin.firebase", dev: "fin.device", link: "fin.linked", lastSync: "fin.lastsync" };
 const CLASSES = [{ id: "stocks", c: "#2346d8" }, { id: "bonds", c: "#7a4fd0" }, { id: "gold", c: "#c99a0a" }, { id: "cash", c: "#138a5b" }];
@@ -1510,11 +1514,13 @@ const VIEWS = ["budget", "bilan", "comptes", "plan", "invest", "conj", "reglages
 const TITLES = { budget: "Accueil", bilan: "Bilan", comptes: "Comptes", plan: "Budget", invest: "Portefeuille", conj: "Conjoncture", reglages: "Réglages", env: "Enveloppe" };
 let view = "budget", pendingAnchor = null;
 // Page d'une enveloppe (#env/<id>) : ouverte depuis l'accueil ; au retour, l'accueil reprend là où il était
-let envPage = null, envFromHome = false, homeY = null;
+let envPage = null, envFromHome = false, homeY = null, envFrom = "budget";
+// Page de détail : une enveloppe (id), « __none », ou une catégorie d'entrées (« cat:<id> »)
+const envPageOk = id => id === "__none" || !!envById(id) || (String(id).startsWith("cat:") && !!incCat(String(id).slice(4)));
 function show(v, anchor) {
   let sec = null; v = String(v || ""); if (v.includes("/")) { const i = v.indexOf("/"); sec = v.slice(i + 1); v = v.slice(0, i) }
   if (!VIEWS.includes(v)) v = "budget";
-  if (v === "env") { try { sec = decodeURIComponent(sec || "") } catch { sec = "" } envPage = sec === "__none" || envById(sec) ? sec : null; if (!envPage) v = "budget" }
+  if (v === "env") { try { sec = decodeURIComponent(sec || "") } catch { sec = "" } envPage = envPageOk(sec) ? sec : null; if (!envPage) v = "budget" }
   const from = view;
   if (v !== "env") envFromHome = false;
   if (v === "reglages") { if (!sec && anchor) sec = secOf(anchor); setSec = SET_SECS.some(x => x.id === sec) ? sec : null }
@@ -1528,16 +1534,17 @@ function show(v, anchor) {
   closeDrawer(false);
   renderView();
   if (anchor && $(anchor) && !(v === "reglages" && $(anchor).dataset.sec)) $(anchor).scrollIntoView({ block: "start" });
-  else if (v === "budget" && from === "env" && homeY !== null) window.scrollTo(0, homeY);
+  else if (from === "env" && v === envFrom && homeY !== null) window.scrollTo(0, homeY);
   else window.scrollTo(0, 0);
 }
 function openEnv(id) {
-  if (!id || !(id === "__none" || envById(id))) return;
-  homeY = view === "budget" ? window.scrollY : null; envFromHome = !IOS && view === "budget";
+  if (!id || !envPageOk(id)) return;
+  if (view !== "env") { envFrom = ["budget", "bilan", "plan"].includes(view) ? view : "budget"; homeY = window.scrollY }
+  envFromHome = !IOS && view === "budget";
   setHash("env/" + encodeURIComponent(id));
 }
 function backFromEnv() {
-  if (envFromHome) { envFromHome = false; history.back() } else { history.replaceState(null, "", "#budget"); show("budget") }
+  if (envFromHome) { envFromHome = false; history.back() } else { history.replaceState(null, "", "#" + envFrom); show(envFrom) }
 }
 // Retour : page d'une enveloppe → accueil, sous-page des réglages → liste des réglages
 const canGoBack = () => view === "env" || (view === "reglages" && !!setSec);
@@ -1748,6 +1755,62 @@ function periodBudget(a, b) {
   return { total: round2(total), first, factor };
 }
 const CYCLE_DAYS = 30.44;   // durée moyenne d'un cycle, pour ramener un budget à une période de dates choisies
+
+/* 1.12 : disponible et montant par jour à partir du compte courant.
+   Disponible = compte courant − épargne encore à virer ce cycle − charges pas encore passées.
+   Par jour = ce disponible au matin ÷ jours jusqu'à la veille de la paie ; fixé pour la journée, il baisse avec les dépenses « libres »
+   (hors épargne et hors charges prévues, déjà mises de côté). Les grosses opérations ponctuelles (vente, remboursement de crédit,
+   argent mis sur un livret) ne jouent que sur le solde du compte courant. */
+// Solde du compte courant au matin du jour D (null sans solde relevé ou pour un jour à venir)
+function ccpAt(D) {
+  const cc = ccpEstimate(), t = midnight(new Date()); if (!cc || D > t) return null;
+  const a = ymd(D), z = ymd(t); let v = cc.value;
+  S.budget.expenses.forEach(e => { if (e.date >= a && e.date <= z) v += +e.amount || 0 });
+  S.budget.incomes.forEach(i => { if (i.date >= a && i.date <= z) v -= +i.amount || 0 });
+  S.budget.transfers.forEach(x => { if (x.date < a || x.date > z) return; if (x.from === "ccp") v += +x.amount || 0; if (x.to === "ccp") v -= +x.amount || 0 });
+  for (let c = shiftCycle(cycleOf(D), 1); c.start <= t; c = shiftCycle(c, 1)) v -= cycleIncome(c);   // salaires arrivés après ce matin-là
+  return round2(v);
+}
+// Dépenses « libres » d'une période : hors enveloppes d'épargne et hors charges cochées, remboursements déduits
+function flexSpend(a, b) {
+  const st = cycleStats({ start: a, end: b }), kind = id => envById(id)?.kind || "spend", paid = new Set();
+  for (let c = cycleOf(a); c.start <= b; c = shiftCycle(c, 1)) Object.values(chargeStatus(c).paid).forEach(e => paid.add(e));
+  let v = 0;
+  st.ex.forEach(e => { if (kind(e.env) !== "save" && !paid.has(e)) v += +e.amount || 0 });
+  st.inc.forEach(i => { const env = refundEnv(i); if (env && kind(env) !== "save") v -= +i.amount || 0 });
+  return round2(v);
+}
+// Charges du cycle pas encore payées avant le jour D (une charge payée le jour D était encore à passer ce matin-là)
+function chargesLeftAt(C, D) {
+  const s = chargeStatus(C), a = ymd(D);
+  return round2(S.budget.charges.reduce((t, ch) => { const e = s.paid[ch.id]; return t + (e && e.date < a ? 0 : (+ch.amount || 0)) }, 0));
+}
+// Budget du jour D d'après le compte courant au matin
+function planCcp(D) {
+  const v = ccpAt(D); if (v === null) return null;
+  const C = cycleOf(D), before = D > C.start ? cycleStats({ start: C.start, end: addDays(D, -1) }) : null;
+  const toSave = round2(Math.max(0, savePlanned() - (before ? before.saved : 0))), chLeft = chargesLeftAt(C, D);
+  const dispo = round2(v - toSave - chLeft), days = dayDiff(D, C.end) + 1;
+  return { dispo, days, rate: Math.max(0, dispo) / days, toSave, chLeft, ccp: v };
+}
+// Cycle à venir : revenu − épargne prévue − charges, réparti sur le cycle
+function plannedRate(C) { return Math.max(0, cycleIncome(C) - savePlanned() - chargeStatus(C).planned) / (dayDiff(C.start, C.end) + 1) }
+// Budget d'un jour : passé ou aujourd'hui → compte courant au matin ; plus tard dans le cycle en cours → celui d'aujourd'hui ; autre cycle à venir → prévu
+function rateFor(D) {
+  const today = midnight(new Date());
+  if (D <= today) { const p = planCcp(D); if (p) return p }
+  const C = cycleOf(D);
+  if (isCurrent(C)) { const p = planCcp(today); if (p) return { ...p, days: dayDiff(D, C.end) + 1 } }
+  return { rate: plannedRate(C), days: dayDiff(D, C.end) + 1, dispo: null, planned: true };
+}
+// Budget d'une semaine : le budget de son premier jour × ses jours (une semaine peut chevaucher deux cycles)
+function weekBudgetCcp(a, b) {
+  let total = 0, first = null;
+  for (let d = a; d <= b;) { const C = cycleOf(d), to = C.end < b ? C.end : b, n = dayDiff(d, to) + 1, r = rateFor(d); total += r.rate * n; if (!first) first = r; d = addDays(to, 1) }
+  return { total: round2(total), first };
+}
+// Part de cycle(s) couverte par une période (pour ramener les budgets des enveloppes)
+function periodFactor(a, b) { let f = 0; for (let d = a; d <= b;) { const C = cycleOf(d), to = C.end < b ? C.end : b; f += (dayDiff(d, to) + 1) / (dayDiff(C.start, C.end) + 1); d = addDays(to, 1) } return f }
 function periodSummary(pi) {
   const envs = S.budget.envelopes, savePlan = savePlanned(), plannedSpend = envs.filter(e => e.kind !== "save").reduce((s, e) => s + (+e.planned || 0), 0);
   const st = cycleStats({ start: pi.a, end: pi.b }), spend = round2(st.out - st.saved), today = midnight(new Date());
@@ -1756,6 +1819,15 @@ function periodSummary(pi) {
   const savedOf = goal => goal > 0.005 ? (st.saved >= goal - 0.005 ? ok : "") + `/ ${fmtEUR(goal)}` : "";
   const extraNote = st.extra ? `dont ${fmtEUR(st.extra)} d'entrées` : "";
   const noIncome = "Revenu à indiquer (Budget)";
+  if ((pi.m === "day" || pi.m === "week") && S.budget.ccp) {
+    const day = pi.m === "day", wb = day ? (() => { const r = rateFor(pi.a); return { total: round2(r.rate), first: r } })() : weekBudgetCcp(pi.a, pi.b);
+    const flex = flexSpend(pi.a, pi.b), left = round2(wb.total - flex), f = wb.first, factor = periodFactor(pi.a, pi.b);
+    return { st, spend: flex, factor, left, pct: pct(flex, wb.total), ccpMode: true,
+      title: pi.a > today ? (day ? "Budget prévu ce jour" : "Budget prévu sur la semaine") : day ? (pi.now ? "Reste aujourd'hui" : "Reste ce jour-là") : (pi.now ? "Reste cette semaine" : "Reste sur la semaine"),
+      pace: f ? `${f.days} j avant la paie / ${fmtEUR(f.rate)} par jour` + (f.dispo !== null && f.dispo < 0 ? " / épargne compromise" : "") : "",
+      pstat: true, revLbl: "Budget", rev: wb.total, revNote: day ? "" : `${fmtEUR(wb.total / 7)} / jour`,
+      outTarget: wb.total, savTarget: round2(savePlan * factor), outNote: of(wb.total), savedNote: savedOf(savePlan * factor) };
+  }
   if (pi.m === "day" || pi.m === "week") {
     const pb = periodBudget(pi.a, pi.b), room = pb.total + st.extra, left = round2(room - spend), day = pi.m === "day", f = pb.first;
     return { st, spend, factor: pb.factor, left, pct: pct(spend, room),
@@ -1770,7 +1842,7 @@ function periodSummary(pi) {
     let sal = 0; for (let c = cycleOf(pi.a); c.start <= pi.b; c = shiftCycle(c, 1)) if (c.start >= pi.a) sal += cycleIncome(c);
     const factor = pi.days / CYCLE_DAYS, income = sal + st.extra, left = round2(income - spend - st.saved);
     return { st, spend, factor, left, pct: pct(spend, income - st.saved),
-      title: pi.b < today ? "Restant sur la période" : "Disponible sur la période",
+      title: pi.b < today ? "Restant" : "Disponible",
       pace: `${pi.days} j / ${fmtEUR(spend / pi.days)} de dépenses par jour`,
       pstat: true, revLbl: "Revenus", rev: income, revNote: extraNote,
       outTarget: plannedSpend ? plannedSpend * factor : income - st.saved, savTarget: savePlan * factor,
@@ -1781,11 +1853,21 @@ function periodSummary(pi) {
     pi.cs.forEach(c => { const s = cycleStats(c), past = c.end < today && !isCurrent(c); sal += cycleIncome(c); goal += past ? s.saved : Math.max(savePlan, s.saved) });
     const n = pi.cs.length, income = sal + st.extra, left = round2(income - spend - goal), past = pi.b < today;
     return { st, spend, factor: n, left, pct: pct(spend, income - goal),
-      title: past ? `Restant sur ${n} cycles` : `Disponible sur ${n} cycles`,
+      title: past ? "Restant" : "Disponible",
       pace: `Moyenne : ${fmtEUR(spend / n)} de dépenses / cycle`,
       pstat: true, revLbl: "Revenus", rev: income, revNote: extraNote,
       outTarget: plannedSpend ? plannedSpend * n : income - goal, savTarget: savePlan * n,
       outNote: plannedSpend ? of(plannedSpend * n) : "", savedNote: savedOf(savePlan * n) };
+  }
+  // Cycle en cours : disponible d'après le compte courant ; montant par jour fixé ce matin, reste du jour qui baisse avec les dépenses libres
+  if (pi.now && S.budget.ccp) {
+    const c = viewCycle, T = midnight(new Date()), cc = ccpEstimate(), toSave = round2(Math.max(0, savePlan - st.saved)), chLeft = chargesLeftAt(c, addDays(T, 1));
+    const left = round2(cc.value - toSave - chLeft), m = planCcp(T), restToday = round2(m.rate - flexSpend(T, T));
+    return { st, spend, factor: 1, left, pct: pct(spend, plannedSpend || spend), cur: true, toSave, chLeft, ccpMode: true, rate: m.rate, restToday,
+      title: "Disponible",
+      pace: `${m.days} j avant la paie / ${fmtEUR(m.rate)} par jour / reste aujourd'hui ${fmtEUR(restToday)}`,
+      pstat: null, revLbl: "Revenus", rev: cycleIncome(c) + st.extra, revNote: extraNote,
+      outTarget: plannedSpend || spend, savTarget: savePlan, outNote: of(plannedSpend), savedNote: savedOf(savePlan) };
   }
   // Un cycle : revenus du cycle − dépenses − objectif d'épargne (ou ce qui a déjà été viré, si c'est plus)
   const c = viewCycle, salary = cycleIncome(c), cur = pi.now, past = c.end < new Date() && !cur;
@@ -1897,7 +1979,14 @@ function movRowHtml({ k, o }, opt = {}) {
       <span class="l"><b><span class="tdot t-rev"></span>${esc(o.label || cat?.name || "Entrée")}</b><small>${esc(cat?.name || "Entrée")}${env && !opt.env ? " / " + esc(env.name) : ""}</small></span>
       <span class="num" style="font-weight:600">+${fmtEUR(o.amount)}</span></button>`;
   }
-  const en = envById(o.env), sub = opt.env ? "" : `<small>${esc(en?.name || "Sans enveloppe")}</small>`;
+  const en = envById(o.env);
+  if (en?.kind === "save") {
+    const to = acctFromText(o.label), where = to ? `Compte courant → ${esc(to.name)}` : esc(en.name);
+    return `<button type="button" class="${cls}" data-exp="${esc(o.id)}">${day}
+      <span class="l"><b><span class="tdot t-sav"></span>${esc(o.label || en.name)}</b><small>Épargne${opt.env && !to ? "" : " / " + where}</small></span>
+      <span class="num" style="font-weight:600;color:var(--c-sav)">${o.amount < 0 ? "−" + fmtEUR(-o.amount) : fmtEUR(o.amount)}</span></button>`;
+  }
+  const sub = opt.env ? "" : `<small>${esc(en?.name || "Sans enveloppe")}</small>`;
   return `<button type="button" class="${cls}" data-exp="${esc(o.id)}">${day}
     <span class="l"><b><span class="tdot ${en?.kind === "save" ? "t-sav" : "t-exp"}"></span>${esc(o.label || en?.name || "Dépense")}</b>${sub}</span>
     <span class="num" style="font-weight:600">${o.amount < 0 ? "+" + fmtEUR(-o.amount) : fmtEUR(o.amount)}</span></button>`;
@@ -1942,13 +2031,11 @@ function updateSummary(pi = periodInfo()) {
   const full = s.outTarget > 0.005 ? s.spend >= s.outTarget - 0.005 && s.spend > 0.005 : s.spend > 0.005;
   $("b-outbar").style.width = fill(s.spend, s.outTarget) + "%"; $("b-outbar").className = full ? "over" : "t-exp";
   $("b-savbar").style.width = fill(st.saved, s.savTarget) + "%";
-  // Compte courant (solde réel le plus récent + mouvements depuis)
-  const cc = ccpEstimate(), toSave = cyc && s.cur ? s.toSave : 0;
-  // ⚠ en orange : le disponible du cycle dépasse ce qui est vraiment libre sur le compte courant
-  const free = cc ? round2(cc.value - toSave) : null, warn = !!(cyc && s.cur && cc && s.left > free + 1);
-  $("b-ccp").classList.toggle("warn", warn);
+  // Compte courant (solde réel le plus récent + mouvements depuis) et ce qui y est déjà réservé ce cycle
+  const cc = ccpEstimate(), toSave = cyc && s.cur ? s.toSave || 0 : 0, chLeft = cyc && s.cur ? s.chLeft || 0 : 0;
+  $("b-ccp").classList.remove("warn");
   $("b-ccp").innerHTML = cc
-    ? `<span><span class="small muted">Compte courant</span><small>${[toSave > 0 ? `dont ${fmtEUR(toSave)} à virer` : `estimé / relevé du ${fmtDay(parseYmd(S.budget.ccp.date))}`, warn ? `${fmtEUR(free)} libres` : ""].filter(Boolean).join(" / ")}</small></span><b${cc.value < 0 ? ' style="color:var(--down)"' : ""}>${warn ? "⚠ " : ""}${fmtEUR(cc.value)}</b>`
+    ? `<span><span class="small muted">Compte courant</span><small>${[toSave > 0.005 ? `${fmtEUR(toSave)} à virer` : "", chLeft > 0.005 ? `${fmtEUR(chLeft)} de charges à passer` : ""].filter(Boolean).join(" / ") || `estimé / relevé du ${fmtDay(parseYmd(S.budget.ccp.date))}`}</small></span><b${cc.value < 0 ? ' style="color:var(--down)"' : ""}>${fmtEUR(cc.value)}</b>`
     : `<span><span class="small muted">Compte courant</span><small>Solde à indiquer</small></span><b style="font-family:var(--body);font-size:.85rem;color:var(--accent)">Ajouter ›</b>`;
   $("b-out").textContent = fmtEUR(s.spend); $("b-outnote").textContent = s.outNote; $("b-revnote").hidden = !s.revNote; $("b-outnote").hidden = !s.outNote; $("b-savenote").hidden = !s.savedNote;
   $("b-saved").textContent = fmtEUR(st.saved); $("b-savenote").innerHTML = s.savedNote;
@@ -2071,7 +2158,7 @@ $("ch-del").addEventListener("click", e => {
 });
 $("chg-head").addEventListener("click", () => { ensureChargesEnv(); openEnv(S.budget.chargesEnv) });
 $("ev-charges").addEventListener("click", e => {
-  if (PF.period === "day" || PF.period === "week") viewCycle = cycleOf(viewDate);   // les cases portent sur le cycle du jour affiché
+  viewCycle = chargeCycle();   // les cases portent sur le cycle affiché (ou celui du jour, de la semaine, de la période du Bilan)
   if (e.target.closest("[data-chadd]")) { openCharge("edit", null); return }
   const x = e.target.closest("[data-chexp]"); if (x) { const o = S.budget.expenses.find(v => v.id === x.dataset.chexp); if (o) openSheet("exp", o); return }
   const row = e.target.closest("[data-ch]"); if (!row) return;
@@ -2088,17 +2175,28 @@ function envMovs(id, a, b) {
   const tr = none ? [] : st.tr.filter(t => trEnv(t) === id).map(o => ({ k: "tr", o, v: trFlow(o)?.amount || 0 }));
   return [...ex, ...inc, ...tr].sort((x, y) => y.o.date.localeCompare(x.o.date) || (y.o.at || 0) - (x.o.at || 0));
 }
+// Période de la page de détail : celle du Bilan si on vient du Bilan, sinon celle de l'Accueil
+function envPeriod() {
+  if (envFrom !== "bilan") { const pi = periodInfo(); return { pi, label: periodLabel(pi), factor: null } }
+  const P = blPeriod(), today = midnight(new Date());
+  return { pi: { m: P.m === "all" || P.m === "multi" ? "multi" : P.m, a: P.a, b: P.b, cs: P.cs, now: today >= P.a && today <= P.b }, label: blLabel(P), factor: periodFactor(P.a, P.b), bl: P };
+}
+function envShift(dir) { if (envFrom === "bilan") { blMove(dir); renderView() } else shiftPeriod(dir) }
 // Cycle des cases à cocher : celui affiché (vue Cycle ou Plusieurs), sinon celui du jour ou de la semaine affichés
-const chargeCycle = () => (PF.period === "day" || PF.period === "week") ? cycleOf(viewDate) : viewCycle;
+const chargeCycle = () => {
+  if (envFrom === "bilan") { const P = blPeriod(), t = midnight(new Date()); return cycleOf(P.b < t ? P.b : P.a > t ? P.a : t) }
+  return (PF.period === "day" || PF.period === "week") ? cycleOf(viewDate) : viewCycle;
+};
 // Barres SVG : une par jour ou par semaine ; trait pointillé = rythme prévu
 function evChart(buckets, ref, color, byWeek) {
-  const n = buckets.length; if (!n) return "";
-  const W = 340, H = 132, B = 18, T = 8, gap = n > 45 ? 1 : n > 20 ? 2 : 4, bw = Math.max(1, (W - gap * (n - 1)) / n);
+  const n = buckets.length; if (n < 2) return "";   // une seule barre ne dit rien (vue Jour)
+  const W = 340, H = 132, B = 18, T = 8, gap = n > 45 ? 1 : n > 20 ? 2 : 4, bw = Math.min(28, Math.max(1, (W - gap * (n - 1)) / n));
   const max = Math.max(ref || 0, ...buckets.map(x => x.v), 1) * 1.1, y = v => T + (H - B - T) * (1 - Math.max(0, v) / max);
   const step = byWeek ? (n > 14 ? Math.ceil(n / 7) : 1) : (n <= 10 ? 1 : n <= 20 ? 2 : n <= 45 ? 5 : Math.ceil(n / 8));
   let g = "";
+  const x0 = (W - (n * bw + (n - 1) * gap)) / 2;   // barres centrées quand il y en a peu
   buckets.forEach((x, i) => {
-    const X = i * (bw + gap), yy = y(x.v), h = H - B - yy;
+    const X = x0 + i * (bw + gap), yy = y(x.v), h = H - B - yy;
     if (x.v > 0.004) g += `<rect class="b${x.now ? " now" : ""}" x="${X.toFixed(1)}" y="${yy.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(1.5, h).toFixed(1)}" rx="${Math.min(3, bw / 3).toFixed(1)}"/>`;
     else g += `<rect class="z" x="${X.toFixed(1)}" y="${(H - B - 1.5).toFixed(1)}" width="${bw.toFixed(1)}" height="1.5"/>`;
     if (i % step === 0) g += `<text class="lb" x="${(X + bw / 2).toFixed(1)}" y="${H - 4}" text-anchor="middle">${x.lab}</text>`;
@@ -2108,15 +2206,18 @@ function evChart(buckets, ref, color, byWeek) {
   return `<svg class="evchart" viewBox="0 0 ${W} ${H}" style="--c:${color}" role="img" aria-label="${byWeek ? "Dépenses par semaine" : "Dépenses par jour"}">${refLine}${g}</svg>`;
 }
 function renderEnv() {
-  const id = envPage, e = id === "__none" ? null : envById(id);
-  if (!id || (id !== "__none" && !e)) { backFromEnv(); return }
-  const B = S.budget, pi = periodInfo(), [lbl, sub] = periodLabel(pi), today = midnight(new Date());
+  const id = envPage;
+  $("ev-back").textContent = "‹ " + ({ budget: "Accueil", bilan: "Bilan", plan: "Budget" }[envFrom] || "Accueil");
+  if (!id || !envPageOk(id)) { backFromEnv(); return }
+  if (String(id).startsWith("cat:")) { renderCatPage(id.slice(4)); return }
+  const e = id === "__none" ? null : envById(id);
+  const B = S.budget, EP = envPeriod(), pi = EP.pi, [lbl, sub] = EP.label, today = midnight(new Date());
   const isCh = !!e && e.id === B.chargesEnv, save = e?.kind === "save", name = e ? e.name : "Sans enveloppe";
   const color = save ? "var(--c-sav)" : "var(--c-exp)";
   $("vtitle").textContent = name; document.title = name + " · Mes Finances";
   const list = envMovs(id, pi.a, pi.b), net = round2(list.reduce((t, x) => t + x.v, 0)), refunds = round2(list.filter(x => x.k === "inc").reduce((t, x) => t - x.v, 0));
-  const f = periodSummary(pi).factor;
-  const pl = !e ? 0 : round2(isCh && PF.period === "cycle" && B.charges.length ? chargeStatus(viewCycle).planned : (+e.planned || 0) * f);
+  const f = EP.factor ?? periodSummary(pi).factor;
+  const pl = !e ? 0 : round2(isCh && pi.m === "cycle" && B.charges.length ? chargeStatus(chargeCycle()).planned : (+e.planned || 0) * f);
   const rest = round2(pl - net), over = !save && (pl > 0 ? net > pl + 0.005 : net > 0.005);
   const pct = pl > 0 ? Math.min(100, Math.max(0, net / pl * 100)) : (net > 0 ? 100 : 0), ok = '<span style="color:var(--c-sav)">✓</span> ';
   const right = save
@@ -2164,9 +2265,31 @@ function renderEnv() {
     ${list.length && ref ? `<div class="small muted evleg"><span><span class="ln"></span>prévu ${fmtEUR(ref)} / ${byWeek ? "semaine" : "jour"}</span></div>` : ""}
     ${groups || `<div class="notice" style="padding-top:8px">Aucun mouvement</div>`}`;
 }
+function renderCatPage(cid) {
+  const cat = incCat(cid), EP = envPeriod(), pi = EP.pi, [lbl, sub] = EP.label, today = midnight(new Date());
+  $("vtitle").textContent = cat.name; document.title = cat.name + " · Mes Finances";
+  const a = ymd(pi.a), b = ymd(pi.b);
+  const list = S.budget.incomes.filter(i => i.cat === cid && i.date >= a && i.date <= b).map(o => ({ k: "inc", o, v: +o.amount || 0 })).sort((x, y) => y.o.date.localeCompare(x.o.date) || (y.o.at || 0) - (x.o.at || 0));
+  const tot = round2(list.reduce((t, x) => t + x.v, 0)), env = envById(cat.env);
+  $("ev-hero").innerHTML = `<div class="cyclenav evnav"><button class="arrow" type="button" data-evshift="-1" aria-label="Période précédente">‹</button><div><b>${esc(lbl)}</b><div class="small muted">${esc(sub)}</div></div><button class="arrow" type="button" data-evshift="1" aria-label="Période suivante">›</button></div>
+    <div><div class="eyebrow">Reçu</div><div class="big" style="color:var(--c-rev)">${fmtEUR(tot)}</div>
+    <div class="small muted num">${list.length} entrée${list.length > 1 ? "s" : ""}${env ? " / déduites de " + esc(env.name) : ""}</div></div>
+    <button type="button" class="btn primary evbtn" data-evadd>＋ Entrée</button>`;
+  $("ev-charges").hidden = true;
+  const days = dayDiff(pi.a, pi.b) + 1, byWeek = days > 62, bk = [];
+  for (let d = midnight(pi.a); d <= pi.b; d = addDays(d, byWeek ? 7 : 1)) {
+    const z = byWeek ? (addDays(d, 6) < pi.b ? addDays(d, 6) : midnight(pi.b)) : d, x = ymd(d), y2 = ymd(z), items = list.filter(m => m.o.date >= x && m.o.date <= y2);
+    const t = d.toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" });
+    bk.push({ key: x, items, v: round2(items.reduce((s2, m) => s2 + m.v, 0)), now: today >= d && today <= z, lab: byWeek ? dmDate(d) : String(d.getDate()), title: byWeek ? `${dmDate(d)} → ${dmDate(z)}` : t.charAt(0).toUpperCase() + t.slice(1) });
+  }
+  const groups = bk.filter(x => x.items.length).reverse().map(x => `<div class="mgroup evg" id="evg-${x.key}"><span>${esc(x.title)} <span class="muted" style="font-weight:500">· ${x.items.length}</span></span><span class="num">+${fmtEUR(x.v)}</span></div>`
+    + x.items.map(m => movRowHtml(m, { nod: !byWeek })).join("")).join("");
+  $("ev-detail").innerHTML = `<div class="clshead"><h2>${byWeek ? "Semaine par semaine" : "Jour par jour"}</h2><span class="small muted">${list.length} entrée${list.length > 1 ? "s" : ""}</span></div>
+    ${list.length ? evChart(bk, 0, "var(--c-rev)", byWeek) : ""}${groups || `<div class="notice" style="padding-top:8px">Aucune entrée</div>`}`;
+}
 $("ev-hero").addEventListener("click", e => {
-  const sh = e.target.closest("[data-evshift]"); if (sh) { shiftPeriod(+sh.dataset.evshift); return }
-  if (e.target.closest("[data-evadd]")) openSheet("exp", null);
+  const sh = e.target.closest("[data-evshift]"); if (sh) { envShift(+sh.dataset.evshift); return }
+  if (e.target.closest("[data-evadd]")) { if (String(envPage).startsWith("cat:")) { lastCat = envPage.slice(4); openSheet("inc", null) } else openSheet("exp", null) }
 });
 $("ev-detail").addEventListener("click", e => {
   const j = e.target.closest("[data-evjump]"); if (j) { $("evg-" + j.dataset.evjump)?.scrollIntoView({ behavior: "smooth", block: "start" }); return }
@@ -2274,6 +2397,28 @@ function acctList() {
     .concat([{ id: "pf", name: "DEGIRO (marge libre)", color: S.invest.look.color, icon: S.invest.look.icon, kind: "titres" }]);
 }
 const acctById = id => acctList().find(a => a.id === id);
+// Compte d'épargne ou de placement cité dans un texte : « Virement vers Livret A », « Vir. BFM », « vers Degiro »…
+function acctFromText(text) {
+  const f = " " + fold(text).replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim() + " "; if (f.length < 4) return null;
+  // Comptes créés par l'utilisateur d'abord (« Compte titre Degiro » avant « DEGIRO (marge libre) »), nom complet puis mot distinctif
+  const clean = n => fold(n).replace(/\(.*?\)/g, " ").replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+  const GENERIC = /^(compte|comptes|titre|titres|livret|epargne|marge|libre|de|du|la|le|mon|ma)$/;
+  const full = a => clean(a.name).length >= 2 && f.includes(" " + clean(a.name) + " "), word = a => clean(a.name).split(" ").some(w => w.length >= 3 && !GENERIC.test(w) && f.includes(" " + w + " "));
+  const mine = acctList().filter(a => a.id !== "ccp" && a.id !== "pf"), pf = acctList().filter(a => a.id === "pf");
+  return mine.find(full) || mine.find(word) || pf.find(full) || pf.find(word) || null;
+}
+const looksTransfer = text => /\b(vir|virement|virt|transfert|versement)\b|\bvers\b/.test(fold(text));
+// Virement importé (tableau, relevé) : les soldes relevés après sa date le contiennent déjà, on ne l'ajoute qu'aux autres
+function applyNewTransfer(t, sign = 1) {
+  const fresh = id => { if (id === "ccp") return false; const d = id === "pf" ? S.invest.freeCash?.date : S.budget.savings.find(a => a.id === id)?.date; return !d || t.date > d };
+  const move = (id, d) => {
+    if (id === "pf") { const fc = S.invest.freeCash || { amount: 0, date: t.date }; fc.amount = round2((+fc.amount || 0) + d); S.invest.freeCash = fc; return }
+    const a = S.budget.savings.find(x => x.id === id); if (a) a.balance = round2((+a.balance || 0) + d);
+  };
+  if (sign > 0) { t.balTo = fresh(t.to); t.balFrom = fresh(t.from) }
+  if (t.balTo) move(t.to, sign * t.amount);
+  if (t.balFrom) move(t.from, -sign * t.amount);
+}
 // Solde net des virements d'un compte après une date (pour rattraper un solde relevé plus tôt)
 const trNetAfter = (id, date) => round2(S.budget.transfers.filter(t => t.date > date).reduce((n, t) => n + (t.to === id ? +t.amount : 0) - (t.from === id ? +t.amount : 0), 0));
 // Enveloppe d'épargne dans laquelle compte un virement depuis / vers le compte courant
@@ -2595,9 +2740,27 @@ function blPeriod() {
   const n = +PF.blN || 12, last = cycleOf(blDate), cs = Array.from({ length: n }, (_, i) => shiftCycle(last, i - n + 1));
   return { m: "multi", a: cs[0].start, b: last.end, cs };
 }
-// Découpage du graphique : jours (semaine, dates courtes), semaines (cycle, dates moyennes) ou cycles
+// Jour, Semaine, Cycle : une barre par période (14 jours, 12 semaines, 12 cycles), la période choisie surlignée.
+// La fenêtre se termine à la période en cours ; si la période choisie est plus ancienne, elle commence par elle.
+const BL_N = { day: 14, week: 12, cycle: 12 };
+function blWindow(P) {
+  const m = P.m, N = BL_N[m], today = midnight(new Date());
+  const unit = d => m === "day" ? midnight(d) : m === "week" ? mondayOf(d) : cycleOf(d).start;
+  const step = (d, k) => m === "day" ? addDays(d, k) : m === "week" ? addDays(d, 7 * k) : shiftCycle(cycleOf(d), k).start;
+  const sel = unit(P.a), cur = unit(today);
+  let end = cur; if (sel > cur) end = sel; else if (step(sel, N - 1) < cur) end = step(sel, N - 1);
+  const out = [];
+  for (let k = N - 1; k >= 0; k--) {
+    const a0 = step(end, -k);
+    if (m === "cycle") { const c = cycleOf(a0); out.push({ a: c.start, b: c.end, k: "cycle", c, sel: +c.start === +sel }) }
+    else out.push({ a: a0, b: m === "week" ? addDays(a0, 6) : a0, k: m, sel: +a0 === +sel });
+  }
+  return out;
+}
+// Découpage du graphique : une barre par période (Jour, Semaine, Cycle), ou par cycle / semaine / jour pour plusieurs cycles et des dates choisies
 function blBuckets(P) {
   const days = dayDiff(P.a, P.b) + 1, out = [];
+  if (BL_N[P.m]) return { unit: P.m, days, list: blWindow(P), win: true };
   const unit = P.m === "day" ? "none" : P.m === "week" ? "day" : P.m === "cycle" ? "week" : P.m === "range" ? (days <= 14 ? "day" : days <= 120 ? "week" : "cycle") : "cycle";
   if (unit === "day") for (let d = P.a; d <= P.b; d = addDays(d, 1)) out.push({ a: d, b: d, k: "day" });
   else if (unit === "week") for (let d = P.a; d <= P.b;) { const e = addDays(mondayOf(d), 6), z = e < P.b ? e : P.b; out.push({ a: d, b: z, k: "week" }); d = addDays(z, 1) }
@@ -2628,7 +2791,7 @@ function blLabel(P) {
   return [span, `${P.cs.length} cycles`];
 }
 function renderBilan() {
-  const P = blPeriod(), B = blBuckets(P), cyc = B.unit === "cycle" || P.m === "cycle";
+  const P = blPeriod(), B = blBuckets(P), cyc = B.unit === "cycle";
   blUnit = B.unit;
   document.querySelectorAll("#bl-mode [data-bm]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.bm === PF.blMode)));
   $("bl-multi").hidden = PF.blMode !== "multi";
@@ -2637,17 +2800,20 @@ function renderBilan() {
   $("bl-prev").disabled = $("bl-next").disabled = P.m === "all";
   const T = blStats(P.a, P.b, cyc), per = B.list.map(x => ({ ...x, ...blStats(x.a, x.b, x.k === "cycle") }));
   blPer = per;
-  // Moyennes : par cycle quand le bilan compte des cycles, sinon par jour (rien pour un seul jour)
-  const avgU = B.unit === "cycle" ? (per.length > 1 ? { n: per.length, u: "cycle" } : null) : P.m === "day" ? null : { n: B.days, u: "jour" };
-  const avg = v => avgU ? `Moyenne : ${fmtEUR(v / avgU.n)} / ${avgU.u}` : "", avgCyc = v => B.unit === "cycle" ? avg(v) : "";
+  // Moyennes. Jour / Semaine / Cycle : sur les périodes du graphique (14 jours, 12 semaines, 12 cycles), à comparer à la période choisie.
+  // Plusieurs cycles : par cycle. Dates choisies : par cycle ou par jour.
+  const UN = { day: "jour", week: "semaine", cycle: "cycle" };
+  const wsum = k => per.reduce((t, p) => t + p[k], 0), avgU = B.win ? { n: per.length, u: UN[B.unit], w: true } : B.unit === "cycle" ? (per.length > 1 ? { n: per.length, u: "cycle" } : null) : { n: B.days, u: "jour" };
+  const avgOf = k => avgU ? `Moyenne : ${fmtEUR((avgU.w ? wsum(k) : T[k]) / avgU.n)} / ${avgU.u}` : "";
+  const avg = v => avgU && !avgU.w ? `Moyenne : ${fmtEUR(v / avgU.n)} / ${avgU.u}` : "", avgCyc = v => B.unit === "cycle" ? (avgU?.w ? avgOf("rev") : avg(v)) : "";
   const stat = (dot, label, v, sub, color) => `<div class="stat"><span class="eyebrow">${dot ? `<span class="tdot ${dot}"></span>` : ""}${label}</span><span class="v"${color ? ` style="color:${color}"` : ""}>${v}</span>${sub ? `<span class="small muted">${sub}</span>` : ""}</div>`;
   const rate = cyc && T.rev > 0 ? Math.round(T.save / T.rev * 100) : null, nMov = T.st.ex.length + T.st.inc.length + T.st.tr.length;
   $("bl-stats").innerHTML = stat("t-rev", "Revenus", fmtEUR(T.rev), avgCyc(T.rev))
-    + stat("t-exp", "Dépenses", fmtEUR(T.spend), avg(T.spend))
-    + stat("t-sav", cyc ? "Épargne" : "Épargne virée", fmtEUR(T.save), avgU && B.unit === "cycle" ? avg(T.save) : (cyc && T.placed ? `Virés : ${fmtEUR(T.placed)}` : ""), T.save < 0 ? "var(--down)" : "")
+    + stat("t-exp", "Dépenses", fmtEUR(T.spend), avgU?.w ? avgOf("spend") : avg(T.spend))
+    + stat("t-sav", cyc ? "Épargne" : "Épargne virée", fmtEUR(T.save), avgU && B.unit === "cycle" ? (avgU.w ? avgOf("save") : avg(T.save)) : (cyc && T.placed ? `Virés : ${fmtEUR(T.placed)}` : ""), T.save < 0 ? "var(--down)" : "")
     + (rate !== null ? stat("", "Taux d'épargne", `${rate} %`, "") : stat("", "Mouvements", String(nMov), ""));
   $("bl-chartbox").hidden = B.unit === "none";
-  $("bl-ctitle").textContent = { day: "Par jour", week: "Par semaine", cycle: "Par cycle" }[B.unit] || "";
+  $("bl-ctitle").textContent = B.win ? { day: "14 derniers jours", week: "12 dernières semaines", cycle: "12 derniers cycles" }[B.unit] : ({ day: "Par jour", week: "Par semaine", cycle: "Par cycle" }[B.unit] || "");
   document.querySelector("#bl-legend > span:last-child").lastChild.textContent = B.unit === "cycle" ? "Épargne" : "Épargne virée";
   if (B.unit !== "none") drawBilanChart();
   const has = per.length && (T.spend || T.rev);
@@ -2658,32 +2824,38 @@ function renderBilan() {
   const tot = {}; let orphan = 0;
   Object.entries(T.st.spentBy).forEach(([id, v]) => { if (envById(id)) tot[id] = (tot[id] || 0) + v; else orphan += v });
   Object.entries(T.st.refundBy).forEach(([id, v]) => { tot[id] = (tot[id] || 0) - v });
-  const nC = B.unit === "cycle" ? per.length : 1, factor = B.unit === "cycle" || P.m === "cycle" ? 1 : B.days / CYCLE_DAYS;
+  const nC = B.unit === "cycle" && !B.win ? per.length : 1, factor = P.m === "cycle" || (B.unit === "cycle" && !B.win) ? 1 : periodFactor(P.a, P.b);
   const rows = S.budget.envelopes.map(e => ({ id: e.id, name: e.name, v: tot[e.id] || 0, pl: +e.planned || 0, kind: e.kind, color: envColor(e) })).concat(orphan ? [{ id: "__none", name: "Sans enveloppe", v: orphan, pl: 0, color: OTHER_COLOR }] : [])
     .filter(r => Math.abs(r.v) > 0.004).sort((a, b) => (a.kind === "save") - (b.kind === "save") || b.v - a.v);
   const maxv = Math.max(1, ...rows.map(r => r.v));
   $("bl-env").innerHTML = rows.length ? rows.map(r => {
     const save = r.kind === "save", avgv = r.v / nC, ref = r.pl * factor, over = !save && r.pl > 0 && avgv > ref + 0.005, good = save && r.pl > 0 && avgv >= ref - 0.005;
     const sub = [nC > 1 ? `Moyenne : ${fmtEUR(avgv)}` : "", r.pl ? `Prévu : ${fmtEUR(ref)}` : ""].filter(Boolean).join(" / ");
-    return `<div class="env" style="cursor:default"><span><b>${esc(r.name)}</b>${save ? '<span class="tag">épargne</span>' : ""}${sub ? `<br><span class="small muted num">${sub}</span>` : ""}</span>
+    return `<button type="button" class="env" data-envd="${esc(r.id)}"><span><b>${esc(r.name)}<span class="chev" aria-hidden="true">›</span></b>${save ? '<span class="tag">épargne</span>' : ""}${sub ? `<br><span class="small muted num">${sub}</span>` : ""}</span>
       <span class="num small" style="font-weight:600;color:${over ? "var(--down)" : "var(--fg)"};text-align:right">${over ? "⚠ " : good ? '<span style="color:var(--c-sav)">✓</span> ' : ""}${fmtEUR(r.v)}<br><span class="muted" style="font-weight:500">${T.spend && !save ? (r.v / T.spend * 100).toLocaleString("fr-FR", { maximumFractionDigits: 0 }) + " %" : ""}</span></span>
-      <span class="bar"><i class="${over ? "over" : save ? "t-sav" : "t-exp"}" style="width:${Math.max(0, r.v / maxv * 100)}%"></i></span></div>`;
+      <span class="bar"><i class="${over ? "over" : save ? "t-sav" : "t-exp"}" style="width:${Math.max(0, r.v / maxv * 100)}%"></i></span></button>`;
   }).join("") : `<div class="notice">Aucune dépense</div>`;
   blMixRows = rows; blMixN = nC; renderMix();
   // Entrées : salaires puis catégories
-  const incRows = [{ name: "Salaires", v: T.sal }].concat(Object.entries(T.st.byCat).map(([id, v]) => ({ name: incCat(id)?.name || "Autre entrée", v })).sort((a, b) => b.v - a.v));
-  $("bl-inc").innerHTML = incRows.filter(r => r.v).map(r => `<div class="totrow" style="font-weight:500"><span><span class="tdot t-rev"></span>${esc(r.name)}</span><span class="num">${fmtEUR(r.v)}</span></div>`).join("")
+  const incRows = [{ name: "Salaires", v: T.sal }].concat(Object.entries(T.st.byCat).map(([id, v]) => ({ id, name: incCat(id)?.name || "Autre entrée", v })).sort((a, b) => b.v - a.v));
+  $("bl-inc").innerHTML = incRows.filter(r => r.v).map(r => r.id && incCat(r.id)
+    ? `<button type="button" class="totrow rowbtn" data-catd="${esc(r.id)}" style="font-weight:500"><span><span class="tdot t-rev"></span>${esc(r.name)}<span class="chev" aria-hidden="true">›</span></span><span class="num">${fmtEUR(r.v)}</span></button>`
+    : `<div class="totrow" style="font-weight:500"><span><span class="tdot t-rev"></span>${esc(r.name)}</span><span class="num">${fmtEUR(r.v)}</span></div>`).join("")
     || `<div class="notice">Aucune entrée</div>`;
 }
-function blShift(dir) {
+function blShift(dir) { blMove(dir); renderBilan() }
+function blMove(dir) {
   const m = PF.blMode;
   if (m === "day") blDate = addDays(blDate, dir);
   else if (m === "week") blDate = addDays(blDate, 7 * dir);
   else if (m === "cycle") blDate = midnight(shiftCycle(cycleOf(blDate), dir).start);
   else if (PF.blN === "range") { const a = parseYmd(PF.blRange.a), b = parseYmd(PF.blRange.b), n = (dayDiff(a, b) + 1) * dir; PF.blRange = { a: ymd(addDays(a, n)), b: ymd(addDays(b, n)) }; savePrefs() }
   else if (PF.blN !== "all") blDate = midnight(shiftCycle(cycleOf(blDate), dir * (+PF.blN || 12)).start);
-  blPin = null; blMix = null; renderBilan();
+  blPin = null; blMix = null;
 }
+$("bl-env").addEventListener("click", e => { const b = e.target.closest("[data-envd]"); if (b) openEnv(b.dataset.envd) });
+$("bl-inc").addEventListener("click", e => { const b = e.target.closest("[data-catd]"); if (b) openEnv("cat:" + b.dataset.catd) });
+$("bl-mixnote").addEventListener("click", e => { const b = e.target.closest("[data-envd]"); if (b) openEnv(b.dataset.envd) });
 $("bl-prev").addEventListener("click", () => blShift(-1));
 $("bl-next").addEventListener("click", () => blShift(1));
 $("bl-mode").addEventListener("click", e => { const b = e.target.closest("[data-bm]"); if (!b) return; PF.blMode = b.dataset.bm; savePrefs(); blPin = null; blMix = null; renderBilan() });
@@ -2717,7 +2889,7 @@ function drawBilanChart() {
   el.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="group" aria-label="Revenus, dépenses et épargne">
     ${ticks.map(v => `<line x1="${pl}" x2="${W - pr}" y1="${y(v)}" y2="${y(v)}" class="${v === 0 ? "base" : "grid"}"/><text x="${pl - 6}" y="${y(v) + 4}" text-anchor="end" class="ax">${fmtK(v)}</text>`).join("")}
     ${per.map((p, i) => { const gx = pl + i * gw, x0 = gx + (gw - (3 * bw + 4)) / 2;
-      return `<g data-ck="${bucketKey(p)}" data-i="${i}" tabindex="0" role="button" aria-label="${esc(bucketRange(p))} : revenus ${fmtEUR(p.rev)}, dépenses ${fmtEUR(p.spend)}, épargne ${fmtEUR(p.save)}"${blPin === bucketKey(p) ? ' class="sel"' : ""}>
+      return `<g data-ck="${bucketKey(p)}" data-i="${i}" tabindex="0" role="button" aria-label="${esc(bucketRange(p))} : revenus ${fmtEUR(p.rev)}, dépenses ${fmtEUR(p.spend)}, épargne ${fmtEUR(p.save)}"${p.sel ? ' aria-current="true"' : ""} class="${[blPin === bucketKey(p) ? "sel" : "", p.sel ? "cur" : ""].filter(Boolean).join(" ")}">
         <rect class="hl" x="${gx + 1}" y="${pt - 6}" width="${gw - 2}" height="${H - pt - pb + 6}" rx="6"/>
         ${BL_SERIES.map(([k], j) => `<path d="${bar(x0 + j * (bw + 2), p[k])}" fill="${BL_COLOR[k]}"/>`).join("")}
         ${i % labStep === 0 ? `<text x="${gx + gw / 2}" y="${H - 9}" text-anchor="middle" class="ax">${esc(bucketLabel(p))}</text>` : ""}</g>`; }).join("")}
@@ -2752,6 +2924,9 @@ $("bl-chart").addEventListener("click", e => {
   if (e.target.closest("#bl-tip")) return;
   const g = e.target.closest("[data-ck]");
   if (!g || blPin === g.dataset.ck) { blUnpin(); return }
+  // Jour / Semaine / Cycle : toucher une barre choisit cette période (chiffres, enveloppes et entrées en dessous)
+  const p = blPer[+g.dataset.i];
+  if (p && BL_N[PF.blMode] && !p.sel) { blDate = midnight(p.a); blMix = null; blPin = g.dataset.ck; renderBilan(); return }
   blPin = g.dataset.ck; blTip(+g.dataset.i, true);
 });
 $("bl-chart").addEventListener("keydown", e => {
@@ -2793,7 +2968,7 @@ function renderMix() {
   const sp = blMixRows.filter(r => r.kind !== "save" && r.v > 0.004).sort((a, b) => b.v - a.v), total = sp.reduce((t, r) => t + r.v, 0), n = blMixN;
   document.querySelectorAll("#bl-mixmode [data-mx]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.mx === PF.mix)));
   if (!total) { $("bl-mixchart").innerHTML = `<div class="notice">Aucune dépense</div>`; $("bl-mixnote").textContent = ""; return }
-  const parts = sp.slice(0, 7).map(r => ({ name: r.name, v: r.v, color: r.color })), rest = sp.slice(7);
+  const parts = sp.slice(0, 7).map(r => ({ id: r.id, name: r.name, v: r.v, color: r.color })), rest = sp.slice(7);
   if (rest.length) parts.push({ name: `Autres (${rest.length})`, v: rest.reduce((t, r) => t + r.v, 0), color: OTHER_COLOR });
   if (blMix != null && blMix >= parts.length) blMix = null;
   const pc = v => (v / total * 100).toLocaleString("fr-FR", { maximumFractionDigits: v / total < 0.1 ? 1 : 0 }) + " %", dim = i => blMix != null && blMix !== i ? " dim" : "";
@@ -2806,7 +2981,8 @@ function renderMix() {
       <div class="dlegend">${parts.map((p, i) => `<button type="button" class="lg${dim(i)}" data-mi="${i}"><span class="sw" style="background:${p.color}"></span><span class="nm">${esc(p.name)}</span><span class="vl">${fmtEUR(p.v)}<small>${pc(p.v)}</small></span></button>`).join("")}</div></div>`;
   }
   const v = sel ? sel.v : total;
-  $("bl-mixnote").textContent = `${sel ? sel.name : "Total"} : ${fmtEUR(v)}` + (n > 1 ? ` / Moyenne : ${fmtEUR(v / n)} / cycle` : "");
+  $("bl-mixnote").innerHTML = esc(`${sel ? sel.name : "Total"} : ${fmtEUR(v)}` + (n > 1 ? ` / Moyenne : ${fmtEUR(v / n)} / cycle` : ""))
+    + (sel && sel.id && (sel.id === "__none" || envById(sel.id)) ? ` <button type="button" class="linkbtn small" data-envd="${esc(sel.id)}">Détail ›</button>` : "");
 }
 $("bl-mixmode").addEventListener("click", e => { const b = e.target.closest("[data-mx]"); if (!b) return; PF.mix = b.dataset.mx; savePrefs(); renderMix() });
 $("bl-mixchart").addEventListener("click", e => { const b = e.target.closest("[data-mi]"); if (!b) return; const i = +b.getAttribute("data-mi"); blMix = blMix === i ? null : i; renderMix() });
@@ -2952,6 +3128,7 @@ function renderPlan() {
       <label><span class="cap">${isCh ? "Somme des charges" : "Prévu par cycle (€)"}</span><input class="n" data-ek="planned" type="text" inputmode="decimal" value="${fmtIn(e.planned)}" placeholder="0" aria-label="Montant prévu pour ${esc(e.name)}"${isCh ? " readonly" : ""}></label>
       <label><span class="cap">Type</span><select data-ek="kind" aria-label="Type de ${esc(e.name)}"><option value="spend"${!save ? " selected" : ""}>Dépense</option><option value="save"${save ? " selected" : ""}>Épargne</option></select></label>
       <button class="del" type="button" data-edel aria-label="Supprimer l'enveloppe ${esc(e.name)}" style="align-self:end">✕</button>
+      <button class="linkbtn small full" type="button" data-envd="${esc(e.id)}" style="justify-self:start;padding:2px 0">Détail ›</button>
       <div class="full prow2"><span><span class="tdot ${save ? "t-sav" : "t-exp"}"></span>${A.n ? `Moyenne : ${fmtEUR(avg)} / cycle` : "Pas de moyenne"}</span>${A.n && avg > 0 && !isCh && r !== (+e.planned || 0) ? `<button class="linkbtn" type="button" data-euse="${r}">Mettre ${fmtEUR(r).replace(",00", "")}</button>` : ""}</div></div>`; };
   const spendE = b.envelopes.filter(e => e.kind !== "save"), saveE = b.envelopes.filter(e => e.kind === "save");
   $("s-envs").innerHTML = (spendE.map(envRowHtml).join("") + (saveE.length ? `<div class="subhead">Épargne &amp; placements</div>` + saveE.map(envRowHtml).join("") : "")) || `<div class="notice">Aucune enveloppe.</div>`;
@@ -2973,6 +3150,7 @@ const updateEnvTotal = updatePlanTotals;
 const undoBtn = '<button class="linkbtn small" type="button" data-planundo>Annuler</button>';
 $("p-income").addEventListener("input", e => { S.budget.income = parseNum(e.target.value); commit(false); updatePlanTotals() });
 $("p-excl").addEventListener("change", e => { planExcl = e.target.checked; renderPlan() });
+$("s-envs").addEventListener("click", e => { const d = e.target.closest("[data-envd]"); if (d) { e.stopImmediatePropagation(); openEnv(d.dataset.envd) } });
 $("s-envs").addEventListener("click", e => {
   const ic = e.target.closest("[data-eico]"); if (ic) { openIconPicker("env", ic.closest("[data-eid]").dataset.eid); return }
   const u = e.target.closest("[data-euse]"); if (!u) return;
@@ -3311,7 +3489,13 @@ $("hx-box").addEventListener("click", e => {
     const t = resolve(r);
     if (t === "skip") return;
     if (t === "salary") { const k = salaryCycle(r.date).key; salByCycle[k] = (salByCycle[k] || 0) + r.amount; return }
-    if (t.startsWith("env:")) { S.budget.expenses.push({ id: rid(), date: r.date, amount: r.amount, env: t.slice(4), label: r.label, imp: impId }); nE++ }
+    if (t.startsWith("env:")) {
+      // « Virement vers Livret A » rangé en épargne : un vrai virement du compte courant vers ce compte
+      const to = envById(t.slice(4))?.kind === "save" && r.amount > 0 && looksTransfer(r.label) ? acctFromText(r.label) : null;
+      if (to) { const x = { id: rid(), date: r.date, amount: r.amount, from: "ccp", to: to.id, label: r.label, imp: impId, at: now }; applyNewTransfer(x); S.budget.transfers.push(x) }
+      else S.budget.expenses.push({ id: rid(), date: r.date, amount: r.amount, env: t.slice(4), label: r.label, imp: impId });
+      nE++;
+    }
     else if (t.startsWith("inc:")) { const cat = t.slice(4), ce = incCat(cat)?.env; S.budget.incomes.push({ id: rid(), date: r.date, amount: r.amount, cat, env: ce && envById(ce) ? ce : "", label: r.label, imp: impId }); nI++ }
   });
   const setCycle = (k, v) => { if (!(k in prevCycles)) prevCycles[k] = S.budget.cycles[k] ?? null; S.budget.cycles[k] = { income: round2(v) } };
@@ -3342,6 +3526,8 @@ document.addEventListener("click", e => {
   const li = S.budget.lastImport; if (!li) return;
   S.budget.expenses = S.budget.expenses.filter(x => x.imp !== li.id);
   S.budget.incomes = S.budget.incomes.filter(x => x.imp !== li.id);
+  S.budget.transfers.filter(x => x.imp === li.id).forEach(x => applyNewTransfer(x, -1));
+  S.budget.transfers = S.budget.transfers.filter(x => x.imp !== li.id);
   Object.entries(li.prevCycles || {}).forEach(([k, v]) => { if (v === null) delete S.budget.cycles[k]; else S.budget.cycles[k] = v });
   S.budget.envelopes = S.budget.envelopes.filter(x => !(li.newEnvs || []).includes(x.id) || S.budget.expenses.some(e => e.env === x.id));
   S.budget.incomeCats = S.budget.incomeCats.filter(x => !(li.newCats || []).includes(x.id) || S.budget.incomes.some(i => i.cat === x.id));
@@ -3898,18 +4084,28 @@ function gsCat(name) {
 }
 function gsMovements(rows, res) {
   if (!rows.length) return;
-  const { idx, body } = gsCols(rows, { id: [/^id$|identifiant/, 0], date: [/^date/, 1], type: [/^type|^sens/, 2], amount: [/montant|somme/, 3], env: [/enveloppe/, 4], cat: [/categ|origine/, 5], label: [/libelle|description|detail|note/, 6] });
+  const { idx, body } = gsCols(rows, { id: [/^id$|identifiant/, 0], date: [/^date/, 1], type: [/^type|^sens/, 2], amount: [/montant|somme/, 3], env: [/enveloppe/, 4], cat: [/categ|origine/, 5], label: [/libelle|description|detail|note/, 6], from: [/^de$|^depuis|compte de depart|^source/, -1], to: [/^vers$|^a$|compte d.arrivee|destination/, -1] });
   const seen = {};
   for (const r of body) {
     const date = gsDate(r[idx.date]), amount = round2(toNum(r[idx.amount]));
     if (!date || !isFinite(amount) || !amount) { if (r.some(c => String(c ?? "").trim())) res.bad++; continue }
-    const inc = /^(entree|revenu|credit|recette|rembours|vente|\+)/.test(fold(r[idx.type])), envName = cell(r, idx.env), catName = cell(r, idx.cat), label = cell(r, idx.label);
-    const h = hashStr([date, inc ? "i" : "e", amount, fold(envName), fold(catName), label].join("|"));
+    const type = fold(r[idx.type]), inc = /^(entree|revenu|credit|recette|rembours|vente|\+)/.test(type), envName = cell(r, idx.env), catName = cell(r, idx.cat), label = cell(r, idx.label);
+    const B = S.budget;
+    // Virement : type « Virement » (comptes en colonnes De / Vers ou dans le libellé), ou dépense d'épargne « Virement vers Livret A »
+    const acctCol = k => { const v = idx[k] >= 0 ? cell(r, idx[k]) : ""; return v ? (/^(compte courant|ccp|courant)$/.test(fold(v)) ? { id: "ccp" } : acctFromText(v)) : null };
+    let tr = null;
+    if (/^(vir|transf)/.test(type)) { const fr = acctCol("from"), to = acctCol("to") || (fr?.id === "ccp" || !fr ? acctFromText(label) : { id: "ccp" }); tr = { from: fr?.id || "ccp", to: to?.id || "" } }
+    else if (!inc && looksTransfer(label) && (matchEnv(envName)?.kind === "save" || !envName)) { const to = acctFromText(label); if (to) tr = { from: "ccp", to: to.id } }
+    else if (inc && looksTransfer(label) && /\b(de|depuis|du)\b/.test(fold(label))) { const fr = acctFromText(label); if (fr) tr = { from: fr.id, to: "ccp" } }
+    if (tr && (!tr.to || tr.to === tr.from)) tr = null;
+    const h = hashStr([date, tr ? "t" + tr.from + ">" + tr.to : inc ? "i" : "e", amount, fold(envName), fold(catName), label].join("|"));
     let gid = cell(r, idx.id); if (!gid) { seen[h] = (seen[h] || 0) + 1; gid = "h" + h + "-" + seen[h] }
-    const B = S.budget, ex = B.expenses.find(x => x.gs === gid), ic = B.incomes.find(x => x.gs === gid), cur = ex || ic;
+    const ex = B.expenses.find(x => x.gs === gid), ic = B.incomes.find(x => x.gs === gid), tx = B.transfers.find(x => x.gs === gid), cur = ex || ic || tx;
     if (cur && cur.gsh === h) continue;                     // déjà importé et inchangé dans le tableau (une modification faite dans l'appli est gardée)
     if (ex) B.expenses = B.expenses.filter(x => x !== ex); if (ic) B.incomes = B.incomes.filter(x => x !== ic);
+    if (tx) { applyNewTransfer(tx, -1); B.transfers = B.transfers.filter(x => x !== tx) }
     const base = { id: cur?.id || rid(), date, label, at: cur?.at || Date.now(), gs: gid, gsh: h };
+    if (tr) { const t = { ...base, amount: Math.abs(amount), from: tr.from, to: tr.to }; applyNewTransfer(t); B.transfers.push(t); cur ? res.upd++ : res.add++; continue }
     if (inc) B.incomes.push({ ...base, amount: Math.abs(amount), cat: gsCat(catName), env: envName ? (matchEnv(envName)?.id || "") : "" });
     else B.expenses.push({ ...base, amount, env: gsEnv(envName, res) });
     cur ? res.upd++ : res.add++;
@@ -4108,7 +4304,10 @@ function gswRows() {
     pf.push([cname(c.id), a.name || "", a.sym || "", a.isin || "", +a.units || 0, cost, v, q ? Math.round(q.eur * 1e4) / 1e4 : "", cost === "" ? "" : round2(v - cost), q ? "Cours en direct" : "Valeur saisie ou importée"]);
   }));
 
+  // Disponible du cycle en cours, montant par jour fixé ce matin et reste du jour (calcul d'après le compte courant)
+  const snap = S.budget.ccp ? (() => { const T = midnight(new Date()), C = cycleOf(T), st2 = cycleStats(C), m = planCcp(T); return { left: round2(ccpEstimate().value - Math.max(0, savePlanned() - st2.saved) - chargesLeftAt(C, addDays(T, 1))), rate: round2(m.rate), rest: round2(m.rate - flexSpend(T, T)) } })() : null;
   const inf = [["Info", "Valeur"], ["Envoyé le", stamp(Date.now())], ["Depuis", deviceName()], ["Version de l'appli", APP_VERSION],
+    ...(snap ? [["Disponible (cycle en cours)", snap.left], ["Par jour (fixé ce matin)", snap.rate], ["Reste aujourd'hui", snap.rest]] : []),
     ["Dernière modification dans l'appli", S.updatedAt ? stamp(S.updatedAt) : ""], ["Cycle en cours", `${ymd(cur.start)} → ${ymd(cur.end)}`],
     ["Jour de paie", B.payday + (B.shiftWeekend ? " (avancé au vendredi si week-end)" : "")], ["Revenu habituel", round2(+B.income || 0)],
     ["Mouvements dans l'appli", capped ? `${total} (les ${GSW_MAX} plus récents sont recopiés)` : total],
