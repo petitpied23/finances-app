@@ -30,6 +30,7 @@
   --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --body: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --num: "IBM Plex Sans", system-ui, -apple-system, sans-serif;   /* chiffres : police du texte, chiffres de même largeur */
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
@@ -61,7 +62,7 @@ h2 { font-size: 1.15rem; font-weight: 600 }
 .eyebrow { font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600 }
 .muted { color: var(--muted) }
 .small { font-size: .82rem }
-.num { font-family: var(--mono); font-variant-numeric: tabular-nums }
+.num { font-family: var(--num); font-variant-numeric: tabular-nums }
 .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; min-width: 0; scroll-margin-top: calc(70px + env(safe-area-inset-top, 0px)) }
 .stack { display: flex; flex-direction: column; gap: 12px }
 button, select, input, textarea { font: inherit; color: inherit }
@@ -85,7 +86,7 @@ button { cursor: pointer }
 label.field { display: flex; flex-direction: column; gap: 6px; min-width: 0 }
 .input, .field input, .field select, .field textarea { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface) }
 .field textarea { font-family: var(--mono); font-size: 13px; min-height: 140px; resize: vertical }
-.n { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right }
+.n { font-family: var(--num); font-variant-numeric: tabular-nums; text-align: right }
 .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px }
 .actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end }
 .switchrow { display: flex; align-items: center; justify-content: space-between; gap: 12px }
@@ -155,11 +156,11 @@ label.field { display: flex; flex-direction: column; gap: 6px; min-width: 0 }
 /* Budget */
 .cyclenav { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; gap: 8px; text-align: center; padding: 10px }
 .cyclenav button.arrow { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; height: 40px; font-size: 1.3rem; line-height: 1 }
-.big { font-family: var(--mono); font-size: 2rem; font-weight: 500; font-variant-numeric: tabular-nums }
+.big { font-family: var(--num); font-size: 2rem; font-weight: 500; font-variant-numeric: tabular-nums }
 .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px }
 .stat { display: flex; flex-direction: column; gap: 2px; min-width: 0 }
-.stat .v { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 1.05rem; font-weight: 500 }
-.stat input { width: 100%; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); font-family: var(--mono); font-variant-numeric: tabular-nums }
+.stat .v { font-family: var(--num); font-variant-numeric: tabular-nums; font-size: 1.05rem; font-weight: 500 }
+.stat input { width: 100%; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); font-family: var(--num); font-variant-numeric: tabular-nums }
 .env { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; padding: 10px 2px; border: 0; border-bottom: 1px solid var(--line); background: none; text-align: left; width: 100%; border-radius: 0 }
 .env:last-child { border-bottom: 0 }
 .env .bar { grid-column: 1 / -1 }
@@ -182,7 +183,7 @@ label.field { display: flex; flex-direction: column; gap: 6px; min-width: 0 }
 .pjhead, .pjrow { display: grid; grid-template-columns: minmax(0, 1.7fr) repeat(5, minmax(0, 1fr)); gap: 5px; align-items: center }
 .pjhead span { font-size: .66rem; color: var(--muted); text-align: center }
 .pjrow span { min-width: 0; font-size: .8rem; line-height: 1.2 } .pjrow small { display: block; color: var(--muted); font-size: .72rem }
-.pjrow input { width: 100%; min-width: 0; padding: 6px 2px; text-align: center; border-radius: 7px; border: 1px solid var(--line); background: var(--bg); font-family: var(--mono); font-size: 16px }
+.pjrow input { width: 100%; min-width: 0; padding: 6px 2px; text-align: center; border-radius: 7px; border: 1px solid var(--line); background: var(--bg); font-family: var(--num); font-size: 16px }
 .chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 0 -2px; padding: 0 2px 2px }
 .chips::-webkit-scrollbar { display: none }
 .chips button { flex: none; border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 999px; padding: 7px 13px; font: inherit; font-size: .85rem; cursor: pointer }
@@ -190,7 +191,7 @@ label.field { display: flex; flex-direction: column; gap: 6px; min-width: 0 }
 .mhead { display: flex; justify-content: space-between; gap: 10px; padding: 14px 2px 4px; font-size: .78rem; font-weight: 600; color: var(--muted) }
 .mhead span:first-child::first-letter { text-transform: uppercase }
 .mhead:first-child { padding-top: 2px }
-.exp .d { font-family: var(--mono); font-size: .75rem; color: var(--muted) }
+.exp .d { font-family: var(--num); font-size: .75rem; color: var(--muted) }
 .exp .l { min-width: 0 }
 .exp .l b.wrap { white-space: normal }
 .exp .l b { display: block; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
@@ -245,7 +246,7 @@ td input:hover { border-color: var(--line) }
 td input:focus { border-color: var(--accent); background: var(--bg); outline: none }
 td input.isin { font-family: var(--mono); width: 9.5em; text-transform: uppercase; font-size: 16px }
 td input.bad { border-color: var(--down) }
-td.calc { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; padding: 0 8px }
+td.calc { font-family: var(--num); font-variant-numeric: tabular-nums; text-align: right; padding: 0 8px }
 td.acts { text-align: right }
 .mv { width: 34px; padding: 6px 2px; border: 1px solid transparent; background: transparent; color: var(--muted); border-radius: 6px; appearance: none; -webkit-appearance: none; text-align: center; cursor: pointer }
 .clsfoot { display: flex; justify-content: space-between; font-weight: 600; font-size: .9rem }
@@ -260,7 +261,7 @@ td.acts { text-align: right }
 .act.buy { color: var(--up); background: color-mix(in srgb, var(--up) 14%, transparent) }
 .act.sell { color: var(--down); background: color-mix(in srgb, var(--down) 14%, transparent) }
 .act.ok { color: var(--muted); background: var(--bg) }
-.scale { display: flex; justify-content: space-between; font-size: .7rem; color: var(--muted); font-family: var(--mono) }
+.scale { display: flex; justify-content: space-between; font-size: .7rem; color: var(--muted); font-family: var(--num) }
 input[type=range] { width: 100%; accent-color: var(--accent) }
 .apport { display: flex; flex-direction: column; gap: 10px; border-top: 1px solid var(--line); padding-top: 14px }
 .aprow { display: flex; justify-content: space-between; align-items: center; gap: 10px }
@@ -268,13 +269,13 @@ input[type=range] { width: 100%; accent-color: var(--accent) }
 .chart { position: relative; min-width: 0 }
 .chart svg { display: block; max-width: 100%; touch-action: pan-y }
 .chart .grid { stroke: var(--line); stroke-width: 1 }
-.chart .ax { fill: var(--muted); font: 11px var(--mono) }
+.chart .ax { fill: var(--muted); font: 11px var(--num) }
 .chart .area { fill: var(--accent); opacity: .12 }
 .chart .ln { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round }
 .chart .end { fill: var(--accent); stroke: var(--surface); stroke-width: 2 }
 .chart .xh { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 3 }
 .tip { position: absolute; width: 124px; padding: 6px 8px; border-radius: 8px; background: var(--fg); color: var(--bg); font-size: .78rem; pointer-events: none; display: flex; flex-direction: column }
-.tip b { font-family: var(--mono); font-weight: 500 }
+.tip b { font-family: var(--num); font-weight: 500 }
 .vh { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; pointer-events: none }
 label.btn { cursor: pointer }
 a.btn { color: inherit; text-decoration: none }
@@ -312,7 +313,7 @@ td.live { color: var(--fg) }
 .cell span { font-size: .72rem; opacity: .85 }
 .cell.on { background: var(--c); color: #fff }
 .ind { display: grid; grid-template-columns: 1fr 1fr; gap: 12px }
-.ind .v { font-family: var(--mono); font-size: 1.7rem; font-weight: 500; font-variant-numeric: tabular-nums }
+.ind .v { font-family: var(--num); font-size: 1.7rem; font-weight: 500; font-variant-numeric: tabular-nums }
 .trend { font-size: .8rem; font-weight: 600 }
 .trend.up { color: var(--up) } .trend.down { color: var(--down) }
 .sources a { color: var(--accent) }
@@ -344,7 +345,7 @@ td.live { color: var(--fg) }
 .acct .an { flex: 1; min-width: 0 }
 .acct .an b { display: block; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
 .acct .an small { display: block; color: var(--muted); font-size: .78rem }
-.acct .av { font-family: var(--mono); font-weight: 600; white-space: nowrap }
+.acct .av { font-family: var(--num); font-weight: 600; white-space: nowrap }
 .grphead { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 4px }
 .grphead h2 { display: flex; align-items: center; gap: 8px }
 .donutwrap { display: grid; grid-template-columns: 1fr; justify-items: center; gap: 14px; align-items: center }
@@ -354,7 +355,7 @@ td.live { color: var(--fg) }
 .dlegend div { display: grid; grid-template-columns: 12px 1fr auto; gap: 8px; align-items: center }
 .dlegend .sw { width: 10px; height: 10px; border-radius: 3px }
 .dlegend .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
-.dlegend .vl { font-family: var(--mono); font-size: .8rem; text-align: right; white-space: nowrap }
+.dlegend .vl { font-family: var(--num); font-size: .8rem; text-align: right; white-space: nowrap }
 .dlegend .vl small { color: var(--muted); margin-left: 6px }
 
 /* Bilan : barres groupées revenus / dépenses / épargne */
@@ -364,7 +365,7 @@ td.live { color: var(--fg) }
 .bchart svg { display: block; touch-action: pan-x pan-y }
 .bchart .grid { stroke: var(--line); stroke-width: 1 }
 .bchart .base { stroke: var(--muted); stroke-width: 1 }
-.bchart .ax { fill: var(--muted); font: 11px var(--mono) }
+.bchart .ax { fill: var(--muted); font: 11px var(--num) }
 .bchart g[data-ck] { cursor: pointer; outline: none }
 .bchart .hl { fill: var(--fg); opacity: 0 }
 .bchart g[data-ck]:hover .hl, .bchart g[data-ck]:focus-visible .hl { opacity: .05 }
@@ -374,7 +375,7 @@ td.live { color: var(--fg) }
 .btip.pinned { pointer-events: auto }
 .btip .r { display: flex; align-items: center; justify-content: space-between; gap: 8px }
 .btip .r span { display: inline-flex; align-items: center }
-.btip b { font-family: var(--mono); font-weight: 500 }
+.btip b { font-family: var(--num); font-weight: 500 }
 .btip .go { margin-top: 4px; border: 0; border-radius: 8px; padding: 6px 8px; background: var(--bg); color: var(--fg); font-weight: 600; font-size: .8rem }
 details.tbl summary { cursor: pointer; color: var(--accent); font-weight: 600; font-size: .88rem }
 details.tbl table { min-width: 0; margin-top: 8px }
@@ -391,7 +392,7 @@ details.tbl td.calc { padding: 6px 5px }
 .bigline { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap }
 .ccprow { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; border: 1px solid var(--line); border-radius: 12px;
   background: color-mix(in srgb, var(--fg) 3%, transparent); padding: 10px 12px; text-align: left; color: var(--fg); margin-top: 4px }
-.ccprow b { font-family: var(--mono); font-weight: 600; font-size: 1.05rem; white-space: nowrap }
+.ccprow b { font-family: var(--num); font-weight: 600; font-size: 1.05rem; white-space: nowrap }
 .ccprow small { display: block; color: var(--muted); font-size: .78rem }
 
 /* ---------- 1.8 : ergonomie ---------- */
@@ -412,7 +413,7 @@ details.tbl td.calc { padding: 6px 5px }
 .eic .ico { width: 16px; height: 16px }
 .mgroup { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 16px 2px 6px; font-weight: 600; font-size: .86rem; border-bottom: 1px solid var(--line) }
 .mgroup:first-child { padding-top: 4px }
-.mgroup .num { font-family: var(--mono); font-weight: 500 }
+.mgroup .num { font-family: var(--num); font-weight: 500 }
 .subhead { font-size: .76rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; padding: 16px 0 4px }
 /* Choix des logos */
 #ic-q { width: 100%; padding: 11px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); font-size: 1rem }
@@ -441,7 +442,7 @@ html, body { overflow-x: clip }
 .evchart .b.now { fill: var(--c, var(--c-exp)); stroke: var(--fg); stroke-width: 1 }
 .evchart .z { fill: var(--line) }
 .evchart .ref { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 3 }
-.evchart .lb { font-family: var(--mono); font-size: 9px; fill: var(--muted) }
+.evchart .lb { font-family: var(--num); font-size: 9px; fill: var(--muted) }
 .evchart .hit { fill: transparent; cursor: pointer }
 .evleg { display: flex; gap: 14px; flex-wrap: wrap }
 .evleg .ln { display: inline-block; width: 14px; border-top: 1px dashed var(--muted); vertical-align: middle; margin-right: 4px }
@@ -470,7 +471,7 @@ html, body { overflow-x: clip }
 .mixrow .nm { display: flex; align-items: center; gap: 8px; min-width: 0 }
 .mixrow .nm span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
 .mixrow .sw, .dlegend .sw { width: 10px; height: 10px; border-radius: 3px; flex: none }
-.mixrow .vl { font-family: var(--mono); font-size: .8rem; white-space: nowrap }
+.mixrow .vl { font-family: var(--num); font-size: .8rem; white-space: nowrap }
 .mixrow .vl small { color: var(--muted); margin-left: 6px }
 .mixrow .tr { grid-column: 1 / -1; height: 10px; border-radius: 4px; background: color-mix(in srgb, var(--fg) 6%, transparent); overflow: hidden }
 .mixrow .tr i { display: block; height: 100%; border-radius: 4px }
@@ -481,10 +482,10 @@ html, body { overflow-x: clip }
 .tb { display: flex; flex-direction: column; gap: 6px; min-width: 0 }
 .tb .eyebrow { white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
 .tb .bar { height: 10px }
-.tb .v { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: .96rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.tb .v { font-family: var(--num); font-variant-numeric: tabular-nums; font-size: .96rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
 .tb .small { line-height: 1.25; margin-top: -3px }
 .incrow { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center }
-.incrow input { width: 100%; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); font-family: var(--mono); font-variant-numeric: tabular-nums }
+.incrow input { width: 100%; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); font-family: var(--num); font-variant-numeric: tabular-nums }
 /* Fenêtres du bas : poignée pour glisser vers le bas */
 .sheetcard::before { content: ""; flex: none; align-self: center; width: 40px; height: 5px; border-radius: 3px; background: var(--line); margin: -8px 0 0 }
 @media (min-width: 600px) { .sheetcard::before { display: none } }
@@ -540,7 +541,7 @@ html, body { overflow-x: clip }
 .calnav b { text-transform: capitalize }
 .calgrid { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 2px }
 .calgrid .wd { text-align: center; font-size: .72rem; color: var(--muted); font-weight: 600; padding: 4px 0 }
-.calgrid button { border: 0; background: none; height: 42px; font-family: var(--mono); font-size: .92rem; color: var(--fg); padding: 0 }
+.calgrid button { border: 0; background: none; height: 42px; font-family: var(--num); font-size: .92rem; color: var(--fg); padding: 0 }
 .calgrid button.out { color: var(--muted); opacity: .5 }
 .calgrid button.today { font-weight: 700; text-decoration: underline; text-underline-offset: 3px }
 .calgrid button.in { background: color-mix(in srgb, var(--accent) 16%, transparent) }
@@ -560,6 +561,110 @@ html, body { overflow-x: clip }
 .panel.infoabs, .sheetcard.infoabs { position: relative }
 .infobtn.abs { position: absolute; top: 12px; right: 12px }
 .years .exp { grid-template-columns: 4.7em minmax(0, 1fr) auto }
+
+/* ---------- 1.14 : chiffres, cartes douces, cibles tactiles, accueil, gestes, saisie express ---------- */
+.num, .n, .big, .stat .v, .tb .v, .acct .av, .ccprow b, .dlegend .vl, .mixrow .vl, .mgroup .num, td.calc, .ind .v, .exp .num, .tip b, .btip b { font-variant-numeric: tabular-nums; letter-spacing: -.005em }
+.big { font-family: var(--num); font-weight: 600; font-size: 2.15rem; letter-spacing: -.02em; line-height: 1.1 }
+.stat .v, .tb .v { font-weight: 600 }
+.panel { border-radius: 18px; border-color: color-mix(in srgb, var(--line) 55%, transparent);
+  box-shadow: 0 1px 2px rgb(20 32 43 / .04), 0 8px 24px -12px rgb(20 32 43 / .14) }
+:root[data-theme="dark"] .panel { box-shadow: none; border-color: var(--line) }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .panel { box-shadow: none; border-color: var(--line) } }
+.setlist { border-radius: 18px }
+.sheetcard { border-radius: 22px 22px 0 0 }
+@media (min-width: 600px) { .sheetcard { border-radius: 22px } }
+.seg { border: 0; background: color-mix(in srgb, var(--fg) 6%, transparent); padding: 3px; gap: 3px; border-radius: 13px }
+.seg button { border-radius: 10px; min-height: 44px }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--accent); box-shadow: 0 1px 3px rgb(0 0 0 / .14) }
+.seg.sm button { min-height: 40px }
+.cyclenav button.arrow { border: 0; background: color-mix(in srgb, var(--fg) 6%, transparent); border-radius: 12px; height: 44px }
+.ccprow { border-radius: 14px; min-height: 52px }
+.btn { min-height: 48px }
+.linkbtn { min-height: 40px; display: inline-flex; align-items: center; gap: 4px }
+.notice .linkbtn, .small .linkbtn, p .linkbtn { min-height: 0; display: inline }
+.clshead .linkbtn, #expcount { white-space: nowrap }
+.chips button { min-height: 40px }
+.exp, .env { padding: 14px 2px }
+.del { min-width: 44px; min-height: 44px }
+.eic { color: color-mix(in srgb, var(--c) 78%, var(--fg)) }
+/* Accueil : anneau, montant, pastilles */
+.hero { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 16px; align-items: center }
+.hero .eyebrow { margin-bottom: 2px }
+.hero #b-pace { margin-top: 6px; line-height: 1.35 }
+.ring svg { width: 96px; height: 96px; display: block; overflow: visible }
+.ring .rtrack { fill: none; stroke: color-mix(in srgb, var(--fg) 9%, transparent); stroke-width: 10 }
+.ring .rarc { fill: none; stroke-width: 10; stroke-linecap: round }
+.ring .rtick { fill: var(--fg); stroke: var(--surface); stroke-width: 2.5 }
+.ring text { text-anchor: middle; fill: var(--fg); font-family: var(--num); font-variant-numeric: tabular-nums }
+.ring .rpct { font-size: 17px; font-weight: 600; dominant-baseline: middle }
+.ring .rlbl { font-size: 9px; fill: var(--muted) }
+.qpills { display: grid; grid-template-columns: 1fr 1fr; gap: 10px }
+.qpill { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; border: 0; background: color-mix(in srgb, var(--fg) 5%, transparent); border-radius: 14px; padding: 9px 14px; min-height: 54px; color: var(--fg); text-align: left }
+.qpill span { font-size: .74rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .06em }
+.qpill b { font-weight: 600; font-size: 1.05rem; font-variant-numeric: tabular-nums; white-space: nowrap }
+/* Barre de période collante */
+.pmini { position: fixed; left: 0; right: 0; top: calc(56px + env(safe-area-inset-top, 0px)); z-index: 7; pointer-events: none; opacity: 0; transform: translateY(-6px); transition: opacity .16s, transform .16s }
+.pmini.on { opacity: 1; transform: none }
+.pmini.on .in { pointer-events: auto }
+.pmini .in { max-width: 688px; width: calc(100% - 24px); margin: 4px auto 0; display: grid; grid-template-columns: 48px minmax(0, 1fr) 48px; align-items: center; min-height: 50px;
+  border-radius: 16px; border: 1px solid var(--line); background: color-mix(in srgb, var(--surface) 96%, transparent); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: 0 8px 24px -8px rgb(0 0 0 / .25) }
+.pmini .arrow { border: 0; background: none; height: 48px; font-size: 1.45rem; color: var(--fg) }
+.pmini .pm-lbl { border: 0; background: none; display: flex; flex-direction: column; align-items: center; min-width: 0; padding: 4px; color: var(--fg); line-height: 1.2 }
+.pmini .pm-lbl b { font-size: .9rem; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.pmini .pm-lbl small { font-size: .72rem; color: var(--muted) }
+@media (min-width: 1024px) { .pmini { left: 272px } }
+/* Balayer un mouvement */
+#explist, #ev-detail { overflow-x: hidden }
+.exp.sw { position: relative; z-index: 1; background: var(--surface) }
+.exp.sw::after, .exp.sw::before { position: absolute; top: 0; bottom: 0; width: 100vw; display: flex; align-items: center; color: #fff; font-weight: 600; font-size: .9rem }
+.exp.sw::after { content: "Supprimer"; left: 100%; padding-left: 18px; background: color-mix(in srgb, var(--down) 55%, var(--surface)) }
+.exp.sw::before { content: "Dupliquer"; right: 100%; justify-content: flex-end; padding-right: 18px; background: color-mix(in srgb, var(--accent) 50%, var(--surface)) }
+.exp.sw.armL::after { background: var(--down) }
+.exp.sw.armR::before { background: var(--accent) }
+/* Tirer pour actualiser */
+.ptr { position: fixed; z-index: 9; left: 50%; top: calc(48px + env(safe-area-inset-top, 0px)); width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--surface); color: var(--muted); box-shadow: 0 4px 14px rgb(0 0 0 / .18); opacity: 0; transform: translate(-50%, 0); pointer-events: none }
+.ptr svg { width: 20px; height: 20px }
+.ptr.arm { color: var(--accent) }
+.ptr.spin { opacity: 1 !important; color: var(--accent); transition: transform .15s }
+.ptr.spin svg { animation: spin .8s linear infinite }
+/* Message avec Annuler */
+.toast.act { display: flex; align-items: center; gap: 14px }
+.tundo { border: 0; background: none; color: inherit; font-weight: 700; text-decoration: underline; padding: 6px 2px; min-height: 36px }
+/* Saisie express */
+.qcard { padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)) }
+.qtop { display: flex; justify-content: space-between; align-items: center; gap: 8px }
+.qamt { font-family: var(--num); font-variant-numeric: tabular-nums; font-size: 2.8rem; font-weight: 600; letter-spacing: -.02em; text-align: center; padding: 6px 0 2px; line-height: 1.1 }
+.qamt span { font-size: 1.6rem; color: var(--muted); font-weight: 500 }
+.qamt.zero { color: var(--muted) }
+.qamt.shake { animation: shake .3s }
+@keyframes shake { 25% { transform: translateX(-6px) } 75% { transform: translateX(6px) } }
+.qlbl { text-align: center; margin: 2px 0 8px }
+.qenvs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px }
+.qenv { display: flex; align-items: center; gap: 8px; min-height: 52px; padding: 8px 10px; border-radius: 14px; border: 1.5px solid color-mix(in srgb, var(--c, var(--line)) 45%, var(--line)); background: color-mix(in srgb, var(--c, transparent) 8%, var(--surface)); color: var(--fg); font-weight: 600; text-align: left; min-width: 0 }
+.qenv span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.qenv .eic { margin: 0 }
+.qenv.more { --c: var(--muted); border-style: dashed; background: none }
+.qpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px }
+.qpad button { height: 58px; border: 0; border-radius: 16px; background: color-mix(in srgb, var(--fg) 6%, transparent); font-family: var(--num); font-size: 1.55rem; font-weight: 500; color: var(--fg) }
+.qpad button:active { background: color-mix(in srgb, var(--fg) 14%, transparent) }
+.qmore { display: flex; justify-content: center; gap: 22px; margin-top: 6px }
+/* Animations légères */
+@media (prefers-reduced-motion: no-preference) {
+  .wrap > .panel, .wrap > .stack, .wrap > .sethead + .panel { animation: rise .26s cubic-bezier(.2, .8, .2, 1) both }
+  .wrap > :nth-child(2) { animation-delay: .02s } .wrap > :nth-child(3) { animation-delay: .04s } .wrap > :nth-child(4) { animation-delay: .06s } .wrap > :nth-child(5) { animation-delay: .08s }
+  .bar i { transition: width .5s cubic-bezier(.2, .8, .2, 1) }
+  .ring .rarc { transition: stroke-dashoffset .7s cubic-bezier(.2, .8, .2, 1), stroke .3s }
+  .sheet:not([hidden]) .sheetcard { animation: sheetUp .26s cubic-bezier(.2, .8, .2, 1) }
+  .sheet:not([hidden]) .sheetbg { animation: fadeIn .2s ease }
+  .toast:not([hidden]) { animation: toastIn .2s ease }
+  .btn:active, .fab:active, .qenv:active, .qpill:active, .env:active, .exp:not(.sw):active { transform: scale(.98) }
+  .btn, .fab, .qenv, .qpill, .env, .exp { transition: transform .12s ease }
+}
+@keyframes rise { from { opacity: 0; transform: translateY(8px) } to { opacity: 1; transform: none } }
+@keyframes sheetUp { from { transform: translateY(40px); opacity: .6 } to { transform: none; opacity: 1 } }
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+@keyframes toastIn { from { opacity: 0; transform: translate(-50%, 8px) } to { opacity: 1; transform: translate(-50%, 0) } }
 </style>
 </head>
 <body>
@@ -603,14 +708,20 @@ html, body { overflow-x: clip }
   </div>
 
   <div class="panel total" data-block="summary">
-    <div class="eyebrow" id="b-lefttitle">Disponible</div>
-    <div class="big" id="b-left">0,00 €</div>
+    <div class="hero">
+      <div class="ring" id="b-ring"></div>
+      <div style="min-width:0">
+        <div class="eyebrow" id="b-lefttitle">Disponible</div>
+        <div class="big" id="b-left">0,00 €</div>
+        <div class="small" id="b-pace" style="font-weight:600"></div>
+      </div>
+    </div>
+    <div class="qpills" id="b-pills" hidden></div>
     <div class="tribars">
       <div class="tb"><span class="eyebrow" id="b-revlbl">Revenus</span><span class="bar" aria-hidden="true"><i class="t-rev" id="b-revbar"></i></span><span class="v" id="b-revv">0,00 €</span><span class="small muted" id="b-revnote"></span></div>
       <div class="tb"><span class="eyebrow">Dépenses</span><span class="bar" aria-hidden="true"><i class="t-exp" id="b-outbar"></i></span><span class="v" id="b-out">0,00 €</span><span class="small muted" id="b-outnote"></span></div>
       <div class="tb"><span class="eyebrow">Épargne</span><span class="bar" aria-hidden="true"><i class="t-sav" id="b-savbar"></i></span><span class="v" id="b-saved">0,00 €</span><span class="small muted" id="b-savenote"></span></div>
     </div>
-    <div class="small" id="b-pace" style="font-weight:600"></div>
     <button type="button" class="ccprow" id="b-ccp"></button>
     <label class="incrow" id="b-incbox"><span class="small muted">Revenu du cycle</span><input id="b-income" type="text" inputmode="decimal" autocomplete="off" placeholder="0" aria-label="Revenu du cycle"><span class="small muted" id="b-incnote"></span></label>
   </div>
@@ -974,7 +1085,24 @@ html, body { overflow-x: clip }
   </div>
 </section>
 
-<button class="fab" id="fab" type="button" aria-label="Ajouter une dépense" hidden>
+<div class="pmini" id="pmini" aria-hidden="true"><div class="in">
+  <button type="button" class="arrow" id="pm-prev" aria-label="Période précédente">‹</button>
+  <button type="button" class="pm-lbl" id="pm-lbl" aria-label="Revenir en haut"><b id="pm-t"></b><small id="pm-s"></small></button>
+  <button type="button" class="arrow" id="pm-next" aria-label="Période suivante">›</button>
+</div></div>
+<!-- Saisie express : montant au pavé, puis l'enveloppe -->
+<div id="qsheet" class="sheet" hidden>
+  <div class="sheetbg" data-qclose></div>
+  <div class="sheetcard qcard" role="dialog" aria-label="Saisie rapide d'une dépense">
+    <div class="qtop"><button type="button" class="linkbtn" data-qfull="exp">Détails</button><span class="small muted">Dépense d'aujourd'hui</span><button type="button" class="linkbtn" data-qclose>Fermer</button></div>
+    <div class="qamt zero" id="q-amt" aria-live="polite">0<span> €</span></div>
+    <div class="small muted qlbl">Touchez l'enveloppe pour enregistrer</div>
+    <div class="qenvs" id="q-envs"></div>
+    <div class="qpad" id="q-pad"><button type="button" data-qk="1">1</button><button type="button" data-qk="2">2</button><button type="button" data-qk="3">3</button><button type="button" data-qk="4">4</button><button type="button" data-qk="5">5</button><button type="button" data-qk="6">6</button><button type="button" data-qk="7">7</button><button type="button" data-qk="8">8</button><button type="button" data-qk="9">9</button><button type="button" data-qk=",">,</button><button type="button" data-qk="0">0</button><button type="button" data-qk="del" aria-label="Effacer">⌫</button></div>
+    <div class="qmore"><button type="button" class="linkbtn" data-qfull="inc">Entrée d'argent</button><button type="button" class="linkbtn" data-qfull="tr">Virement</button></div>
+  </div>
+</div>
+<button class="fab" id="fab" type="button" aria-label="Ajouter une dépense (rester appuyé : formulaire complet)" hidden>
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
 </button>
 
@@ -1135,7 +1263,7 @@ html, body { overflow-x: clip }
 
 <script>
 "use strict";
-const APP_VERSION = "1.13.0";
+const APP_VERSION = "1.14.0";
 const FB_VERSION = "10.12.2"; // SDK Firebase chargé depuis gstatic uniquement si la synchronisation est configurée
 const LS = { state: "fin.state", fb: "fin.firebase", dev: "fin.device", link: "fin.linked", lastSync: "fin.lastsync" };
 const CLASSES = [{ id: "stocks", c: "#2346d8" }, { id: "bonds", c: "#7a4fd0" }, { id: "gold", c: "#c99a0a" }, { id: "cash", c: "#138a5b" }];
@@ -1175,7 +1303,8 @@ function toNum(v) {
 const parseNum = v => { const n = toNum(v); return isFinite(n) ? n : 0 };
 
 let toastTimer = null;
-function toast(msg) { const t = $("toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true }, 2600) }
+let undoSnap = null;   // « Annuler » du dernier message (1.14)
+function toast(msg) { const t = $("toast"); t.classList.remove("act"); undoSnap = null; t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true }, 2600) }
 
 /* ---------- Logos et natures de comptes ---------- */
 // Pictogrammes au trait (24 × 24), dessinés pour l'appli.
@@ -1471,7 +1600,7 @@ const ICON_KW = {
   dots: "autre divers"
 };
 // Couleurs des enveloppes dans les graphiques (couleur propre à chaque enveloppe, réglable avec son logo)
-const ENV_COLORS = ["#2A78D6", "#FF8A3D", "#22C7C9", "#F2CF2E", "#E030BE", "#1BAF7A", "#6250D6", "#FF4D5A"], OTHER_COLOR = "#A0A7AF";
+const ENV_COLORS = ["#2A78D6", "#FF8A3D", "#22C7C9", "#F2CF2E", "#E030BE", "#1BAF7A", "#6250D6", "#5B7C99"], OTHER_COLOR = "#A0A7AF";
 const envColor = e => okColor(e?.color) ? e.color : ENV_COLORS[Math.max(0, S.budget.envelopes.indexOf(e)) % ENV_COLORS.length];
 // Personnalisation (Réglages › Personnalisation)
 const HOME_IDS = ["summary", "charges", "envs", "savs", "movs"], MENU_IDS = ["budget", "bilan", "comptes", "plan", "invest", "conj"];
@@ -1661,7 +1790,7 @@ document.addEventListener("click", e => { if (e.target.closest("[data-back]")) g
 function renderView() {
   applyMenu();
   ({ budget: renderBudget, bilan: renderBilan, comptes: renderComptes, plan: renderPlan, invest: renderInvest, conj: renderConj, reglages: renderSettings, env: renderEnv })[view]();
-  renderSync();
+  renderSync(); try { updateMini() } catch {}
 }
 // Changer de rubrique en passant par l'adresse (#bilan…), pour que le bouton Retour du téléphone fonctionne
 // iPhone : changer d'onglet sans remplir l'historique. Sinon le geste « retour » d'iOS (glisser depuis le bord gauche)
@@ -1715,7 +1844,7 @@ $("drawer").addEventListener("touchend", () => {
 // Glisser depuis le bord gauche : sur une sous-page (enveloppe, rubrique des réglages), la page suit le doigt et revient
 // à l'écran précédent ; sur les pages principales, le menu s'ouvre
 let edge = null;
-const sheetOpen = () => ["sheet", "acsheet", "icsheet", "chsheet", "txsheet"].some(id => $(id) && !$(id).hidden);
+const sheetOpen = () => ["sheet", "acsheet", "icsheet", "chsheet", "txsheet", "qsheet"].some(id => $(id) && !$(id).hidden);
 document.addEventListener("touchstart", e => {
   const t = e.touches[0];
   if (e.touches.length !== 1 || t.clientX > 28 || wideScreen() || $("drawer").classList.contains("open") || sheetOpen() || lsDrag) { edge = null; return }
@@ -2048,7 +2177,7 @@ function renderBudget() {
   renderCharges(); renderGoals();
   const orphan = Object.keys(st.spentBy).filter(id => !envById(id)).reduce((s, id) => s + st.spentBy[id], 0);
   // Dépense : barre orange, hachurée en rouge si l'enveloppe est dépassée. Épargne : barre bleue, et mettre plus que prévu est une bonne nouvelle.
-  const envRow = (id, name, sp, refund, pl, kind, icon) => {
+  const envRow = (id, name, sp, refund, pl, kind, icon, color = OTHER_COLOR) => {
     const net = sp - refund, save = kind === "save", rest = pl - net;
     const pct = pl > 0 ? Math.min(100, Math.max(0, net / pl * 100)) : (net > 0 ? 100 : 0);
     const over = !save && (pl > 0 ? net > pl + 0.005 : net > 0);
@@ -2057,11 +2186,11 @@ function renderBudget() {
       ? (pl > 0 ? (rest > 0.005 ? "reste " + fmtEUR(rest) : rest < -0.005 ? ok + "+" + fmtEUR(-rest) : ok + "atteint") : (net > 0 ? ok + fmtEUR(net) : "—"))
       : (pl > 0 || net ? (rest >= 0 ? "reste " + fmtEUR(rest) : "⚠ +" + fmtEUR(-rest)) : "—");
     return `<button type="button" class="env lsrow${envFilter === id ? " on" : ""}" data-env="${esc(id)}">
-      <span><b><span class="eic" style="--c:${save ? "var(--c-sav)" : "var(--c-exp)"}">${ico(icon)}</span>${esc(name)}</b><br><span class="small muted num">${fmtEUR(net)} / ${fmtEUR(pl)}${refund ? ` / ${fmtEUR(refund)} remboursés` : ""}</span></span>
+      <span><b><span class="eic" style="--c:${color}">${ico(icon)}</span>${esc(name)}</b><br><span class="small muted num">${fmtEUR(net)} / ${fmtEUR(pl)}${refund ? ` / ${fmtEUR(refund)} remboursés` : ""}</span></span>
       <span class="num small" style="font-weight:600;text-align:right;color:${over ? "var(--down)" : "var(--fg)"}">${right}</span>
-      <span class="bar"><i class="${over ? "over" : save ? "t-sav" : "t-exp"}" style="width:${pct}%"></i></span></button>`;
+      <span class="bar"><i class="${over ? "over" : ""}" style="width:${pct}%${over ? "" : ";background:" + color}"></i></span></button>`;
   };
-  const row = e => envRow(e.id, e.name, st.spentBy[e.id] || 0, st.refundBy[e.id] || 0, round2((+e.planned || 0) * f), e.kind, envIcon(e));
+  const row = e => envRow(e.id, e.name, st.spentBy[e.id] || 0, st.refundBy[e.id] || 0, round2((+e.planned || 0) * f), e.kind, envIcon(e), envColor(e));
   const visible = e => +e.planned || st.spentBy[e.id] || st.refundBy[e.id] || envFilter === e.id;
   const spendE = envs.filter(e => e.kind !== "save"), saveE = envs.filter(e => e.kind === "save"), shown = spendE.filter(visible), hidden = spendE.length - shown.length;
   $("env-pnote").hidden = f === 1;
@@ -2096,7 +2225,7 @@ function renderBudget() {
     html = [...envs.map(e => e.id), "__none", "__inc", "__tr"].filter(g => groups[g]).map(g => {
       const items = groups[g], tot = items.reduce((s, x) => s + val(x, g), 0), e = envById(g);
       const name = e?.name || { __none: "Sans enveloppe", __inc: "Entrées d'argent", __tr: "Virements entre comptes" }[g];
-      const icon = e ? envIcon(e) : { __none: "dots", __inc: "euro", __tr: "swap" }[g], col = e ? (e.kind === "save" ? "var(--c-sav)" : "var(--c-exp)") : g === "__inc" ? "var(--c-rev)" : g === "__tr" ? "var(--c-sav)" : "var(--muted)";
+      const icon = e ? envIcon(e) : { __none: "dots", __inc: "euro", __tr: "swap" }[g], col = e ? envColor(e) : g === "__inc" ? "var(--c-rev)" : g === "__tr" ? "var(--c-sav)" : "var(--muted)";
       return `<div class="mgroup"><span><span class="eic" style="--c:${col}">${ico(icon)}</span>${esc(name)} <span class="muted" style="font-weight:500">· ${items.length}</span></span><span class="num">${g === "__inc" ? "+" : ""}${fmtEUR(tot)}</span></div>` + items.map(movRow).join("");
     }).join("");
   } else html = list.map(movRow).join("");
@@ -2122,12 +2251,12 @@ function movRowHtml({ k, o }, opt = {}) {
   if (en?.kind === "save") {
     const to = acctFromText(o.label), where = to ? `Compte courant → ${esc(to.name)}` : esc(en.name);
     return `<button type="button" class="${cls}" data-exp="${esc(o.id)}">${day}
-      <span class="l"><b><span class="tdot t-sav"></span>${esc(o.label || en.name)}</b><small>Épargne${opt.env && !to ? "" : " / " + where}</small></span>
+      <span class="l"><b><span class="tdot" style="background:${envColor(en)}"></span>${esc(o.label || en.name)}</b><small>Épargne${opt.env && !to ? "" : " / " + where}</small></span>
       <span class="num" style="font-weight:600;color:var(--c-sav)">${o.amount < 0 ? "−" + fmtEUR(-o.amount) : fmtEUR(o.amount)}</span></button>`;
   }
   const sub = opt.env ? "" : `<small>${esc(en?.name || "Sans enveloppe")}</small>`;
   return `<button type="button" class="${cls}" data-exp="${esc(o.id)}">${day}
-    <span class="l"><b><span class="tdot ${en?.kind === "save" ? "t-sav" : "t-exp"}"></span>${esc(o.label || en?.name || "Dépense")}</b>${sub}</span>
+    <span class="l"><b><span class="tdot" style="background:${en ? envColor(en) : OTHER_COLOR}"></span>${esc(o.label || en?.name || "Dépense")}</b>${sub}</span>
     <span class="num" style="font-weight:600">${o.amount < 0 ? "+" + fmtEUR(-o.amount) : fmtEUR(o.amount)}</span></button>`;
 }
 // Recherche dans tous les mouvements : libellé, enveloppe, catégorie, comptes, montant (42, 42,5, 1234) et date (12/11, nov, 2026-11)
@@ -2161,7 +2290,9 @@ function updateSummary(pi = periodInfo()) {
   const s = periodSummary(pi), st = s.st, cyc = pi.m === "cycle";
   $("b-lefttitle").textContent = s.title;
   $("b-left").textContent = fmtEUR(s.left); $("b-left").style.color = s.left < 0 ? "var(--down)" : "";
-  $("b-pace").textContent = s.pace;
+  // Pastilles Aujourd'hui / Semaine sur le cycle en cours : la ligne du dessous ne répète pas le reste du jour
+  const pills = renderPills(pi); $("b-pace").textContent = pills ? s.pace.replace(/ \/ reste aujourd'hui [^/]*?(?= \/|$)/, "") : s.pace;
+  renderRing(s, pi);
   $("b-incbox").hidden = !!s.pstat;
   // Trois barres : revenus (vert, pleine), dépenses (orange, rouge une fois le budget atteint), épargne (bleu, jusqu'à l'objectif)
   const fill = (v, t) => t > 0.005 ? Math.min(100, Math.max(0, v / t * 100)) : (v > 0.005 ? 100 : 0);
@@ -2250,7 +2381,7 @@ function renderCharges() {
   const dueLate = ch => { const d = chargeDue(ch, c); return !s.paid[ch.id] && d && d < today };
   const late = B.charges.filter(dueLate).length, rest = round2(s.planned - s.net);
   const over = s.planned > 0 ? s.net > s.planned + 0.005 : s.net > 0.005, pct = s.planned > 0 ? Math.min(100, Math.max(0, s.net / s.planned * 100)) : (s.net > 0 ? 100 : 0);
-  $("chg-head").innerHTML = `<span><b><span class="eic" style="--c:var(--c-exp)">${ico(env ? envIcon(env) : "repeat")}</span>Charges<span class="chev" aria-hidden="true">›</span></b><br><span class="small muted num">${fmtEUR(s.net)} / ${fmtEUR(s.planned)}${n ? ` / ${s.count}/${n}` : ""}${late ? ` / <span style="color:var(--warn)">${late} en retard</span>` : ""}</span></span>
+  $("chg-head").innerHTML = `<span><b><span class="eic" style="--c:${env ? envColor(env) : "var(--c-exp)"}">${ico(env ? envIcon(env) : "repeat")}</span>Charges<span class="chev" aria-hidden="true">›</span></b><br><span class="small muted num">${fmtEUR(s.net)} / ${fmtEUR(s.planned)}${n ? ` / ${s.count}/${n}` : ""}${late ? ` / <span style="color:var(--warn)">${late} en retard</span>` : ""}</span></span>
     <span class="num small" style="font-weight:600;text-align:right;color:${over ? "var(--down)" : "var(--fg)"}">${s.planned > 0 || s.net ? (rest >= 0 ? "reste " + fmtEUR(rest) : "⚠ +" + fmtEUR(-rest)) : "—"}</span>
     <span class="bar"><i class="${over ? "over" : "t-exp"}" style="width:${pct}%"></i></span>`;
 }
@@ -2282,7 +2413,7 @@ $("chform").addEventListener("submit", e => {
     const ex = t.exp && B.expenses.find(x => x.id === t.exp);
     if (ex) Object.assign(ex, { amount, date, charge: ch.id });
     else B.expenses.push({ id: rid(), date, amount, env: B.chargesEnv, label: ch.name, charge: ch.id, at: Date.now() });
-    closeCharge(); commit(); toast(`${ch.name} / ${fmtEUR(amount)}`); return;
+    closeCharge(); haptic(); commit(); toast(`${ch.name} / ${fmtEUR(amount)}`); return;
   }
   const name = $("ch-name").value.trim(); if (!name) { $("ch-err").textContent = "Nom ?"; $("ch-name").focus(); return }
   const day = Math.min(31, Math.max(0, Math.round(+$("ch-day").value) || 0)), ch = t.id && B.charges.find(x => x.id === t.id);
@@ -2352,7 +2483,7 @@ function renderEnv() {
   const e = id === "__none" ? null : envById(id);
   const B = S.budget, EP = envPeriod(), pi = EP.pi, [lbl, sub] = EP.label, today = midnight(new Date());
   const isCh = !!e && e.id === B.chargesEnv, save = e?.kind === "save", name = e ? e.name : "Sans enveloppe";
-  const color = save ? "var(--c-sav)" : "var(--c-exp)";
+  const color = e ? envColor(e) : OTHER_COLOR;
   $("vtitle").textContent = name; document.title = name + " · Mes Finances";
   const list = envMovs(id, pi.a, pi.b), net = round2(list.reduce((t, x) => t + x.v, 0)), refunds = round2(list.filter(x => x.k === "inc").reduce((t, x) => t - x.v, 0));
   const f = EP.factor ?? periodSummary(pi).factor;
@@ -2613,7 +2744,7 @@ function openSheet(kind, item) {
   const orphan = kind === "exp" && item && !envById(item.env);
   $("f-env").innerHTML = envs.map(e => `<option value="${esc(e.id)}">${esc(e.name)}</option>`).join("") + (orphan ? `<option value="${esc(item.env)}">Sans enveloppe</option>` : "");
   $("f-env").value = (kind === "exp" && item?.env) || (view === "env" && envById(envPage) ? envPage : null) || (envFilter && envById(envFilter) ? envFilter : null) || (lastEnv && envById(lastEnv) ? lastEnv : envs[0]?.id || "");
-  $("g-env").innerHTML = gridHTML(envs.map(e => ({ id: e.id, name: e.name, icon: envIcon(e), color: e.kind === "save" ? "var(--c-sav)" : "var(--c-exp)" }))
+  $("g-env").innerHTML = gridHTML(envs.map(e => ({ id: e.id, name: e.name, icon: envIcon(e), color: envColor(e) }))
     .concat(orphan ? [{ id: item.env, name: "Sans enveloppe", icon: "dots", color: "var(--muted)" }] : []), $("f-env").value);
   $("f-cat").innerHTML = cats.map(c => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join("")
     + (kind === "inc" && item && !incCat(item.cat) ? `<option value="${esc(item.cat)}">Autre</option>` : "");
@@ -2798,7 +2929,7 @@ lsBind($("c-groups"), { sel: ".acct[data-acc]", kind: "acct", id: el => el.datas
 lsBind($("s-incs"), { sel: ".erow[data-icid]", kind: "cat", id: el => el.dataset.icid, handle: ".grip" });
 lsBind($("s-envs"), { sel: ".erow[data-eid]", kind: "env", id: el => el.dataset.eid, handle: ".grip", same: (a, b) => a.dataset.kind === b.dataset.kind });
 document.addEventListener("click", e => { if (e.target.closest("[data-rodone]")) roEnd() });
-$("fab").addEventListener("click", () => openSheet("exp", null));
+// Bouton + : voir la saisie express (1.14)
 $("f-kind").addEventListener("click", e => { const b = e.target.closest("[data-k]"); if (b) setSheetKind(b.dataset.k) });
 $("g-env").addEventListener("click", e => { const b = e.target.closest("[data-v]"); if (!b) return; $("f-env").value = b.dataset.v; $("g-env").querySelectorAll(".gi").forEach(x => x.setAttribute("aria-pressed", String(x === b))) });
 $("g-cat").addEventListener("click", e => { const b = e.target.closest("[data-v]"); if (!b) return; $("f-cat").value = b.dataset.v; $("g-cat").querySelectorAll(".gi").forEach(x => x.setAttribute("aria-pressed", String(x === b))); fillRefundEnv(b.dataset.v) });
@@ -2835,7 +2966,7 @@ $("expform").addEventListener("submit", e => {
     lastEnv = env;
     msg = wasEdit ? "Dépense modifiée." : `${fmtEUR(amount)} ajoutés à ${envById(env)?.name || "la dépense"}.`;
   }
-  closeSheet();
+  closeSheet(); haptic();
   viewCycle = cycleOf(parseYmd(date)); viewDate = midnight(parseYmd(date));
   commit();
   toast(msg);
@@ -2849,6 +2980,229 @@ $("f-del").addEventListener("click", e => {
   const what = { tr: "Virement supprimé.", inc: "Entrée supprimée.", exp: "Dépense supprimée." }[sheetKind];
   closeSheet(); commit(); toast(what);
 });
+
+/* ---------- 1.14 : vibration, saisie express, gestes (balayer un mouvement, tirer pour actualiser), barre de période collante ---------- */
+// Vibration courte : navigator.vibrate (Android) ; sur iPhone (iOS 18+), un interrupteur caché donne un retour haptique
+const hapticEl = (() => {
+  try {
+    const l = document.createElement("label"), i = document.createElement("input"); i.type = "checkbox"; i.setAttribute("switch", ""); i.tabIndex = -1; l.appendChild(i);
+    l.setAttribute("aria-hidden", "true"); l.style.cssText = "position:fixed;left:-20px;top:0;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none";
+    document.body.appendChild(l); return l;
+  } catch { return null }
+})();
+function haptic(ms = 12) {
+  try { if (navigator.vibrate && navigator.vibrate(ms)) return } catch {}
+  if (IOS && hapticEl) try { hapticEl.click() } catch {}
+}
+// Message avec « Annuler » : remet les mouvements, soldes et marge libre d'avant
+function toastUndo(msg, snap) {
+  const t = $("toast"); undoSnap = snap;
+  t.innerHTML = `<span>${esc(msg)}</span><button type="button" class="tundo" data-tundo>Annuler</button>`; t.hidden = false; t.classList.add("act");
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; t.classList.remove("act"); undoSnap = null }, 5000);
+}
+const budgetSnap = () => JSON.stringify({ e: S.budget.expenses, i: S.budget.incomes, t: S.budget.transfers, s: S.budget.savings, fc: S.invest.freeCash });
+$("toast").addEventListener("click", e => {
+  if (!e.target.closest("[data-tundo]") || !undoSnap) return;
+  const o = JSON.parse(undoSnap); undoSnap = null;
+  Object.assign(S.budget, { expenses: o.e, incomes: o.i, transfers: o.t, savings: o.s }); S.invest.freeCash = o.fc;
+  $("toast").hidden = true; $("toast").classList.remove("act"); commit(); toast("Annulé");
+});
+
+/* Saisie express : montant au pavé, puis une enveloppe = dépense enregistrée (aujourd'hui) */
+let qAmt = "";
+function topEnvs() {
+  const since = ymd(addDays(new Date(), -90)), n = {}, ch = S.budget.chargesEnv, ok = e => e && e.kind !== "save" && e.id !== ch;
+  S.budget.expenses.forEach(x => { if (x.date >= since && ok(envById(x.env))) n[x.env] = (n[x.env] || 0) + 1 });
+  const ids = Object.keys(n).sort((a, b) => n[b] - n[a]);
+  return [...ids.map(envById), ...S.budget.envelopes.filter(e => ok(e) && !ids.includes(e.id))].filter(Boolean).slice(0, 4);
+}
+const qValue = () => round2(parseNum(qAmt.replace(",", ".")));
+function renderQ() {
+  const v = qAmt || "0", [i, d] = v.split(",");
+  $("q-amt").innerHTML = `${(+i || 0).toLocaleString("fr-FR")}${d !== undefined ? "," + d : ""}<span> €</span>`;
+  $("q-amt").classList.toggle("zero", !qValue());
+}
+function openQ() {
+  roEnd(); qAmt = ""; renderQ();
+  $("q-envs").innerHTML = topEnvs().map(e => `<button type="button" class="qenv" data-qenv="${esc(e.id)}" style="--c:${envColor(e)}"><span class="eic">${ico(envIcon(e))}</span><span>${esc(e.name)}</span></button>`).join("")
+    + `<button type="button" class="qenv more" data-qfull="exp"><span class="eic" style="--c:var(--muted)">${ico("dots")}</span><span>Autre…</span></button>`;
+  $("qsheet").hidden = false;
+}
+const closeQ = () => { $("qsheet").hidden = true };
+function qKey(k) {
+  if (k === "del") qAmt = qAmt.slice(0, -1);
+  else if (k === ",") { if (!qAmt.includes(",")) qAmt = (qAmt || "0") + "," }
+  else if (/^\d$/.test(k)) {
+    const [i, d] = qAmt.split(",");
+    if (d !== undefined ? d.length >= 2 : (i || "").replace(/^0$/, "").length >= 6) return;
+    qAmt = qAmt === "0" ? k : qAmt + k;
+  }
+  renderQ();
+}
+function qFull(kind) {
+  const v = qValue(); closeQ(); openSheet(kind, null);
+  if (v) $("f-amount").value = fmtIn(v);
+}
+function qSave(envId) {
+  const v = qValue(), e = envById(envId);
+  if (!v) { const a = $("q-amt"); a.classList.remove("shake"); void a.offsetWidth; a.classList.add("shake"); haptic(30); return }
+  if (!e) return;
+  const snap = budgetSnap(), today = midnight(new Date());
+  S.budget.expenses.push({ id: rid(), amount: v, date: ymd(today), env: e.id, label: "", at: Date.now() });
+  lastEnv = e.id; closeQ(); haptic();
+  if (view === "budget") { viewCycle = cycleOf(today); viewDate = today }
+  commit(); toastUndo(`${fmtEUR(v)} · ${e.name}`, snap);
+}
+$("qsheet").addEventListener("click", e => {
+  if (e.target.closest("[data-qclose]")) { closeQ(); return }
+  const k = e.target.closest("[data-qk]"); if (k) { qKey(k.dataset.qk); return }
+  const f = e.target.closest("[data-qfull]"); if (f) { qFull(f.dataset.qfull); return }
+  const b = e.target.closest("[data-qenv]"); if (b) qSave(b.dataset.qenv);
+});
+document.addEventListener("keydown", e => {
+  if ($("qsheet").hidden) return;
+  if (e.key === "Escape") { closeQ(); return }
+  if (/^\d$/.test(e.key)) qKey(e.key); else if (e.key === "," || e.key === ".") qKey(","); else if (e.key === "Backspace") qKey("del"); else return;
+  e.preventDefault();
+});
+sheetGestures("qsheet", closeQ);
+// Bouton + : saisie express ; appui long : formulaire complet
+{
+  let lp = null, long = false;
+  const fab = $("fab"), start = () => { long = false; clearTimeout(lp); lp = setTimeout(() => { long = true; haptic(); openSheet("exp", null) }, 480) }, stop = () => clearTimeout(lp);
+  fab.addEventListener("touchstart", start, { passive: true }); fab.addEventListener("touchend", stop); fab.addEventListener("touchmove", stop, { passive: true }); fab.addEventListener("touchcancel", stop);
+  fab.addEventListener("contextmenu", e => e.preventDefault());
+  fab.addEventListener("click", e => { e.stopImmediatePropagation(); if (long) { long = false; return } openQ() }, true);
+}
+
+/* Balayer un mouvement : vers la gauche = supprimer, vers la droite = dupliquer à aujourd'hui (avec « Annuler ») */
+const SW_T = 84;
+let swp = null, swpLast = 0;
+function swipeAction(row, act) {
+  const B = S.budget, k = row.dataset.exp ? "exp" : row.dataset.inc ? "inc" : "tr", id = row.dataset[k];
+  const key = { exp: "expenses", inc: "incomes", tr: "transfers" }[k], o = B[key].find(x => x.id === id);
+  if (!o) { renderView(); return }
+  const snap = budgetSnap();
+  if (act === "del") {
+    if (k === "tr") applyTransfer(o, -1);
+    B[key] = B[key].filter(x => x !== o);
+    commit(); toastUndo({ tr: "Virement supprimé", inc: "Entrée supprimée", exp: "Dépense supprimée" }[k], snap);
+  } else {
+    const c = { ...o, id: rid(), date: todayKey(), at: Date.now() };
+    ["gs", "gsh", "imp", "charge", "balTo", "balFrom"].forEach(f => delete c[f]);
+    B[key].push(c); if (k === "tr") applyTransfer(c, 1);
+    commit(); toastUndo(`Dupliqué au ${fmtDay(new Date())}`, snap);
+  }
+}
+function swBind(box) {
+  box.addEventListener("touchstart", e => {
+    swp = null; if (e.touches.length !== 1 || lsDrag) return;
+    const t = e.touches[0], row = e.target.closest(".exp[data-exp], .exp[data-inc], .exp[data-tr]");
+    if (row && t.clientX > 28) swp = { row, x: t.clientX, y: t.clientY, dx: 0, on: false };
+  }, { passive: true });
+  box.addEventListener("touchmove", e => {
+    if (!swp) return;
+    const t = e.touches[0], dx = t.clientX - swp.x, dy = t.clientY - swp.y;
+    if (!swp.on) {
+      if (Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) { swp = null; return }
+      if (Math.abs(dx) < 12 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
+      swp.on = true; swp.row.classList.add("sw");
+    }
+    e.preventDefault();
+    const lim = swp.row.offsetWidth * .7, v = Math.max(-lim, Math.min(lim, dx)), was = swp.dx;
+    swp.dx = v; swp.row.style.transform = `translateX(${v}px)`;
+    swp.row.classList.toggle("armL", v < -SW_T); swp.row.classList.toggle("armR", v > SW_T);
+    if ((Math.abs(was) < SW_T) !== (Math.abs(v) < SW_T) && Math.abs(v) >= SW_T) haptic(8);
+  }, { passive: false });
+  const end = () => {
+    const s = swp; swp = null; if (!s || !s.on) return;
+    swpLast = Date.now();
+    const row = s.row, act = s.dx < -SW_T ? "del" : s.dx > SW_T ? "dup" : "";
+    if (act === "del") { row.style.transition = "transform .18s ease"; row.style.transform = "translateX(-110%)"; setTimeout(() => swipeAction(row, "del"), 170); return }
+    row.style.transition = "transform .2s ease"; row.style.transform = "";
+    setTimeout(() => { row.classList.remove("sw", "armL", "armR"); row.style.transition = "" }, 220);
+    if (act === "dup") swipeAction(row, "dup");
+  };
+  box.addEventListener("touchend", end); box.addEventListener("touchcancel", end);
+  box.addEventListener("click", e => { if (Date.now() - swpLast < 400) { e.stopImmediatePropagation(); e.preventDefault() } }, true);
+}
+swBind($("explist")); swBind($("ev-detail"));
+
+/* Tirer vers le bas en haut de l'Accueil : récupère le tableau Google Sheets ; dans Portefeuille : actualise les cours */
+const PTR_T = 78, ptrEl = document.createElement("div");
+ptrEl.className = "ptr"; ptrEl.setAttribute("aria-hidden", "true");
+ptrEl.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>`;
+document.body.appendChild(ptrEl);
+let ptr = null;
+const ptrOk = () => (view === "budget" && gsReady()) || (view === "invest" && !!S.invest.quotesUrl);
+document.addEventListener("touchstart", e => {
+  ptr = null;
+  if (e.touches.length !== 1 || window.scrollY > 0 || !ptrOk() || sheetOpen() || $("drawer").classList.contains("open") || ptrEl.classList.contains("spin")) return;
+  const t = e.touches[0]; if (t.clientX <= 28) return;
+  ptr = { x: t.clientX, y: t.clientY, d: 0, on: false };
+}, { passive: true });
+document.addEventListener("touchmove", e => {
+  if (!ptr || swp?.on || lsDrag) { ptr = null; return }
+  const t = e.touches[0], dy = t.clientY - ptr.y, dx = t.clientX - ptr.x;
+  if (!ptr.on) {
+    if (dy < -4 || Math.abs(dx) > 14 || window.scrollY > 0) { ptr = null; return }
+    if (dy < 10 || Math.abs(dx) > dy) return;
+    ptr.on = true;
+  }
+  const was = ptr.d >= PTR_T; ptr.d = Math.max(0, dy);
+  const p = Math.min(1, ptr.d / PTR_T);
+  ptrEl.style.opacity = String(p); ptrEl.style.transform = `translate(-50%, ${Math.min(ptr.d * .55, 64)}px) rotate(${Math.round(p * 300)}deg)`;
+  ptrEl.classList.toggle("arm", p >= 1); if (!was && p >= 1) haptic(8);
+}, { passive: true });
+document.addEventListener("touchend", () => {
+  const p = ptr; ptr = null; if (!p || !p.on) return;
+  const reset = () => { ptrEl.classList.remove("spin", "arm"); ptrEl.style.opacity = "0"; ptrEl.style.transform = "" };
+  if (p.d < PTR_T) { reset(); return }
+  ptrEl.classList.add("spin"); ptrEl.style.transform = "translate(-50%, 48px)";
+  const job = view === "invest" ? refreshQuotes() : (gsConnectAndFetch(), new Promise(r => { const t0 = Date.now(), w = setInterval(() => { if (!gsBusy || Date.now() - t0 > 12000) { clearInterval(w); r() } }, 150); setTimeout(() => { if (!gsBusy) { clearInterval(w); r() } }, 400) }));
+  Promise.resolve(job).catch(() => {}).finally(() => setTimeout(reset, 250));
+});
+
+/* Barre de période collante : quand le choix de période sort de l'écran, une barre ‹ période › reste sous le titre */
+function updateMini() {
+  const el = $("pmini"), b = view === "budget", box = b ? $("v-budget").querySelector(".periodbox") : view === "bilan" ? $("v-bilan").querySelector(".periodbox") : null;
+  let on = false;
+  if (box && box.offsetParent) on = box.getBoundingClientRect().bottom < $("appbar").getBoundingClientRect().bottom + 2;
+  el.classList.toggle("on", on); el.setAttribute("aria-hidden", String(!on));
+  if (on) { $("pm-t").textContent = $(b ? "clabel" : "bl-label").textContent; $("pm-s").textContent = $(b ? "csub" : "bl-sub").textContent }
+}
+window.addEventListener("scroll", updateMini, { passive: true });
+$("pm-prev").addEventListener("click", () => $(view === "bilan" ? "bl-prev" : "cprev").click());
+$("pm-next").addEventListener("click", () => $(view === "bilan" ? "bl-next" : "cnext").click());
+$("pm-lbl").addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+
+/* Accueil : anneau (dépensé / temps écoulé) et pastilles Aujourd'hui / Semaine */
+function periodTimeFrac(pi) {
+  const now = new Date(), t = midnight(now);
+  if (t < pi.a) return 0; if (t > pi.b) return 1;
+  return Math.max(0, Math.min(1, (dayDiff(pi.a, t) + (now - t) / 864e5) / (dayDiff(pi.a, pi.b) + 1)));
+}
+function renderRing(s, pi) {
+  const box = $("b-ring"), R = 40, C = 2 * Math.PI * R, f = Math.max(0, Math.min(1, (s.pct || 0) / 100)), tf = periodTimeFrac(pi);
+  const state = s.left < 0 || f >= 0.999 ? "over" : f > tf + 0.1 && tf < 1 ? "warn" : "ok";
+  if (!box.firstChild) box.innerHTML = `<svg viewBox="0 0 100 100" role="img"><circle cx="50" cy="50" r="${R}" class="rtrack"/><circle cx="50" cy="50" r="${R}" class="rarc" transform="rotate(-90 50 50)" style="stroke-dasharray:${C};stroke-dashoffset:${C}"/><circle r="4.5" class="rtick"/><text x="50" y="47" class="rpct"></text><text x="50" y="63" class="rlbl">dépensé</text></svg>`;
+  const svg = box.firstChild, arc = svg.querySelector(".rarc"), tick = svg.querySelector(".rtick");
+  arc.style.stroke = state === "over" ? "var(--down)" : state === "warn" ? "var(--warn)" : "var(--c-exp)";
+  requestAnimationFrame(() => { arc.style.strokeDashoffset = String(C * (1 - f)) });
+  const a = tf * 2 * Math.PI - Math.PI / 2; tick.setAttribute("cx", (50 + R * Math.cos(a)).toFixed(2)); tick.setAttribute("cy", (50 + R * Math.sin(a)).toFixed(2));
+  tick.style.display = tf > 0 && tf < 1 ? "" : "none";
+  svg.querySelector(".rpct").textContent = `${Math.round(f * 100)} %`;
+  svg.setAttribute("aria-label", `${Math.round(f * 100)} % dépensé${tf > 0 && tf < 1 ? `, ${Math.round(tf * 100)} % de la période écoulée` : ""}`);
+}
+function renderPills(pi) {
+  const box = $("b-pills"), show = PF.period === "cycle" && pi.now;
+  box.hidden = !show; if (!show) return false;
+  const t = midnight(new Date()), mon = mondayOf(t);
+  const d = periodSummary({ m: "day", a: t, b: t, now: true }), w = periodSummary({ m: "week", a: mon, b: addDays(mon, 6), now: true });
+  box.innerHTML = [["day", "Aujourd'hui", d.left], ["week", "Semaine", w.left]].map(([m, l, v]) => `<button type="button" class="qpill" data-qp="${m}"><span>${l}</span><b${v < 0 ? ' style="color:var(--down)"' : ""}>${fmtEUR(v)}</b></button>`).join("");
+  return true;
+}
+$("b-pills").addEventListener("click", e => { const b = e.target.closest("[data-qp]"); if (!b) return; viewDate = midnight(new Date()); setPeriod(b.dataset.qp); window.scrollTo({ top: 0 }) });
 
 /* ---------- Bilan : jour, semaine, cycle, plusieurs cycles ou dates choisies ---------- */
 // Revenus d'une période = salaires des paies tombées dedans + autres entrées. Épargne = revenus − dépenses sur un cycle ou plus,
@@ -3457,7 +3811,7 @@ let icTarget = null, icSel = "", icCol = "";
 function renderIcColors() { $("ic-colors").innerHTML = ACCT_COLORS.map(c => `<button type="button" data-iccol="${c}" aria-label="Couleur ${c}" aria-pressed="${c.toLowerCase() === icCol.toLowerCase()}" style="background:${c}"></button>`).join("") }
 function renderIcGrid() {
   const t = icTarget, q = foldTxt($("ic-q").value).trim(), solid = t.kind === "acct";
-  const tint = t.kind === "cat" ? "var(--c-rev)" : envById(t.id)?.kind === "save" ? "var(--c-sav)" : "var(--c-exp)";
+  const tint = t.kind === "cat" ? "var(--c-rev)" : okColor(icCol) ? icCol : envColor(envById(t.id));
   const groups = ICON_GROUPS.map(g => ({ name: g.name, keys: g.keys.filter(k => !q || foldTxt(`${ICON_NAMES[k]} ${ICON_KW[k] || ""} ${g.name}`).includes(q)) })).filter(g => g.keys.length);
   $("ic-grid").innerHTML = groups.length ? groups.map(g => `<h3>${esc(g.name)}</h3><div class="igrid">${g.keys.map(k => `<button type="button" class="gi" data-pick="${k}" aria-pressed="${k === icSel}">${solid ? acctBadge(icCol, k) : `<span class="gic" style="--c:${tint}">${ico(k)}</span>`}<span class="gil">${esc(ICON_NAMES[k])}</span></button>`).join("")}</div>`).join("")
     : `<div class="notice">Aucun logo pour « ${esc($("ic-q").value)} ». Essayez un autre mot : resto, loyer, livret, prime…</div>`;
@@ -3474,7 +3828,7 @@ function openIconPicker(kind, id) {
 }
 $("icsheet").addEventListener("click", e => {
   if (e.target.closest("[data-icclose]")) { $("icsheet").hidden = true; return }
-  const c = e.target.closest("[data-iccol]"); if (c) { icCol = c.dataset.iccol; renderIcColors(); if (icTarget?.kind === "acct") renderIcGrid(); return }
+  const c = e.target.closest("[data-iccol]"); if (c) { icCol = c.dataset.iccol; renderIcColors(); if (icTarget?.kind === "acct" || icTarget?.kind === "env") renderIcGrid(); return }
   const b = e.target.closest("[data-pick]"); if (b) { icSel = b.dataset.pick; $("ic-grid").querySelectorAll("[data-pick]").forEach(x => x.setAttribute("aria-pressed", String(x === b))) }
 });
 $("ic-q").addEventListener("input", renderIcGrid);
@@ -4681,7 +5035,7 @@ $("txform").addEventListener("submit", e => {
   if (trade && !t.name && !t.sym && !t.isin) { $("tx-err").textContent = "Titre ?"; $("tx-name").focus(); return }
   if (old) txReplace(old, t);
   else if (!txAdd([t]).add) { $("tx-err").textContent = "Cette opération existe déjà."; return }
-  closeTx(); commit(); toast(old ? "Opération modifiée" : "Opération ajoutée");
+  closeTx(); haptic(); commit(); toast(old ? "Opération modifiée" : "Opération ajoutée");
 });
 $("tx-del").addEventListener("click", e => {
   const b = e.currentTarget, t = txEdit && S.invest.tx.find(x => x.id === txEdit); if (!t) return;
