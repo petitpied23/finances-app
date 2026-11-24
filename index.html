@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <title>Mes Finances</title>
-<meta name="theme-color" content="#f3f5f7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0e1419" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f3ee" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#202020" media="(prefers-color-scheme: dark)">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -14,7 +14,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400&display=swap">
 <script>try{var t=localStorage.getItem("fin.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>
 <style>
 /* Appli mobile : barre du haut + menu latéral (fixe à gauche sur grand écran), colonne centrée */
@@ -562,6 +562,16 @@ html, body { overflow-x: clip }
 .infobtn.abs { position: absolute; top: 12px; right: 12px }
 .years .exp { grid-template-columns: 4.7em minmax(0, 1fr) auto }
 
+/* ---------- 1.15 : pas de sélection de texte au toucher, lignes des comptes ---------- */
+body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none }
+input, textarea, select, [contenteditable], code, .kv, .steps, .selectable { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default }
+svg, .chart, .bchart, .ring { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none }
+.hrow { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr) 40px; gap: 6px; align-items: center }
+.hrow input { width: 100%; min-width: 0; padding: 9px 8px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); font-family: var(--num); font-variant-numeric: tabular-nums }
+.hrow input[data-h="sym"] { text-transform: uppercase }
+.hrow .del { min-width: 40px; min-height: 40px }
+.hsub { grid-column: 1 / -1; margin-top: -2px; font-size: .76rem; color: var(--muted) }
+
 /* ---------- 1.14 : chiffres, cartes douces, cibles tactiles, accueil, gestes, saisie express ---------- */
 .num, .n, .big, .stat .v, .tb .v, .acct .av, .ccprow b, .dlegend .vl, .mixrow .vl, .mgroup .num, td.calc, .ind .v, .exp .num, .tip b, .btip b { font-variant-numeric: tabular-nums; letter-spacing: -.005em }
 .big { font-family: var(--num); font-weight: 600; font-size: 2.15rem; letter-spacing: -.02em; line-height: 1.1 }
@@ -665,6 +675,100 @@ html, body { overflow-x: clip }
 @keyframes sheetUp { from { transform: translateY(40px); opacity: .6 } to { transform: none; opacity: 1 } }
 @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
 @keyframes toastIn { from { opacity: 0; transform: translate(-50%, 8px) } to { opacity: 1; transform: translate(-50%, 0) } }
+/* ---------- 1.15 : style de la maquette (gris chauds, terre cuite pour les dépenses, indigo pour les actions) ---------- */
+:root {
+  --bg: #f4f3ee; --surface: #ffffff; --fg: #1a1a19; --fg2: #5f5e5a; --muted: #77766f; --line: #e7e6e0; --track: #ebeae4; --chip: #efeee8;
+  --accent: #534ab7; --accent-fg: #ffffff; --warn: #a8700f; --up: #3b6d11; --down: #b5433d; --over: #e07b74;
+  --c-rev: #4a8f2a; --c-exp: #c8623c; --c-sav: #3b74c0; --pos-bg: #e7f2dc; --pos-fg: #3b6d11; --neg-bg: #f9e3e1; --neg-fg: #a63a34;
+  --n1: #3b74c0; --n2: #c8623c; --n3: #3d9a7e; --n4: #d1a23c; --n5: #c2577f; --n6: #6f8f2a;
+  --display: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #202020; --surface: #1a1a19; --fg: #efefec; --fg2: #c2c2b8; --muted: #9a9a97; --line: #2b2b29; --track: #313130; --chip: #252525;
+  --accent: #8f89e6; --accent-fg: #1a1a19; --warn: #d9a041; --up: #5fb043; --down: #dd8381; --over: #dd8381;
+  --c-rev: #4aa030; --c-exp: #c8623c; --c-sav: #6f9be0; --pos-bg: #162512; --pos-fg: #4aa030; --neg-bg: #371110; --neg-fg: #dd8381;
+  --n1: #6f9be0; --n2: #c8623c; --n3: #3d9a7e; --n4: #d1a23c; --n5: #c2577f; --n6: #7d9a3a } }
+:root[data-theme="dark"] {
+  --bg: #202020; --surface: #1a1a19; --fg: #efefec; --fg2: #c2c2b8; --muted: #9a9a97; --line: #2b2b29; --track: #313130; --chip: #252525;
+  --accent: #8f89e6; --accent-fg: #1a1a19; --warn: #d9a041; --up: #5fb043; --down: #dd8381; --over: #dd8381;
+  --c-rev: #4aa030; --c-exp: #c8623c; --c-sav: #6f9be0; --pos-bg: #162512; --pos-fg: #4aa030; --neg-bg: #371110; --neg-fg: #dd8381;
+  --n1: #6f9be0; --n2: #c8623c; --n3: #3d9a7e; --n4: #d1a23c; --n5: #c2577f; --n6: #7d9a3a }
+h1, h2, h3 { font-family: var(--body) }
+h1 { font-weight: 600 } h2 { font-weight: 600; font-size: 1.08rem }
+.appbar h1 { font-size: 1.4rem; font-weight: 500; letter-spacing: -.01em }
+.eyebrow { text-transform: none; letter-spacing: 0; font-size: .86rem; font-weight: 500; color: var(--fg2) }
+.panel, .setlist { border: 0; box-shadow: none; border-radius: 20px }
+:root:not([data-theme="dark"]) .panel { box-shadow: 0 1px 2px rgb(26 26 25 / .04) }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .panel { box-shadow: none } }
+.btn { border: 0; background: var(--chip); border-radius: 14px; font-weight: 600 }
+.btn.primary { background: var(--accent); color: var(--accent-fg) }
+.btn.danger { background: var(--neg-bg); color: var(--neg-fg) }
+.field input, .field select, .field textarea, .stat input, .stat select, .incrow input, .sel { border: 0; background: var(--chip); border-radius: 12px }
+.seg { background: var(--chip) }
+.seg button { color: var(--fg2); font-weight: 500 }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--fg); font-weight: 600; box-shadow: 0 1px 3px rgb(0 0 0 / .18) }
+.cyclenav button.arrow { background: var(--chip); color: var(--fg) }
+.bar { background: var(--track); height: 6px }
+.tb .bar { height: 6px }
+.bar i.over { background: var(--over) }
+.pill { background: var(--chip); color: var(--fg2) }
+.pill.good { background: var(--pos-bg); color: var(--pos-fg) } .pill.bad { background: var(--neg-bg); color: var(--neg-fg) }
+.notice.err { color: var(--down) }
+.ccprow { border: 0; background: var(--chip) }
+.qpill, .chips button { background: var(--chip); border: 0 }
+.chips button[aria-pressed="true"] { background: var(--fg); color: var(--bg) }
+.fab { background: var(--accent); color: var(--accent-fg); box-shadow: 0 8px 24px -6px rgb(0 0 0 / .35) }
+.sheetcard { background: var(--surface) }
+.exp { border-bottom-color: var(--line) }
+.exp .d { color: var(--muted) }
+/* Pictogrammes : carré arrondi pastel, picto foncé de la même teinte */
+.eic { border-radius: 9px; background: color-mix(in srgb, var(--c) 13%, #ffffff); color: color-mix(in srgb, var(--c) 68%, #000000) }
+.gi .gic { border-radius: 12px }
+/* En-tête : période en pastille ; l'état de la synchronisation devient un point */
+.pchip { border: 0; background: var(--chip); color: var(--fg2); border-radius: 99px; padding: 7px 12px; font-size: .84rem; font-weight: 500; white-space: nowrap; max-width: 62vw; overflow: hidden; text-overflow: ellipsis; min-height: 34px }
+.appbar.haschip [data-syncpill] { width: 10px; height: 10px; min-width: 10px; padding: 0; font-size: 0; border-radius: 50%; background: var(--muted); flex: none; margin: 0 6px }
+.appbar.haschip [data-syncpill].good { background: var(--up) } .appbar.haschip [data-syncpill].warn { background: var(--warn) } .appbar.haschip [data-syncpill].bad { background: var(--down) }
+.pmini { display: none !important }
+/* Accueil : double anneau (dépensé dehors, jours écoulés dedans), montant, pastilles */
+.hero { grid-template-columns: 118px minmax(0, 1fr); gap: 18px }
+.ring svg { width: 118px; height: 118px }
+.ring .rtrack { stroke: var(--track); stroke-width: 9 }
+.ring .rarc { stroke-width: 9 }
+.ring .itrack { fill: none; stroke: var(--track); stroke-width: 5 }
+.ring .iarc { fill: none; stroke: var(--muted); stroke-width: 5; stroke-linecap: round }
+.ring .rc1 { font-size: 15px; font-weight: 500; fill: var(--fg2); dominant-baseline: middle }
+.ring .rc2 { font-size: 10px; fill: var(--muted); dominant-baseline: middle }
+.big { font-weight: 700; font-size: 2.3rem; letter-spacing: -.025em }
+.hpills { display: flex; flex-direction: column; align-items: flex-start; gap: 7px; margin-top: 10px }
+.hpill { border: 0; border-radius: 99px; padding: 6px 13px; font-size: .9rem; font-weight: 500; background: var(--chip); color: var(--fg2); min-height: 34px; font-variant-numeric: tabular-nums; white-space: nowrap }
+.hpill.pos { background: var(--pos-bg); color: var(--pos-fg) } .hpill.neg { background: var(--neg-bg); color: var(--neg-fg) }
+.hero #b-pace { color: var(--muted); font-weight: 500 !important; margin-top: 8px }
+/* Enveloppes : carré pastel, nom, reste à droite, jauge fine à la couleur de l'enveloppe */
+.env.erow2 { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; grid-template-rows: auto auto; column-gap: 14px; row-gap: 9px; align-items: center; padding: 13px 0 }
+.env.erow2 .etile { grid-row: 1 / 3; width: 44px; height: 44px; border-radius: 13px; display: grid; place-items: center; background: color-mix(in srgb, var(--c) 13%, #ffffff); color: color-mix(in srgb, var(--c) 68%, #000000) }
+.env.erow2 .etile .ico { width: 22px; height: 22px }
+.env.erow2 .en { font-weight: 500; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.env.erow2 .en small { display: block; font-weight: 400; color: var(--muted); font-size: .78rem; font-variant-numeric: tabular-nums }
+.env.erow2 .er { color: var(--fg2); font-variant-numeric: tabular-nums; white-space: nowrap; font-size: .95rem }
+.env.erow2 .er.over { color: var(--over) }
+.env.erow2 .bar { grid-column: 2 / 4; margin: 0 }
+.env.erow2 + .env.erow2 { border-top: 1px solid var(--line) }
+.env.erow2 { border-bottom: 0 }
+/* Balayer : poubelle sur fond rouge sombre, copie sur fond neutre */
+.exp.sw::after { content: ""; background: var(--neg-bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23dd8381' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v6M14 11v6'/%3E%3C/svg%3E") no-repeat 26px center / 24px 24px }
+.exp.sw.armL::after { background-color: color-mix(in srgb, var(--neg-bg) 60%, var(--down)) }
+.exp.sw::before { content: ""; background: var(--chip) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238f89e6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='9' y='9' width='12' height='12' rx='2'/%3E%3Cpath d='M5 15V5a2 2 0 0 1 2-2h10'/%3E%3C/svg%3E") no-repeat calc(100% - 26px) center / 24px 24px }
+.exp.sw.armR::before { background-color: color-mix(in srgb, var(--chip) 60%, var(--accent)) }
+
+/* Fenêtres du bas : tout défile d'un bloc (pas de liste qui défile à l'intérieur), boutons toujours visibles en bas */
+.sheetcard { overscroll-behavior: contain; -webkit-overflow-scrolling: touch }
+.sheetcard .igrid, .sheetcard .icgroups { max-height: none; overflow: visible }
+.sheetcard > .actions:last-child { position: sticky; bottom: calc(-18px - env(safe-area-inset-bottom, 0px)); z-index: 3; background: var(--surface);
+  margin: 2px -16px calc(-18px - env(safe-area-inset-bottom, 0px)); padding: 12px 16px calc(14px + env(safe-area-inset-bottom, 0px)); box-shadow: 0 -12px 16px -14px rgb(0 0 0 / .45) }
+input[type="date"] { -webkit-appearance: none; appearance: none; min-width: 0; max-width: 100%; width: 100%; display: block; text-align: left; min-height: 46px }
+input[type="date"]::-webkit-date-and-time-value { text-align: left }
+.gic.solid { border-radius: 13px; background: color-mix(in srgb, var(--c) 15%, #ffffff); color: color-mix(in srgb, var(--c) 66%, #000000); box-shadow: none }
+.acct .gic.solid { width: 44px; height: 44px }
 </style>
 </head>
 <body>
@@ -673,6 +777,7 @@ html, body { overflow-x: clip }
   <div class="in">
     <button class="iconbtn" id="menubtn" type="button" aria-label="Ouvrir le menu" aria-controls="drawer" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
     <h1 id="vtitle">Accueil</h1>
+    <button class="pchip" type="button" id="pchip" hidden aria-label="Période affichée : revenir au choix de période"></button>
     <button class="pill" type="button" data-syncpill data-goto="reglages" data-anchor="set-sync">Local</button>
   </div>
 </header>
@@ -713,10 +818,10 @@ html, body { overflow-x: clip }
       <div style="min-width:0">
         <div class="eyebrow" id="b-lefttitle">Disponible</div>
         <div class="big" id="b-left">0,00 €</div>
+        <div class="hpills" id="b-pills" hidden></div>
         <div class="small" id="b-pace" style="font-weight:600"></div>
       </div>
     </div>
-    <div class="qpills" id="b-pills" hidden></div>
     <div class="tribars">
       <div class="tb"><span class="eyebrow" id="b-revlbl">Revenus</span><span class="bar" aria-hidden="true"><i class="t-rev" id="b-revbar"></i></span><span class="v" id="b-revv">0,00 €</span><span class="small muted" id="b-revnote"></span></div>
       <div class="tb"><span class="eyebrow">Dépenses</span><span class="bar" aria-hidden="true"><i class="t-exp" id="b-outbar"></i></span><span class="v" id="b-out">0,00 €</span><span class="small muted" id="b-outnote"></span></div>
@@ -803,7 +908,7 @@ html, body { overflow-x: clip }
     <div class="seg" id="c-mode" role="group" aria-label="Répartition du patrimoine"><button type="button" data-cm="nature" aria-pressed="true">Par nature</button><button type="button" data-cm="acct" aria-pressed="false">Par compte</button></div>
     <div class="donutwrap"><div class="donut" id="c-donut"></div><div class="dlegend" id="c-legend"></div></div>
     <div class="small muted" id="c-donutnote"></div>
-    <div class="notice info">Toucher un compte : solde, nature, couleur, logo. Rester appuyé : changer l'ordre. Compte courant estimé = dernier solde relevé + salaires et entrées − dépenses et virements saisis depuis.</div>
+
   </div>
   <div id="c-groups" class="stack" style="gap:16px"></div>
   <div><button class="btn" type="button" id="c-add">+ Ajouter un compte</button></div>
@@ -1119,6 +1224,11 @@ html, body { overflow-x: clip }
     </div>
     <label class="field" id="a-goalbox"><span class="small muted">Objectif (€, facultatif)</span><input id="a-goal" type="text" inputmode="decimal" autocomplete="off" placeholder="Ex. 5 000"></label>
     <label class="field" id="a-kindbox"><span class="small muted">Nature</span><select id="a-kind"></select></label>
+    <div class="field" id="a-holdbox" hidden>
+      <span class="small muted">Lignes suivies au cours de bourse</span>
+      <div id="a-hold" class="stack" style="gap:8px"></div>
+      <button type="button" class="linkbtn" id="a-holdadd" style="align-self:flex-start">+ Ligne</button>
+    </div>
     <div class="field"><span class="small muted">Couleur</span><div class="swatches" id="a-colors" role="group" aria-label="Couleur"></div></div>
     <div class="field"><span class="small muted">Logo</span><div class="igrid small" id="a-icons" role="group" aria-label="Logo"></div><button type="button" class="linkbtn" id="a-moreico" style="align-self:flex-start">Plus de logos…</button></div>
     <div class="notice" id="a-note"></div>
@@ -1151,6 +1261,7 @@ html, body { overflow-x: clip }
     <div class="shhead"><button type="button" class="linkbtn" id="f-back" hidden></button><h2 id="sheettitle">Nouvelle dépense</h2></div>
     <label class="field"><span class="small muted">Montant (€)</span><input id="f-amount" class="n" type="text" inputmode="decimal" autocomplete="off" placeholder="0,00" style="text-align:left;font-size:1.4rem"></label>
     <div id="f-expbox" class="field"><span class="small muted">Enveloppe</span><div class="igrid" id="g-env" role="group" aria-label="Enveloppe"></div><select id="f-env" hidden></select></div>
+    <label class="field" id="f-tobox" hidden><span class="small muted">Vers le compte</span><select id="f-to"></select></label>
     <div id="f-incbox" class="stack" hidden>
       <div class="field"><span class="small muted">Origine</span><div class="igrid" id="g-cat" role="group" aria-label="Origine de l'argent"></div><select id="f-cat" hidden></select></div>
       <label class="field"><span class="small muted">Effet sur le budget</span><select id="f-renv"></select></label>
@@ -1263,7 +1374,7 @@ html, body { overflow-x: clip }
 
 <script>
 "use strict";
-const APP_VERSION = "1.14.0";
+const APP_VERSION = "1.15.0";
 const FB_VERSION = "10.12.2"; // SDK Firebase chargé depuis gstatic uniquement si la synchronisation est configurée
 const LS = { state: "fin.state", fb: "fin.firebase", dev: "fin.device", link: "fin.linked", lastSync: "fin.lastsync" };
 const CLASSES = [{ id: "stocks", c: "#2346d8" }, { id: "bonds", c: "#7a4fd0" }, { id: "gold", c: "#c99a0a" }, { id: "cash", c: "#138a5b" }];
@@ -1600,7 +1711,7 @@ const ICON_KW = {
   dots: "autre divers"
 };
 // Couleurs des enveloppes dans les graphiques (couleur propre à chaque enveloppe, réglable avec son logo)
-const ENV_COLORS = ["#2A78D6", "#FF8A3D", "#22C7C9", "#F2CF2E", "#E030BE", "#1BAF7A", "#6250D6", "#5B7C99"], OTHER_COLOR = "#A0A7AF";
+const ENV_COLORS = ["#C8623C", "#7D77D6", "#3D9A7E", "#D1A23C", "#C2577F", "#5B8FD6", "#8A9A3D", "#9A6FBF", "#2F8FA3", "#B5744A"], OLD_ENV_COLORS = ["#2A78D6", "#FF8A3D", "#22C7C9", "#F2CF2E", "#E030BE", "#1BAF7A", "#6250D6", "#FF4D5A", "#5B7C99"], OTHER_COLOR = "#A0A7AF";
 const envColor = e => okColor(e?.color) ? e.color : ENV_COLORS[Math.max(0, S.budget.envelopes.indexOf(e)) % ENV_COLORS.length];
 // Personnalisation (Réglages › Personnalisation)
 const HOME_IDS = ["summary", "charges", "envs", "savs", "movs"], MENU_IDS = ["budget", "bilan", "comptes", "plan", "invest", "conj"];
@@ -1677,6 +1788,7 @@ function normalize(s) {
   if (!s || typeof s !== "object") return d;
   const b = { ...d.budget, ...(s.budget || {}) }, i = { ...d.invest, ...(s.invest || {}) };
   if (!Array.isArray(b.envelopes)) b.envelopes = d.budget.envelopes;
+  if ((b.envPal || 0) < 2) { b.envelopes.forEach(e => { if (OLD_ENV_COLORS.includes(String(e.color || "").toUpperCase())) delete e.color }); b.envPal = 2 }   // 1.15 : couleurs par défaut adoucies
   b.envelopes.forEach((e, k) => { if (!okColor(e.color)) e.color = ENV_COLORS[k % ENV_COLORS.length] });   // couleur dans les graphiques
   if (!Array.isArray(b.expenses)) b.expenses = [];
   if (!Array.isArray(b.savings)) b.savings = [];
@@ -1873,7 +1985,7 @@ const edgeEnd = () => {
 };
 document.addEventListener("touchend", edgeEnd);
 document.addEventListener("touchcancel", edgeEnd);
-const savTotal = () => S.budget.savings.reduce((s, a) => s + (+a.balance || 0), 0);
+const savTotal = () => S.budget.savings.reduce((s, a) => s + acctTotal(a), 0);
 function fmtWhen(t) {
   const d = new Date(t), time = d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
   return d.toDateString() === new Date().toDateString() ? "à " + time : `le ${fmtDay(d)} à ${time}`;
@@ -2185,9 +2297,9 @@ function renderBudget() {
     const right = save
       ? (pl > 0 ? (rest > 0.005 ? "reste " + fmtEUR(rest) : rest < -0.005 ? ok + "+" + fmtEUR(-rest) : ok + "atteint") : (net > 0 ? ok + fmtEUR(net) : "—"))
       : (pl > 0 || net ? (rest >= 0 ? "reste " + fmtEUR(rest) : "⚠ +" + fmtEUR(-rest)) : "—");
-    return `<button type="button" class="env lsrow${envFilter === id ? " on" : ""}" data-env="${esc(id)}">
-      <span><b><span class="eic" style="--c:${color}">${ico(icon)}</span>${esc(name)}</b><br><span class="small muted num">${fmtEUR(net)} / ${fmtEUR(pl)}${refund ? ` / ${fmtEUR(refund)} remboursés` : ""}</span></span>
-      <span class="num small" style="font-weight:600;text-align:right;color:${over ? "var(--down)" : "var(--fg)"}">${right}</span>
+    return `<button type="button" class="env erow2 lsrow${envFilter === id ? " on" : ""}" data-env="${esc(id)}" style="--c:${color}">
+      <span class="etile">${ico(icon)}</span><span class="en">${esc(name)}<small>${fmtEUR(net)} / ${fmtEUR(pl)}${refund ? ` / ${fmtEUR(refund)} remboursés` : ""}</small></span>
+      <span class="er${over ? " over" : ""}">${right.replace("⚠ ", "")}</span>
       <span class="bar"><i class="${over ? "over" : ""}" style="width:${pct}%${over ? "" : ";background:" + color}"></i></span></button>`;
   };
   const row = e => envRow(e.id, e.name, st.spentBy[e.id] || 0, st.refundBy[e.id] || 0, round2((+e.planned || 0) * f), e.kind, envIcon(e), envColor(e));
@@ -2291,7 +2403,8 @@ function updateSummary(pi = periodInfo()) {
   $("b-lefttitle").textContent = s.title;
   $("b-left").textContent = fmtEUR(s.left); $("b-left").style.color = s.left < 0 ? "var(--down)" : "";
   // Pastilles Aujourd'hui / Semaine sur le cycle en cours : la ligne du dessous ne répète pas le reste du jour
-  const pills = renderPills(pi); $("b-pace").textContent = pills ? s.pace.replace(/ \/ reste aujourd'hui [^/]*?(?= \/|$)/, "") : s.pace;
+  const pills = renderPills(pi);
+  $("b-pace").textContent = (pills ? s.pace.replace(/ \/ reste aujourd'hui [^/]*?(?= \/|$)/, "") : s.pace).replace(/^\d+ j avant la paie( \/ )?/, "");
   renderRing(s, pi);
   $("b-incbox").hidden = !!s.pstat;
   // Trois barres : revenus (vert, pleine), dépenses (orange, rouge une fois le budget atteint), épargne (bleu, jusqu'à l'objectif)
@@ -2305,7 +2418,7 @@ function updateSummary(pi = periodInfo()) {
   const cc = ccpEstimate(), toSave = cyc && s.cur ? s.toSave || 0 : 0, chLeft = cyc && s.cur ? s.chLeft || 0 : 0;
   $("b-ccp").classList.remove("warn");
   $("b-ccp").innerHTML = cc
-    ? `<span><span class="small muted">Compte courant</span><small>${[toSave > 0.005 ? `${fmtEUR(toSave)} à virer` : "", chLeft > 0.005 ? `${fmtEUR(chLeft)} de charges à passer` : ""].filter(Boolean).join(" / ") || `estimé / relevé du ${fmtDay(parseYmd(S.budget.ccp.date))}`}</small></span><b${cc.value < 0 ? ' style="color:var(--down)"' : ""}>${fmtEUR(cc.value)}</b>`
+    ? `<span><span class="small muted">Compte courant</span><small>${[toSave > 0.005 ? `${fmtEUR(toSave)} à virer` : "", chLeft > 0.005 ? `${fmtEUR(chLeft)} de charges à passer` : ""].filter(Boolean).join(" / ")}</small></span><b${cc.value < 0 ? ' style="color:var(--down)"' : ""}>${fmtEUR(cc.value)}</b>`
     : `<span><span class="small muted">Compte courant</span><small>Solde à indiquer</small></span><b style="font-family:var(--body);font-size:.85rem;color:var(--accent)">Ajouter ›</b>`;
   $("b-out").textContent = fmtEUR(s.spend); $("b-outnote").textContent = s.outNote; $("b-revnote").hidden = !s.revNote; $("b-outnote").hidden = !s.outNote; $("b-savenote").hidden = !s.savedNote;
   $("b-saved").textContent = fmtEUR(st.saved); $("b-savenote").innerHTML = s.savedNote;
@@ -2353,8 +2466,15 @@ function ensureChargesEnv() {
   B.envelopes.unshift({ id, name: "Charges", planned: 0, kind: "spend", icon: "repeat", color: ENV_COLORS[B.envelopes.length % ENV_COLORS.length] }); B.chargesEnv = id;
 }
 // Date prévue d'une charge dans un cycle : le jour indiqué, dans le mois où il tombe à l'intérieur du cycle
+// Jour prévu d'une charge : celui saisi, sinon celui de son dernier paiement retrouvé (charge cochée, ou libellé dans l'enveloppe Charges)
+function chargeDay(ch) {
+  if (+ch.day) return +ch.day;
+  const n = fold(ch.name), envId = S.budget.chargesEnv; let best = "";
+  S.budget.expenses.forEach(e => { if ((e.charge === ch.id || (n.length >= 3 && e.env === envId && fold(e.label).includes(n))) && e.date > best) best = e.date });
+  return best ? +best.slice(8, 10) : 0;
+}
 function chargeDue(ch, c) {
-  const d = +ch.day; if (!d) return null;
+  const d = chargeDay(ch); if (!d) return null;
   for (let k = 0; k < 2; k++) {
     const y = c.start.getFullYear(), m = c.start.getMonth() + k, x = new Date(y, m, Math.min(d, new Date(y, m + 1, 0).getDate()));
     if (x >= midnight(c.start) && x <= c.end) return x;
@@ -2382,7 +2502,7 @@ function renderCharges() {
   const late = B.charges.filter(dueLate).length, rest = round2(s.planned - s.net);
   const over = s.planned > 0 ? s.net > s.planned + 0.005 : s.net > 0.005, pct = s.planned > 0 ? Math.min(100, Math.max(0, s.net / s.planned * 100)) : (s.net > 0 ? 100 : 0);
   $("chg-head").innerHTML = `<span><b><span class="eic" style="--c:${env ? envColor(env) : "var(--c-exp)"}">${ico(env ? envIcon(env) : "repeat")}</span>Charges<span class="chev" aria-hidden="true">›</span></b><br><span class="small muted num">${fmtEUR(s.net)} / ${fmtEUR(s.planned)}${n ? ` / ${s.count}/${n}` : ""}${late ? ` / <span style="color:var(--warn)">${late} en retard</span>` : ""}</span></span>
-    <span class="num small" style="font-weight:600;text-align:right;color:${over ? "var(--down)" : "var(--fg)"}">${s.planned > 0 || s.net ? (rest >= 0 ? "reste " + fmtEUR(rest) : "⚠ +" + fmtEUR(-rest)) : "—"}</span>
+    <span class="num small" style="font-weight:500;text-align:right;color:${over ? "var(--over)" : "var(--fg2)"}">${s.planned > 0 || s.net ? (rest >= 0 ? "reste " + fmtEUR(rest) : "+" + fmtEUR(-rest)) : "—"}</span>
     <span class="bar"><i class="${over ? "over" : "t-exp"}" style="width:${pct}%"></i></span>`;
 }
 function openCharge(mode, id) {
@@ -2505,12 +2625,14 @@ function renderEnv() {
   const chBox = $("ev-charges"); chBox.hidden = !isCh;
   if (isCh) {
     const c = chargeCycle(), s = chargeStatus(c), cur = isCurrent(c), due = ch => chargeDue(ch, c);
-    const todo = B.charges.filter(ch => !s.paid[ch.id]).sort((x, y) => (due(x) || c.end) - (due(y) || c.end));
+    // Dans l'ordre des dates ; une charge sans date connue à la fin, par nom
+    const byName = (x, y) => fold(x.name).localeCompare(fold(y.name));
+    const todo = B.charges.filter(ch => !s.paid[ch.id]).sort((x, y) => { const a = due(x), b = due(y); return a && b ? (a - b) || byName(x, y) : a ? -1 : b ? 1 : byName(x, y) });
     const left = round2(todo.reduce((t, ch) => t + (+ch.amount || 0), 0));
     const rows = todo.map(ch => {
       const d = due(ch), late = d && d < today;
       return `<div class="chg${late ? " late" : ""}" data-ch="${esc(ch.id)}"><button type="button" class="cbox" data-chk aria-pressed="false" aria-label="${esc(ch.name)} : à cocher">✓</button>
-        <button type="button" class="cmain" data-chedit><b>${esc(ch.name)}</b><small${late ? ' style="color:var(--warn)"' : ""}>${d ? `le ${dmDate(d)}${late ? " / en retard" : ""}` : "à payer"}</small></button><span class="num">${fmtEUR(ch.amount)}</span></div>`;
+        <button type="button" class="cmain" data-chedit><b>${esc(ch.name)}</b><small${late ? ' style="color:var(--warn)"' : ""}>${d ? `${+ch.day ? "le" : "vers le"} ${dmDate(d)}${late ? " / en retard" : ""}` : "à payer"}</small></button><span class="num">${fmtEUR(ch.amount)}</span></div>`;
     }).join("");
     chBox.innerHTML = `<div class="clshead"><h2>${cur ? "À passer d'ici la paie" : c.end < today ? "Non cochées" : "À passer"}</h2>${todo.length ? `<span class="num small" style="font-weight:600">${fmtEUR(left)}</span>` : ""}</div>
       <div class="small muted">${fmtDay(c.start)} → ${fmtDay(c.end)}${B.charges.length ? ` / ${s.count}/${B.charges.length} cochées` : ""}</div>
@@ -2693,6 +2815,7 @@ function applyNewTransfer(t, sign = 1) {
 const trNetAfter = (id, date) => round2(S.budget.transfers.filter(t => t.date > date).reduce((n, t) => n + (t.to === id ? +t.amount : 0) - (t.from === id ? +t.amount : 0), 0));
 // Enveloppe d'épargne dans laquelle compte un virement depuis / vers le compte courant
 function trEnv(t) {
+  if (t.env && envById(t.env)?.kind === "save" && (t.from === "ccp" || t.to === "ccp")) return t.env;   // enveloppe choisie à la saisie
   const other = t.from === "ccp" ? t.to : t.to === "ccp" ? t.from : null; if (!other || other === "ccp") return null;
   const k = acctById(other)?.kind, saves = S.budget.envelopes.filter(e => e.kind === "save");
   const inv = saves.find(e => /invest|bourse|placement|pea/.test(foldTxt(e.name))), ep = saves.find(e => /epargn|livret/.test(foldTxt(e.name)));
@@ -2721,6 +2844,16 @@ function renderTrGrids() {
   $("f-trnote").textContent = !trTo ? "Compte d'arrivée ?" : trFrom === "ccp" ? `Épargne du cycle${env ? " / " + env.name : ""}`
     : trTo === "ccp" ? `Épargne reprise${env ? " / " + env.name : ""}` : `${f} → ${to} / sans effet sur le budget`;
 }
+// Enveloppe d'épargne choisie dans une dépense : le compte d'arrivée (le mouvement devient un virement et le solde du compte suit)
+let lastSaveTo = {};
+function syncSaveTo() {
+  const e = envById($("f-env").value), show = sheetKind === "exp" && e?.kind === "save";
+  $("f-tobox").hidden = !show; if (!show) return;
+  const opts = acctList().filter(a => a.id !== "ccp"), cur = $("f-to").value;
+  $("f-to").innerHTML = opts.map(a => `<option value="${esc(a.id)}">${esc(a.name)}</option>`).join("") + `<option value="">Aucun compte suivi</option>`;
+  const guess = $("f-to").dataset.touched ? cur : (acctFromText($("f-label").value)?.id || lastSaveTo[e.id] || acctFromText(e.name)?.id || (opts.find(a => /livret a\b/.test(foldTxt(a.name)))?.id) || "");
+  $("f-to").value = opts.some(a => a.id === guess) ? guess : "";
+}
 function setSheetKind(k) {
   roEnd(); sheetKind = k;
   document.querySelectorAll("#f-kind button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.k === k)));
@@ -2732,6 +2865,7 @@ function setSheetKind(k) {
   $("f-back").hidden = !!editing || !prev; $("f-back").textContent = prev ? "‹ " + { exp: "Dépense", inc: "Entrée" }[prev] : "";
   $("f-label").placeholder = k === "inc" ? "Ex. Vente casque sur Leboncoin" : k === "tr" ? "Ex. Épargne du mois" : "Ex. Courses Saran";
   if (k === "tr") renderTrGrids();
+  syncSaveTo();
 }
 function fillRefundEnv(catId, value) {
   const cat = incCat(catId), v = value !== undefined ? value : (cat?.env && envById(cat.env) ? cat.env : "");
@@ -2761,6 +2895,7 @@ function openSheet(kind, item) {
   $("f-date").value = item?.date || defaultDate();
   $("f-err").textContent = "";
   $("f-kind").hidden = !!item;
+  delete $("f-to").dataset.touched;
   setSheetKind(kind);
   const del = $("f-del"); del.hidden = !item; delete del.dataset.confirm; del.textContent = "Supprimer";
   $("sheet").hidden = false;
@@ -2931,7 +3066,9 @@ lsBind($("s-envs"), { sel: ".erow[data-eid]", kind: "env", id: el => el.dataset.
 document.addEventListener("click", e => { if (e.target.closest("[data-rodone]")) roEnd() });
 // Bouton + : voir la saisie express (1.14)
 $("f-kind").addEventListener("click", e => { const b = e.target.closest("[data-k]"); if (b) setSheetKind(b.dataset.k) });
-$("g-env").addEventListener("click", e => { const b = e.target.closest("[data-v]"); if (!b) return; $("f-env").value = b.dataset.v; $("g-env").querySelectorAll(".gi").forEach(x => x.setAttribute("aria-pressed", String(x === b))) });
+$("g-env").addEventListener("click", e => { const b = e.target.closest("[data-v]"); if (!b) return; $("f-env").value = b.dataset.v; $("g-env").querySelectorAll(".gi").forEach(x => x.setAttribute("aria-pressed", String(x === b))); syncSaveTo() });
+$("f-to").addEventListener("change", () => { $("f-to").dataset.touched = "1" });
+$("f-label").addEventListener("change", () => { if (!$("f-to").dataset.touched) syncSaveTo() });
 $("g-cat").addEventListener("click", e => { const b = e.target.closest("[data-v]"); if (!b) return; $("f-cat").value = b.dataset.v; $("g-cat").querySelectorAll(".gi").forEach(x => x.setAttribute("aria-pressed", String(x === b))); fillRefundEnv(b.dataset.v) });
 $("g-from").addEventListener("click", e => { const b = e.target.closest("[data-v]"); if (!b) return; trFrom = b.dataset.v; if (trTo === trFrom) trTo = acctList().find(a => a.id !== trFrom)?.id || ""; renderTrGrids() });
 $("g-to").addEventListener("click", e => { const b = e.target.closest("[data-v]"); if (!b) return; trTo = b.dataset.v; renderTrGrids() });
@@ -2960,11 +3097,19 @@ $("expform").addEventListener("submit", e => {
     lastCat = cat;
     msg = wasEdit ? "Entrée modifiée." : `+${fmtEUR(amount)} enregistrés (${incCat(cat)?.name || "entrée"})${envById(env) ? ", déduits de " + envById(env).name : ""}.`;
   } else {
-    const env = $("f-env").value, ex = editing && S.budget.expenses.find(x => x.id === editing);
-    if (ex) { Object.assign(ex, { amount, date, env, label }); wasEdit = true }
-    else S.budget.expenses.push({ id: rid(), amount, date, env, label, at: Date.now() });
-    lastEnv = env;
-    msg = wasEdit ? "Dépense modifiée." : `${fmtEUR(amount)} ajoutés à ${envById(env)?.name || "la dépense"}.`;
+    const env = $("f-env").value, ex = editing && S.budget.expenses.find(x => x.id === editing), to = !$("f-tobox").hidden ? $("f-to").value : "";
+    if (to && amount > 0) {
+      // Épargne vers un compte suivi : virement depuis le compte courant, compté dans l'enveloppe choisie
+      if (ex) S.budget.expenses = S.budget.expenses.filter(x => x !== ex);
+      const t = { id: ex?.id || rid(), amount, date, from: "ccp", to, env, label: label || envById(env)?.name || "", at: ex?.at || Date.now() };
+      S.budget.transfers.push(t); applyTransfer(t, 1); lastSaveTo[env] = to; lastEnv = env;
+      msg = `${fmtEUR(amount)} virés vers ${acctById(to)?.name} (${envById(env)?.name}).`;
+    } else {
+      if (ex) { Object.assign(ex, { amount, date, env, label }); wasEdit = true }
+      else S.budget.expenses.push({ id: rid(), amount, date, env, label, at: Date.now() });
+      lastEnv = env;
+      msg = wasEdit ? "Dépense modifiée." : `${fmtEUR(amount)} ajoutés à ${envById(env)?.name || "la dépense"}.`;
+    }
   }
   closeSheet(); haptic();
   viewCycle = cycleOf(parseYmd(date)); viewDate = midnight(parseYmd(date));
@@ -3164,13 +3309,18 @@ document.addEventListener("touchend", () => {
 });
 
 /* Barre de période collante : quand le choix de période sort de l'écran, une barre ‹ période › reste sous le titre */
+// Pastille de période dans l'en-tête (Accueil, Bilan) : toujours visible, la toucher ramène au choix de période
+const MODE_NAME = { day: "Jour", week: "Semaine", cycle: "Cycle", multi: "Plusieurs", range: "Dates", all: "Tout" };
 function updateMini() {
-  const el = $("pmini"), b = view === "budget", box = b ? $("v-budget").querySelector(".periodbox") : view === "bilan" ? $("v-bilan").querySelector(".periodbox") : null;
-  let on = false;
-  if (box && box.offsetParent) on = box.getBoundingClientRect().bottom < $("appbar").getBoundingClientRect().bottom + 2;
-  el.classList.toggle("on", on); el.setAttribute("aria-hidden", String(!on));
-  if (on) { $("pm-t").textContent = $(b ? "clabel" : "bl-label").textContent; $("pm-s").textContent = $(b ? "csub" : "bl-sub").textContent }
+  const b = view === "budget", on = b || view === "bilan", chip = $("pchip");
+  chip.hidden = !on; $("appbar").classList.toggle("haschip", on);
+  if (on) {
+    const m = b ? PF.period : PF.blMode, lbl = $(b ? "clabel" : "bl-label").textContent.replace(/ \d{4}$/, "");
+    chip.textContent = `${MODE_NAME[m] || ""} · ${lbl}`;
+  }
+  const el = $("pmini"); el.classList.remove("on"); el.setAttribute("aria-hidden", "true");
 }
+$("pchip").addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
 window.addEventListener("scroll", updateMini, { passive: true });
 $("pm-prev").addEventListener("click", () => $(view === "bilan" ? "bl-prev" : "cprev").click());
 $("pm-next").addEventListener("click", () => $(view === "bilan" ? "bl-next" : "cnext").click());
@@ -3182,24 +3332,26 @@ function periodTimeFrac(pi) {
   if (t < pi.a) return 0; if (t > pi.b) return 1;
   return Math.max(0, Math.min(1, (dayDiff(pi.a, t) + (now - t) / 864e5) / (dayDiff(pi.a, pi.b) + 1)));
 }
+// Double anneau : dehors l'argent dépensé (terre cuite, rouge clair une fois le budget atteint), dedans les jours écoulés ; au centre, les jours restants
 function renderRing(s, pi) {
-  const box = $("b-ring"), R = 40, C = 2 * Math.PI * R, f = Math.max(0, Math.min(1, (s.pct || 0) / 100)), tf = periodTimeFrac(pi);
-  const state = s.left < 0 || f >= 0.999 ? "over" : f > tf + 0.1 && tf < 1 ? "warn" : "ok";
-  if (!box.firstChild) box.innerHTML = `<svg viewBox="0 0 100 100" role="img"><circle cx="50" cy="50" r="${R}" class="rtrack"/><circle cx="50" cy="50" r="${R}" class="rarc" transform="rotate(-90 50 50)" style="stroke-dasharray:${C};stroke-dashoffset:${C}"/><circle r="4.5" class="rtick"/><text x="50" y="47" class="rpct"></text><text x="50" y="63" class="rlbl">dépensé</text></svg>`;
-  const svg = box.firstChild, arc = svg.querySelector(".rarc"), tick = svg.querySelector(".rtick");
-  arc.style.stroke = state === "over" ? "var(--down)" : state === "warn" ? "var(--warn)" : "var(--c-exp)";
-  requestAnimationFrame(() => { arc.style.strokeDashoffset = String(C * (1 - f)) });
-  const a = tf * 2 * Math.PI - Math.PI / 2; tick.setAttribute("cx", (50 + R * Math.cos(a)).toFixed(2)); tick.setAttribute("cy", (50 + R * Math.sin(a)).toFixed(2));
-  tick.style.display = tf > 0 && tf < 1 ? "" : "none";
-  svg.querySelector(".rpct").textContent = `${Math.round(f * 100)} %`;
-  svg.setAttribute("aria-label", `${Math.round(f * 100)} % dépensé${tf > 0 && tf < 1 ? `, ${Math.round(tf * 100)} % de la période écoulée` : ""}`);
+  const box = $("b-ring"), R = 44, r = 32, C = 2 * Math.PI * R, c = 2 * Math.PI * r, f = Math.max(0, Math.min(1, (s.pct || 0) / 100)), tf = periodTimeFrac(pi);
+  if (!box.querySelector(".iarc")) box.innerHTML = `<svg viewBox="0 0 100 100" role="img"><circle cx="50" cy="50" r="${R}" class="rtrack"/><circle cx="50" cy="50" r="${R}" class="rarc" transform="rotate(-90 50 50)" style="stroke-dasharray:${C};stroke-dashoffset:${C}"/><circle cx="50" cy="50" r="${r}" class="itrack"/><circle cx="50" cy="50" r="${r}" class="iarc" transform="rotate(-90 50 50)" style="stroke-dasharray:${c};stroke-dashoffset:${c}"/><text x="50" y="46" class="rc1"></text><text x="50" y="60" class="rc2"></text></svg>`;
+  const svg = box.firstChild, arc = svg.querySelector(".rarc"), iarc = svg.querySelector(".iarc");
+  arc.style.stroke = s.left < 0 || f >= 0.999 ? "var(--over)" : f > tf + 0.1 && tf < 1 ? "var(--warn)" : "var(--c-exp)";
+  requestAnimationFrame(() => { arc.style.strokeDashoffset = String(C * (1 - f)); iarc.style.strokeDashoffset = String(c * (1 - tf)) });
+  const today = midnight(new Date()), left = pi.b >= today ? dayDiff(today < pi.a ? pi.a : today, pi.b) + (today < pi.a ? 1 : 0) : -1;
+  const [t1, t2] = pi.m === "day" ? (left >= 0 && +pi.a === +today ? ["Aujourd'hui", ""] : [pi.a.toLocaleDateString("fr-FR", { day: "numeric", month: "short" }), ""])
+    : left < 0 ? ["Terminé", ""] : today < pi.a ? ["À venir", ""] : pi.m === "cycle" ? [`${left + 1} j`, "avant paie"] : [`${left + 1} j`, "restants"];
+  svg.querySelector(".rc1").textContent = t1; svg.querySelector(".rc2").textContent = t2;
+  svg.querySelector(".rc1").setAttribute("y", t2 ? "46" : "50");
+  svg.setAttribute("aria-label", `${Math.round(f * 100)} % dépensé, ${Math.round(tf * 100)} % de la période écoulée`);
 }
 function renderPills(pi) {
   const box = $("b-pills"), show = PF.period === "cycle" && pi.now;
   box.hidden = !show; if (!show) return false;
   const t = midnight(new Date()), mon = mondayOf(t);
   const d = periodSummary({ m: "day", a: t, b: t, now: true }), w = periodSummary({ m: "week", a: mon, b: addDays(mon, 6), now: true });
-  box.innerHTML = [["day", "Aujourd'hui", d.left], ["week", "Semaine", w.left]].map(([m, l, v]) => `<button type="button" class="qpill" data-qp="${m}"><span>${l}</span><b${v < 0 ? ' style="color:var(--down)"' : ""}>${fmtEUR(v)}</b></button>`).join("");
+  box.innerHTML = [["day", "Aujourd'hui", d.left, true], ["week", "Semaine", w.left, false]].map(([m, l, v, tone]) => `<button type="button" class="hpill${v < 0 ? " neg" : tone ? " pos" : ""}" data-qp="${m}">${l} ${fmtEUR(v)}</button>`).join("");
   return true;
 }
 $("b-pills").addEventListener("click", e => { const b = e.target.closest("[data-qp]"); if (!b) return; viewDate = midnight(new Date()); setPeriod(b.dataset.qp); window.scrollTo({ top: 0 }) });
@@ -3517,7 +3669,7 @@ function renderProjHyp() {
     <label class="field"><span class="small muted">Inflation par an (%)${typeof inf?.value === "number" ? ` / Insee : ${inf.value.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} % sur un an (${esc(fmtPeriod(inf.period))})` : ""}</span>${num(P.inf, 'id="pj-inf"')}</label>
     <div class="pjhead"><span></span><span>Épargne %</span><span>Prudent</span><span>Médian</span><span>Optim.</span><span>Impôt</span></div>
     ${shown.map(b => `<div class="pjrow"><span><b>${esc(b.name)}</b><small>${pjK(D.by[b.id] || 0)}</small></span>${num(Math.round(+(al[b.id] || 0)), `data-pja="${b.id}" aria-label="Part de l'épargne, ${esc(b.name)}"`)}${[0, 1, 2].map(s => num(P.r[b.id][s], `data-pjr="${b.id}:${s}" aria-label="Rendement ${["prudent", "médian", "optimiste"][s]}, ${esc(b.name)}"`)).join("")}${num(P.tax[b.id], `data-pjt="${b.id}" aria-label="Impôt, ${esc(b.name)}"`)}</div>`).join("")}
-    <div class="small muted">Rendements bruts par an (%). ${P.alloc && Math.abs(sumA - 100) > 0.5 ? `Parts ramenées à 100 % (total ${sumA.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} %). ` : ""}${P.alloc ? "" : "Parts d'après vos virements des 6 derniers cycles. "}Taux au 24/11/2026 : Livret A / LDDS 1,7 % · PEL 2026 2 % brut · flat tax 31,4 % · PEA (+5 ans) 18,6 % · PEL et assurance vie 17,2 %.</div>
+    ${P.alloc && Math.abs(sumA - 100) > 0.5 ? `<div class="small muted">Total des parts : ${sumA.toLocaleString("fr-FR", { maximumFractionDigits: 1 })} % (ramené à 100 %)</div>` : ""}
     <div><button class="btn" type="button" id="pj-reset">Valeurs par défaut</button></div>`;
 }
 function pjSave(redrawHyp) {
@@ -3643,11 +3795,50 @@ let cMode = "nature", acEdit = null, acColor = "", acIcon = "";
 const freeCash = () => +S.invest.freeCash?.amount || 0;
 const investTotal = () => grandTotal() + freeCash();
 const fmtDate = d => d ? `${fmtDay(parseYmd(d))} ${d.slice(0, 4)}` : "";
+// Comptes en direct (1.15) : un compte titres, PEA ou crypto peut avoir des lignes (hold : symbole, quantité, montant investi).
+// Son solde (balance) est alors le « reste du compte » (liquidités et lignes non détaillées) ; sa valeur = reste + lignes au cours du moment.
+// Les virements font bouger le reste ; les achats et ventes du journal font bouger les lignes et le reste ; la bourse fait bouger les lignes.
+const holdOf = a => Array.isArray(a?.hold) ? a.hold : [];
+const isLive = a => holdOf(a).length > 0;
+const holdKey = h => (h.isin || "").toUpperCase() || normSym(h.sym) || fold(h.name);
+function holdVal(h) {
+  const q = h.sym ? quoteFor({ sym: h.sym }) : null, qty = +h.qty || 0;
+  const eur = q ? q.eur : (+h.px || (qty > 1e-9 ? (+h.cost || 0) / qty : 0));
+  return { v: qty * eur, eur, live: !!q };
+}
+const holdTotal = a => holdOf(a).reduce((t, h) => t + holdVal(h).v, 0);
+const acctTotal = a => round2((+a.balance || 0) + holdTotal(a));
+// Dernier cours connu gardé avec la ligne (sert hors ligne ou si le symbole disparaît du tableau des cours)
+function updateHoldPx() { S.budget.savings.forEach(a => holdOf(a).forEach(h => { const q = h.sym ? quoteFor({ sym: h.sym }) : null; if (q) h.px = Math.round(q.eur * 1e4) / 1e4 })) }
+// Lignes d'un compte remplacées (onglet Portefeuille avec une colonne Compte, fiche du compte) : la valeur totale connue est gardée,
+// le reste du compte s'ajuste ; une ligne « liquidités » donne directement le reste.
+function setHold(a, rows, cash, asOf) {
+  const total = acctTotal(a), old = holdOf(a);
+  a.hold = rows.filter(r => (+r.qty || 0) > 1e-9).map(r => {
+    const o = old.find(h => holdKey(h) === holdKey(r));
+    return { id: o?.id || rid(), name: r.name || o?.name || r.sym || r.isin || "", sym: normSym(r.sym) || o?.sym || "", isin: (r.isin || o?.isin || "").toUpperCase(), qty: round6(+r.qty), cost: +r.cost > 0 ? round2(+r.cost) : (o?.cost || 0), px: o?.px || 0 };
+  });
+  a.holdAsOf = asOf || ymd(new Date());
+  if (isFinite(cash)) { a.balance = round2(cash); a.date = a.holdAsOf } else a.balance = round2(Math.max(0, total - holdTotal(a)));
+  if (a.hold.length && !["titres", "crypto"].includes(a.kind)) a.kind = /crypto|kraken|binance|coinbase|bitcoin/.test(fold(a.name)) ? "crypto" : "titres";
+}
+// Après un relevé importé : les lignes du compte suivent le journal (quantités et montant investi), la valeur totale est gardée
+function syncHoldFromLedger(id) {
+  const a = S.budget.savings.find(x => x.id === id); if (!a) return false;
+  const pos = ledger(id).pos.filter(x => x.qty > 1e-9); if (!pos.length) return false;
+  const last = S.invest.tx.filter(t => t.acct === id).map(t => t.date).sort().at(-1) || "";
+  setHold(a, pos.map(x => ({ name: x.name, sym: x.sym, isin: x.isin, qty: x.qty, cost: x.cost })), NaN, [a.date || "", last].sort().at(-1));
+  return true;
+}
 // Tous les comptes avec leur valeur actuelle (compte courant estimé, portefeuille DEGIRO avec sa marge libre)
 function acctValues() {
   const cc = ccpEstimate(), L = S.budget.ccpLook;
-  const list = [{ id: "ccp", name: "Compte courant", kind: "courant", color: L.color, icon: L.icon, value: cc ? cc.value : 0, sub: cc ? `estimé / relevé du ${fmtDay(parseYmd(S.budget.ccp.date))}` : "Solde à indiquer", set: !!cc }];
-  S.budget.savings.forEach(a => list.push({ id: a.id, name: a.name, kind: a.kind, color: a.color, icon: a.icon, value: +a.balance || 0, goal: +a.goal || 0, sub: a.date ? `solde du ${fmtDay(parseYmd(a.date))}` : "" }));
+  const list = [{ id: "ccp", name: "Compte courant", kind: "courant", color: L.color, icon: L.icon, value: cc ? cc.value : 0, sub: cc ? "" : "Solde à indiquer", set: !!cc }];
+  S.budget.savings.forEach(a => {
+    const live = isLive(a), n = holdOf(a).filter(h => h.qty > 1e-9).length, nq = holdOf(a).filter(h => h.qty > 1e-9 && holdVal(h).live).length;
+    list.push({ id: a.id, name: a.name, kind: a.kind, color: a.color, icon: a.icon, value: acctTotal(a), goal: +a.goal || 0,
+      sub: live ? `${n} ligne${n > 1 ? "s" : ""}${nq ? (nq === n ? " en direct" : ` dont ${nq} en direct`) : ""}${Math.abs(+a.balance || 0) >= 0.5 ? ` / reste ${fmtEUR(+a.balance || 0)}` : ""}` : a.date ? `solde du ${fmtDay(parseYmd(a.date))}` : "" });
+  });
   const pv = grandTotal(), fc = freeCash();
   if (pv || fc || allAssets().length) list.push({ id: "pf", name: "Portefeuille DEGIRO", kind: "titres", color: S.invest.look.color, icon: S.invest.look.icon, value: pv + fc, sub: `positions ${fmtEUR(pv)}${fc ? ` / marge ${fmtEUR(fc)}` : ""}` });
   return list;
@@ -3659,7 +3850,7 @@ function ringSVG(parts, total, o = {}) {
   const segs = parts.map((p, i) => { const len = p.v / total * C, d = Math.max(0, len - gap), on = o.sel === i, dim = o.sel != null && !on;
     const el = `<circle data-mi="${i}" cx="75" cy="75" r="${R}" fill="none" stroke="${p.color}" stroke-width="${on ? W + 5 : W}" stroke-dasharray="${d} ${C - d}" stroke-dashoffset="${-off}" transform="rotate(-90 75 75)"${dim ? ' opacity=".35"' : ""}><title>${esc(p.name)} : ${fmtEUR(p.v)}</title></circle>`; off += len; return el }).join("");
   const top = String(o.top ?? "Total"), t = top.length > 17 ? top.slice(0, 16) + "…" : top;
-  return `<svg viewBox="0 0 150 150" role="img" aria-label="${esc(o.aria || "Répartition")}">${segs}<text x="75" y="71" text-anchor="middle" style="font:11px var(--body);fill:var(--muted)">${esc(t)}</text><text x="75" y="88" text-anchor="middle" style="font:600 13px var(--mono);fill:var(--fg)">${esc(o.val ?? fmtK(total))}</text></svg>`;
+  return `<svg viewBox="0 0 150 150" role="img" aria-label="${esc(o.aria || "Répartition")}">${segs}<text x="75" y="71" text-anchor="middle" style="font:11px var(--body);fill:var(--muted)">${esc(t)}</text><text x="75" y="88" text-anchor="middle" style="font:600 13px var(--num);fill:var(--fg)">${esc(o.val ?? fmtK(total))}</text></svg>`;
 }
 const donutSVG = (parts, total) => ringSVG(parts, total, { aria: "Répartition du patrimoine" });
 // Bilan : répartition des dépenses par enveloppe (7 plus grosses + Autres), en camembert ou en barres
@@ -3774,6 +3965,9 @@ function openAcct(id) {
   $("a-kind").value = a?.kind || "epargne";
   acColor = isCcp ? S.budget.ccpLook.color : a ? a.color : KIND_COLOR.epargne;
   acIcon = isCcp ? S.budget.ccpLook.icon : a ? a.icon : KIND_ICON.epargne;
+  acHold = holdOf(a).filter(h => h.qty > 1e-9).map(h => ({ ...h }));
+  if (a && isLive(a)) { $("a-bal").value = fmtIn(acctTotal(a)); $("a-ballabel").textContent = "Valeur totale (€)" }
+  renderAcHold();
   const cc = isCcp && ccpEstimate();
   $("a-note").textContent = isCcp ? (cc ? `Estimé : ${fmtEUR(cc.value)} / +${fmtEUR(cc.inc)} entrées / −${fmtEUR(cc.out)} sorties` : "Solde affiché par la banque") : "";
   $("a-err").textContent = "";
@@ -3781,11 +3975,35 @@ function openAcct(id) {
   setTimeout(() => (isCcp ? $("a-bal") : $("a-name")).focus(), 60);
 }
 const closeAcct = () => { $("acsheet").hidden = true; acEdit = null };
+let acHold = [];
+function renderAcHold() {
+  const k = $("a-kind").value, show = acEdit !== "ccp" && (k === "titres" || k === "crypto" || acHold.length > 0);
+  $("a-holdbox").hidden = !show; if (!show) return;
+  $("a-hold").innerHTML = acHold.map((h, i) => `<div class="hrow" data-hi="${i}"><input data-h="sym" type="text" autocomplete="off" spellcheck="false" placeholder="Symbole" value="${esc(h.sym || "")}" aria-label="Symbole"><input data-h="qty" type="text" inputmode="decimal" autocomplete="off" placeholder="Quantité" value="${esc(fmtIn6(h.qty))}" aria-label="Quantité"><input data-h="cost" type="text" inputmode="decimal" autocomplete="off" placeholder="Investi €" value="${esc(fmtIn(h.cost))}" aria-label="Montant investi"><button type="button" class="del" data-hdel aria-label="Retirer la ligne">✕</button>
+      <span class="hsub">${esc(hsubText(h))}</span></div>`).join("")
+    || `<div class="small muted">Aucune : le solde ne suit que les virements.</div>`;
+}
+// Sous la ligne : nom et valeur au cours du moment (mis à jour pendant la saisie, sans redessiner les champs)
+function hsubText(h) {
+  const v = holdVal(h), q = h.sym ? quotes.map[normSym(h.sym)] : null, name = h.name && h.name !== h.sym ? h.name : q?.name || "";
+  if (!h.sym) return "";
+  if (!q) return `${name ? name + " / " : ""}symbole absent du tableau des cours`;
+  return [name, v.v ? fmtEUR(v.v) + (v.live ? " en direct" : "") : ""].filter(Boolean).join(" / ");
+}
+$("a-hold").addEventListener("input", e => {
+  const inp = e.target.closest("[data-h]"), row = e.target.closest("[data-hi]"); if (!inp || !row) return;
+  const h = acHold[+row.dataset.hi], k = inp.dataset.h; if (!h) return;
+  if (k === "sym") { h.sym = normSym(inp.value); h.isin = ""; h.name = "" } else h[k] = parseNum(inp.value);
+  const sub = row.querySelector(".hsub"); if (sub) sub.textContent = hsubText(h);
+});
+$("a-hold").addEventListener("click", e => { const b = e.target.closest("[data-hdel]"); if (!b) return; acHold.splice(+b.closest("[data-hi]").dataset.hi, 1); renderAcHold() });
+$("a-holdadd").addEventListener("click", () => { acHold.push({ sym: "", qty: 0, cost: 0 }); renderAcHold(); setTimeout(() => $("a-hold").querySelector(".hrow:last-of-type input")?.focus(), 30) });
 $("acsheet").addEventListener("click", e => {
   if (e.target.closest("[data-acclose]")) { closeAcct(); return }
   const c = e.target.closest("[data-col]"); if (c) { acColor = c.dataset.col; renderAcPickers(); return }
   const k = e.target.closest("[data-ico]"); if (k) { acIcon = k.dataset.ico; renderAcPickers() }
 });
+$("a-kind").addEventListener("change", () => renderAcHold());
 $("a-kind").addEventListener("change", e => { if (!acEdit) { acIcon = KIND_ICON[e.target.value] || acIcon; acColor = KIND_COLOR[e.target.value] || acColor; renderAcPickers() } });
 $("acform").addEventListener("submit", e => {
   e.preventDefault();
@@ -3798,7 +4016,15 @@ $("acform").addEventListener("submit", e => {
     const name = $("a-name").value.trim(); if (!name) { $("a-err").textContent = "Donnez un nom au compte."; $("a-name").focus(); return }
     let a = acEdit && S.budget.savings.find(x => x.id === acEdit);
     if (!a) { a = { id: rid() }; S.budget.savings.push(a) }
-    Object.assign(a, { name, balance: isFinite(bal) ? round2(bal + trNetAfter(a.id, date)) : (+a.balance || 0), date, goal: Math.max(0, parseNum($("a-goal").value)), kind: $("a-kind").value, color: acColor, icon: acIcon });
+    const rows = acHold.filter(h => h.sym && h.qty > 0), wasLive = isLive(a);
+    if ((rows.length || wasLive) && isFinite(bal)) {
+      // Valeur totale saisie : les lignes au cours du moment, le reste du compte = la différence
+      setHold(a, rows, NaN, date); a.balance = round2(bal - holdTotal(a) + trNetAfter(a.id, date));
+      Object.assign(a, { name, date, goal: Math.max(0, parseNum($("a-goal").value)), kind: $("a-kind").value, color: acColor, icon: acIcon });
+    } else {
+      if (rows.length || wasLive) setHold(a, rows, NaN, date);
+      Object.assign(a, { name, balance: isFinite(bal) ? round2(bal + trNetAfter(a.id, date)) : (+a.balance || 0), date, goal: Math.max(0, parseNum($("a-goal").value)), kind: $("a-kind").value, color: acColor, icon: acIcon });
+    }
   }
   closeAcct(); commit(); toast("Compte enregistré.");
 });
@@ -3808,7 +4034,7 @@ $("a-del").addEventListener("click", e => {
 });
 // Choix d'un logo (et d'une couleur) pour une enveloppe, une catégorie d'entrée ou un compte
 let icTarget = null, icSel = "", icCol = "";
-function renderIcColors() { $("ic-colors").innerHTML = ACCT_COLORS.map(c => `<button type="button" data-iccol="${c}" aria-label="Couleur ${c}" aria-pressed="${c.toLowerCase() === icCol.toLowerCase()}" style="background:${c}"></button>`).join("") }
+function renderIcColors() { $("ic-colors").innerHTML = (icTarget?.kind === "env" ? ENV_COLORS : ACCT_COLORS).map(c => `<button type="button" data-iccol="${c}" aria-label="Couleur ${c}" aria-pressed="${c.toLowerCase() === icCol.toLowerCase()}" style="background:${c}"></button>`).join("") }
 function renderIcGrid() {
   const t = icTarget, q = foldTxt($("ic-q").value).trim(), solid = t.kind === "acct";
   const tint = t.kind === "cat" ? "var(--c-rev)" : okColor(icCol) ? icCol : envColor(envById(t.id));
@@ -4787,9 +5013,25 @@ function txApply(t) {
     }
     const fc = S.invest.freeCash, cash = txCash(t);
     if (cash && fc && (!fc.date || t.date > fc.date)) { fc.amount = round2((+fc.amount || 0) + cash); ap.fc = cash }
-  } else if (t.type === "div" || t.type === "int" || t.type === "fee") {
+  } else {
     const a = S.budget.savings.find(x => x.id === t.acct), cash = txCash(t);
-    if (a && cash && (!a.date || t.date > a.date)) { a.balance = round2((+a.balance || 0) + cash); ap.bal = cash }
+    if (a && isTrade(t)) {
+      // Achat ou vente après le dernier état connu du compte : la ligne suit (créée au besoin), le reste du compte paie ou encaisse
+      if (t.date > [a.holdAsOf || "", a.date || ""].sort().at(-1)) {
+        if (!Array.isArray(a.hold)) a.hold = [];
+        const k = txPosKey(t); let h = a.hold.find(x => holdKey(x) === k), created = false;
+        if (!h && t.type === "buy") { h = { id: rid(), name: t.name || t.sym || t.isin, sym: normSym(t.sym), isin: (t.isin || "").toUpperCase(), qty: 0, cost: 0, px: 0 }; a.hold.push(h); created = true }
+        if (h) {
+          const q = Math.abs(+t.qty || 0), u0 = +h.qty || 0; let du, dc;
+          if (t.type === "buy") { du = q; dc = (+t.amount || 0) + (+t.fees || 0) } else { const r = u0 > 1e-9 ? Math.min(1, q / u0) : 0; du = -Math.min(q, u0); dc = -(+h.cost || 0) * r }
+          h.qty = round6(u0 + du); h.cost = round2(Math.max(0, (+h.cost || 0) + dc));
+          if (!h.sym && t.sym) h.sym = normSym(t.sym); if (!h.isin && t.isin) h.isin = t.isin.toUpperCase();
+          a.balance = round2((+a.balance || 0) + cash);
+          Object.assign(ap, { hid: h.id, du, dc, hcreated: created, bal: cash });
+          if (!["titres", "crypto"].includes(a.kind)) a.kind = "titres";
+        }
+      }
+    } else if (a && cash && (!a.date || t.date > a.date)) { a.balance = round2((+a.balance || 0) + cash); ap.bal = cash }
   }
   if (Object.keys(ap).length) t.ap = ap;
 }
@@ -4804,7 +5046,13 @@ function txRevert(t) {
     }
   }
   if (ap.fc) { const fc = S.invest.freeCash; if (fc && (!fc.date || t.date > fc.date)) fc.amount = round2((+fc.amount || 0) - ap.fc) }
-  if (ap.bal) { const a = S.budget.savings.find(x => x.id === t.acct); if (a && (!a.date || t.date > a.date)) a.balance = round2((+a.balance || 0) - ap.bal) }
+  if (ap.hid) {
+    const a = S.budget.savings.find(x => x.id === t.acct), h = a && holdOf(a).find(x => x.id === ap.hid);
+    if (a && h && t.date > [a.holdAsOf || "", a.date || ""].sort().at(-1)) {
+      h.qty = round6(Math.max(0, h.qty - ap.du)); h.cost = round2(Math.max(0, (+h.cost || 0) - ap.dc)); a.balance = round2((+a.balance || 0) - (ap.bal || 0));
+      if (ap.hcreated && !(h.qty > 1e-9)) a.hold = a.hold.filter(x => x !== h);
+    }
+  } else if (ap.bal) { const a = S.budget.savings.find(x => x.id === t.acct); if (a && (!a.date || t.date > a.date)) a.balance = round2((+a.balance || 0) - ap.bal) }
   delete t.ap;
 }
 // Opération propre (nombres, signes, ISIN) ou null si incomplète
@@ -4871,11 +5119,12 @@ function renderTx() {
   $("tx-stats").innerHTML = ops.length ? stat("Plus-values réalisées", T.realized, T.yr.realized) + stat("Dividendes et intérêts", T.div, T.yr.div)
     + stat("Frais", -T.fees, -T.yr.fees) + stat("Versé", T.dep - T.wd, T.yr.dep - T.yr.wd, false) : "";
   // Positions des autres comptes (celles de DEGIRO sont dans les classes plus bas)
-  const pos = L.pos.filter(p => p.acct !== "pf" && p.qty > 1e-9), byAcct = {};
-  pos.forEach(p => (byAcct[p.acct] ||= []).push(p));
+  const byAcct = {};
+  S.budget.savings.filter(a => isLive(a) && (!txF || txF === a.id)).forEach(a => { byAcct[a.id] = holdOf(a).filter(h => h.qty > 1e-9).map(h => ({ acct: a.id, name: h.name, sym: h.sym, isin: h.isin, qty: h.qty, cost: +h.cost || 0, h })) });
+  L.pos.filter(p => p.acct !== "pf" && p.qty > 1e-9 && !byAcct[p.acct]).forEach(p => (byAcct[p.acct] ||= []).push(p));
   $("tx-pos").innerHTML = Object.entries(byAcct).map(([id, list]) => {
-    const rows = list.map(p => { const q = p.sym ? quoteFor({ sym: p.sym }) : null; return { p, q, v: q ? p.qty * q.eur : null } });
-    const tv = rows.reduce((t, r) => t + (r.v ?? r.p.cost), 0);
+    const rows = list.map(p => { const q = p.sym ? quoteFor({ sym: p.sym }) : null, hv = p.h ? holdVal(p.h) : null; return { p, q, v: q ? p.qty * q.eur : hv && hv.v ? hv.v : null } });
+    const a = S.budget.savings.find(x => x.id === id), tv = a && isLive(a) ? acctTotal(a) : rows.reduce((t, r) => t + (r.v ?? r.p.cost), 0);
     return `<div class="mhead"><span>${esc(txAcctName(id))}</span><span class="num">${fmtEUR(tv)}</span></div>` + rows.map(({ p, q, v }) => {
       const g = v === null ? null : v - p.cost;
       return `<div class="exp nod" style="cursor:default"><span class="l"><b>${esc(p.name || p.sym || p.isin)}</b><small>${fmtQty(p.qty)} × PRU ${fmtEUR(p.cost / p.qty)}${q ? ` / cours ${fmtEUR(q.eur)}` : ""}</small></span>
@@ -4915,8 +5164,9 @@ $("tx-panel").addEventListener("click", e => {
   const r = e.target.closest("[data-txid]"); if (r) { const t = S.invest.tx.find(x => x.id === r.dataset.txid); if (t) openTx(t); return }
   const b = e.target.closest("[data-txi]"); if (!b || !txImp) return;
   if (b.dataset.txi === "cancel") { txImp = null; renderTxImp(); $("tx-impnote").textContent = "Import annulé."; return }
-  const res = txAdd(txImp.list), acct = txImp.acct; txImp = null; txF = S.invest.tx.some(t => t.acct !== acct) ? acct : txF; commit();
-  $("tx-impnote").textContent = `${res.add} opération${res.add > 1 ? "s" : ""} ajoutée${res.add > 1 ? "s" : ""} au journal.`;
+  const res = txAdd(txImp.list), acct = txImp.acct; txImp = null; txF = S.invest.tx.some(t => t.acct !== acct) ? acct : txF;
+  const synced = acct !== "pf" && res.add && syncHoldFromLedger(acct); commit();
+  $("tx-impnote").textContent = `${res.add} opération${res.add > 1 ? "s" : ""} ajoutée${res.add > 1 ? "s" : ""} au journal.${synced ? " Lignes du compte suivies au cours de bourse." : ""}`;
 });
 // Relevé CSV ou Excel d'un courtier : colonnes repérées par leur titre (date, type ou description, titre, ISIN, quantité, cours, montant, frais…)
 function txDate(v) {
@@ -5202,12 +5452,12 @@ function applyBudgetRows(rows, res) {
 }
 function gsPortRows(rows) {
   if (!rows.length) return [];
-  const { idx, body } = gsCols(rows, { sym: [/symbole|ticker/, 0], units: [/quantit|nombre|parts/, 1], cost: [/investi|cout|prix de revient/, 2], cls: [/classe/, 3], isin: [/isin/, 4], name: [/^nom|libelle|valeur/, 5] });
+  const { idx, body } = gsCols(rows, { sym: [/symbole|ticker/, 0], units: [/quantit|nombre|parts/, 1], cost: [/investi|cout|prix de revient/, 2], cls: [/classe/, 3], isin: [/isin/, 4], name: [/^nom|libelle|valeur/, 5], acct: [/^compte|courtier/, 99] });
   return body.map(r => {
-    const sym = normSym(r[idx.sym]), name = cell(r, idx.name);
-    if (/^(MARGE|CASH|LIQUID|ESPACE)/.test(sym) || /marge libre|liquidit/.test(foldTxt(name))) { const c = toNum(r[idx.cost]), u = toNum(r[idx.units]); return { cash: true, amount: isFinite(c) && c ? c : u } }
-    return { sym, units: toNum(r[idx.units]), cost: toNum(r[idx.cost]), cls: cell(r, idx.cls), isin: cell(r, idx.isin).toUpperCase(), name };
-  }).filter(r => r.cash ? isFinite(r.amount) : ((r.sym || r.isin) && isFinite(r.units)));
+    const sym = normSym(r[idx.sym]), name = cell(r, idx.name), acct = txAcct(cell(r, idx.acct));
+    if (/^(MARGE|CASH|LIQUID|ESPACE|ESPECE|RESTE)/.test(sym) || /marge libre|liquidit|reste du compte/.test(foldTxt(name))) { const c = toNum(r[idx.cost]), u = toNum(r[idx.units]); return { cash: true, amount: isFinite(c) && c ? c : u, acct } }
+    return { sym, units: toNum(r[idx.units]), cost: toNum(r[idx.cost]), cls: cell(r, idx.cls), isin: cell(r, idx.isin).toUpperCase(), name, acct };
+  }).filter(r => r.acct && (r.cash ? isFinite(r.amount) : ((r.sym || r.isin) && isFinite(r.units))));
 }
 function applyPortRows(rows) {
   rows.forEach(r => {
@@ -5263,7 +5513,7 @@ function applySoldRows(rows) {
     if (/degiro|portefeuille/.test(f)) { look(S.invest.look); return }
     let a = S.budget.savings.find(x => foldTxt(x.name) === f) || S.budget.savings.find(x => { const g = foldTxt(x.name); return g.length >= 3 && f.length >= 3 && (g.includes(f) || f.includes(g)) });
     if (!a) { if (!isFinite(r.balance)) return; const k = r.kind && r.kind !== "courant" ? r.kind : guessKind(r.name) === "courant" ? "epargne" : guessKind(r.name); a = { id: rid(), name: r.name, balance: 0, goal: 0, kind: k, color: KIND_COLOR[k], icon: KIND_ICON[k] }; S.budget.savings.push(a) }
-    if (isFinite(r.balance) && (!a.date || r.date >= a.date)) { a.balance = round2(r.balance + trNetAfter(a.id, r.date)); a.date = r.date }
+    if (isFinite(r.balance) && (!a.date || r.date >= a.date)) { a.balance = round2(r.balance - holdTotal(a) + trNetAfter(a.id, r.date)); a.date = r.date }
     if (r.kind && r.kind !== "courant") a.kind = r.kind;
     look(a);
   });
@@ -5280,7 +5530,13 @@ function gsApply(v) {
     else { planUndo = JSON.stringify(S.budget.envelopes); applyBudgetRows(bRows, res); S.gs.budgetHash = bh; res.budget = true; gsBudgetNote = "Budget mis à jour depuis Google Sheets." }
   }
   const pRows = gsPortRows(v.pf || []), ph = pRows.length ? hashStr(JSON.stringify(pRows)) : "";
-  if (pRows.length && ph !== S.gs.portHash) { applyPortRows(pRows); S.gs.portHash = ph; res.port = pRows.length }
+  if (pRows.length && ph !== S.gs.portHash) {
+    applyPortRows(pRows.filter(r => r.acct === "pf"));
+    const byAcct = {}; pRows.filter(r => r.acct !== "pf").forEach(r => (byAcct[r.acct] ||= []).push(r));
+    Object.entries(byAcct).forEach(([id, rs]) => { const a = S.budget.savings.find(x => x.id === id); if (!a) return; const c = rs.find(r => r.cash);
+      setHold(a, rs.filter(r => !r.cash).map(r => ({ name: r.name, sym: r.sym, isin: r.isin, qty: Math.max(0, r.units), cost: r.cost })), c ? c.amount : NaN) });
+    S.gs.portHash = ph; res.port = pRows.length;
+  }
   const sRows = gsSoldRows(v.so || []), sh = sRows.length ? hashStr(JSON.stringify(sRows)) : "";
   if (sRows.length && sh !== S.gs.soldHash) { applySoldRows(sRows); S.gs.soldHash = sh; res.sold = sRows.length }
   gsTx(v.tx || [], res);   // après le portefeuille et les soldes : une opération plus récente que leur état les met à jour
@@ -5395,16 +5651,21 @@ function gswRows() {
   const cc = ccpEstimate(), co = [["Compte", "Nature", "Solde", "Date du solde", "Objectif", "Note"]];
   co.push(B.ccp ? ["Compte courant", "Compte courant", cc.value, ymd(today), "", `Estimé : solde relevé de ${fmtEUR(+B.ccp.balance || 0)} le ${B.ccp.date}, plus les mouvements et salaires depuis`]
     : ["Compte courant", "Compte courant", "", "", "", "Aucun solde relevé dans l'appli"]);
-  B.savings.forEach(a => co.push([a.name, natureOf(a.kind).name, round2(+a.balance || 0), a.date || "", +a.goal > 0 ? round2(+a.goal) : "", ""]));
+  B.savings.forEach(a => co.push([a.name, natureOf(a.kind).name, acctTotal(a), a.date || "", +a.goal > 0 ? round2(+a.goal) : "", isLive(a) ? `Lignes au cours du moment ${fmtEUR(holdTotal(a))} + reste du compte ${fmtEUR(+a.balance || 0)}` : ""]));
   co.push(["DEGIRO (marge libre)", "Comptes titres & PEA", round2(freeCash()), S.invest.freeCash?.date || "", "", "Non investie"]);
   co.push(["Portefeuille (titres)", "Comptes titres & PEA", round2(grandTotal()), ymd(today), "", quotes.at ? `Cours en direct du ${stamp(quotes.at)}` : "Valeurs saisies ou importées"]);
 
   // Portefeuille, ligne par ligne
-  const pf = [["Classe", "Nom", "Symbole", "ISIN", "Quantité", "Montant investi", "Valeur", "Cours (€)", "Plus-value", "Valeur d'après"]];
+  const pf = [["Classe", "Nom", "Symbole", "ISIN", "Quantité", "Montant investi", "Valeur", "Cours (€)", "Plus-value", "Valeur d'après", "Compte"]];
   CLASSES.forEach(c => P()[c.id].forEach(a => {
     const q = live(a), v = round2(val(a)), cost = +a.cost > 0 ? round2(+a.cost) : "";
-    pf.push([cname(c.id), a.name || "", a.sym || "", a.isin || "", +a.units || 0, cost, v, q ? Math.round(q.eur * 1e4) / 1e4 : "", cost === "" ? "" : round2(v - cost), q ? "Cours en direct" : "Valeur saisie ou importée"]);
+    pf.push([cname(c.id), a.name || "", a.sym || "", a.isin || "", +a.units || 0, cost, v, q ? Math.round(q.eur * 1e4) / 1e4 : "", cost === "" ? "" : round2(v - cost), q ? "Cours en direct" : "Valeur saisie ou importée", "DEGIRO"]);
   }));
+  B.savings.filter(isLive).forEach(a => {
+    holdOf(a).filter(h => h.qty > 1e-9).forEach(h => { const hv = holdVal(h), v = round2(hv.v), cost = +h.cost > 0 ? round2(+h.cost) : "";
+      pf.push(["", h.name || "", h.sym || "", h.isin || "", h.qty, cost, v, hv.eur ? Math.round(hv.eur * 1e4) / 1e4 : "", cost === "" ? "" : round2(v - cost), hv.live ? "Cours en direct" : "Dernier cours connu", a.name]) });
+    pf.push(["", "Reste du compte", "RESTE", "", "", round2(+a.balance || 0), round2(+a.balance || 0), "", "", "Liquidités et lignes non détaillées", a.name]);
+  });
 
   // Disponible du cycle en cours, montant par jour fixé ce matin et reste du jour (calcul d'après le compte courant)
   const snap = S.budget.ccp ? (() => { const T = midnight(new Date()), C = cycleOf(T), st2 = cycleStats(C), m = planCcp(T); return { left: round2(ccpEstimate().value - Math.max(0, savePlanned() - st2.saved) - chargesLeftAt(C, addDays(T, 1))), rate: round2(m.rate), rest: round2(m.rate - flexSpend(T, T)) } })() : null;
@@ -5507,12 +5768,12 @@ function parseQuotesCSV(text) {
   const hi = rows.findIndex(r => r.some(c => /^(symbole|symbol|ticker)$/.test(normH(c))));
   if (hi < 0) return {};
   const H = rows[hi].map(normH), col = re => H.findIndex(h => re.test(h));
-  const iS = col(/^(symbole|symbol|ticker)$/), iP = col(/^(cours|price|prix)$/), iC = col(/^(devise|currency)$/), iI = col(/^isin$/);
+  const iS = col(/^(symbole|symbol|ticker)$/), iP = col(/^(cours|price|prix)$/), iC = col(/^(devise|currency)$/), iI = col(/^isin$/), iN = col(/^(nom|name)$/);
   const out = {};
   for (const r of rows.slice(hi + 1)) {
     const sym = normSym(r[iS]); if (!sym) continue;
     const price = iP >= 0 ? toNum(r[iP]) : NaN, cur = iC >= 0 ? String(r[iC] ?? "").trim().toUpperCase() : "";
-    out[sym] = { price: isFinite(price) && price > 0 ? price : null, cur: /^[A-Z_]{3,9}$/.test(cur) ? cur : curOf(sym), isin: iI >= 0 ? String(r[iI] ?? "").trim().toUpperCase() : "" };
+    out[sym] = { price: isFinite(price) && price > 0 ? price : null, cur: /^[A-Z_]{3,9}$/.test(cur) ? cur : curOf(sym), isin: iI >= 0 ? String(r[iI] ?? "").trim().toUpperCase() : "", name: iN >= 0 ? String(r[iN] ?? "").trim() : "" };
   }
   return out;
 }
@@ -5529,6 +5790,7 @@ async function refreshQuotes() {
     const map = parseQuotesCSV(text);
     if (!Object.keys(map).length) throw new Error("empty");
     quotes = { at: Date.now(), map }; ls.set("fin.quotes", JSON.stringify(quotes)); qErr = "";
+    updateHoldPx(); save();
     if (!fx) qErr = "Taux de change indisponibles : les lignes hors euro gardent leur dernière valeur.";
   } catch (e) {
     qErr = e.message === "html" ? "Le lien ne renvoie pas un fichier CSV : dans Google Sheets, publiez la feuille au format CSV (Fichier › Partager › Publier sur le Web)."
@@ -5539,6 +5801,7 @@ async function refreshQuotes() {
   qBusy = false; $("qrefresh").classList.remove("spin");
   if (view === "invest") { if (document.activeElement?.closest?.("#classes")) renderTotals(); else renderInvest() }
   else if (view === "comptes") updateComptesTotals();
+  else if (view === "bilan" && pjD) { try { pjD = pjData(); drawProj() } catch {} }
   updateDrawer();
   renderQuoteNote(); scheduleHistory(false);
 }
@@ -5556,7 +5819,7 @@ function renderQuoteNote() {
 }
 function sheetTSV() {
   const seen = new Set(), rows = [["Symbole", "Cours", "Devise", "ISIN", "Nom"]];
-  allAssets().filter(a => a.sym).forEach(a => {
+  [...allAssets(), ...S.budget.savings.flatMap(holdOf), ...S.invest.tx].filter(a => a.sym).forEach(a => {
     const s = normSym(a.sym); if (seen.has(s)) return; seen.add(s);
     rows.push([s, `=GOOGLEFINANCE(A${rows.length + 1})`, curOf(s), a.isin || "", String(a.name || "").replace(/[\t\r\n]+/g, " ")]);
   });
